@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     
     # Local apps
+    "market.apps.MarketConfig",
 ]
 
 MIDDLEWARE = [
