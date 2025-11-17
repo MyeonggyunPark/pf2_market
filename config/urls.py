@@ -18,6 +18,9 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("", include("market.urls")),
+    # Route for the Django admin interface
+    path("admin/", admin.site.urls),
+    
+    # Include all django-allauth URLs at the root
+    path("", include("allauth.urls")),
 ]
