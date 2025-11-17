@@ -20,7 +20,8 @@ from django.urls import path, include
 urlpatterns = [
     # Route for the Django admin interface
     path("admin/", admin.site.urls),
-    
+    # Include URLs for the local "market" app at the root path
+    path("", include("market.urls")),
     # Include all django-allauth URLs at the root
     path("", include("allauth.urls")),
 ]
