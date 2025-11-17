@@ -37,37 +37,55 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
+    # Required by django-allauth to tie users to a Site object
+    "django.contrib.sites",
     # Third-party apps
     "django_seed",
     "widget_tweaks",
-    
+    # django-allauth apps
+    # Core allauth functionality
+    "allauth",
+    # Email/password based authentication flows
+    "allauth.account",
+    # Core social account functionality
+    "allauth.socialaccount",
+    # Provider-specific apps for social login
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.github",
+    "allauth.socialaccount.providers.kakao",
+    "allauth.socialaccount.providers.naver",
     # Local apps
     "market.apps.MarketConfig",
 ]
 
+# Sites framework: required by django-allauth
+# Make sure a Site with this ID exists in the database (see django.contrib.sites in the admin).
+SITE_ID = 1
+
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Add the account middleware:
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
@@ -131,3 +149,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Instruct Django to use the custom User model defined in market/models.py
 AUTH_USER_MODEL = "market.User"
+
+# Tell Django which authentication backends to use.
+# Keep the ModelBackend for Django admin and use the allauth backend for account/social logins.
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Redirect URLs used after login/logout (works for both account and social logins)
+# Where to send the user after a successful login
+LOGIN_REDIRECT_URL = "/"  
+# Where to send the user after a successful logout
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"  
+
+# Use the console email backend so all emails are printed to the terminal instead of being sent
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
