@@ -161,10 +161,21 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Redirect URLs used after login/logout (works for both account and social logins)
-# Where to send the user after a successful login
-LOGIN_REDIRECT_URL = "home"  
-# Where to send the user after a successful logout
-ACCOUNT_LOGOUT_REDIRECT_URL = "home"  
+
+# URL name to redirect to after a successful login
+# This resolves to the "home" view defined in market/urls.py
+LOGIN_REDIRECT_URL = "home"
+
+# URL name to redirect to after a successful logout
+# Used by django-allauth when a user logs out
+ACCOUNT_LOGOUT_REDIRECT_URL = "home"
+
+# Explicitly tell django-allauth to use the same redirect target after login
+# (defaults to LOGIN_REDIRECT_URL, but we set it here for clarity)
+ACCOUNT_LOGIN_REDIRECT_URL = "home"
+
+# Immediately log the user out on GET /accounts/logout/ without showing a confirmation page
+ACCOUNT_LOGOUT_ON_GET = True
 
 # Use the console email backend so all emails are printed to the terminal instead of being sent
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
