@@ -162,9 +162,9 @@ AUTHENTICATION_BACKENDS = [
 
 # Redirect URLs used after login/logout (works for both account and social logins)
 # Where to send the user after a successful login
-LOGIN_REDIRECT_URL = "/"  
+LOGIN_REDIRECT_URL = "home"  
 # Where to send the user after a successful logout
-ACCOUNT_LOGOUT_REDIRECT_URL = "/"  
+ACCOUNT_LOGOUT_REDIRECT_URL = "home"  
 
 # Use the console email backend so all emails are printed to the terminal instead of being sent
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
