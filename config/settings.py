@@ -177,5 +177,17 @@ ACCOUNT_LOGIN_REDIRECT_URL = "home"
 # Immediately log the user out on GET /accounts/logout/ without showing a confirmation page
 ACCOUNT_LOGOUT_ON_GET = True
 
+# Use email address as the primary credential for login instead of username
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+
+# Require users to provide a valid email address during signup
+ACCOUNT_EMAIL_REQUIRED = True
+
+# Do not require a username field; users authenticate only with their email
+ACCOUNT_USERNAME_REQUIRED = False
+
+# Keep users logged in across browser sessions when "remember me" is used
+ACCOUNT_SESSION_REMEMBER = True
+
 # Use the console email backend so all emails are printed to the terminal instead of being sent
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
