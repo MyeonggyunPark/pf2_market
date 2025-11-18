@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     # Third-party apps
     "django_seed",
     "widget_tweaks",
+    # Local apps
+    "market.apps.MarketConfig",
     # django-allauth apps
     # Core allauth functionality
     "allauth",
@@ -54,8 +56,6 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.github",
     "allauth.socialaccount.providers.kakao",
     "allauth.socialaccount.providers.naver",
-    # Local apps
-    "market.apps.MarketConfig",
 ]
 
 # Sites framework: required by django-allauth
