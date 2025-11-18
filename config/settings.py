@@ -110,19 +110,14 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        # Still prevent passwords that are too similar to user attributes (e.g. email, username)
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        # Custom complexity rules: length, upper/lowercase letters, digits, special chars
+        "NAME": "market.validators.CustomPasswordValidator",
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -196,6 +191,11 @@ ACCOUNT_FORMS = {
 
 # Keep users logged in across browser sessions when "remember me" is used
 ACCOUNT_SESSION_REMEMBER = True
+
+# Keep the previously entered password value in the input field
+# when the form is re-rendered (e.g., after validation errors).
+# By default, password fields are cleared for security reasons.
+ACCOUNT_PASSWORD_INPUT_RENDER_VALUE = True
 
 # Use the console email backend so all emails are printed to the terminal instead of being sent
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

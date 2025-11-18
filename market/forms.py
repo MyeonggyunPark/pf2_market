@@ -20,6 +20,29 @@ class CustomSignupForm(SignupForm):
     # Required address field displayed on the signup page
     address = forms.CharField(max_length=40, required=True, label="Address")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remove all help text from password fields
+        if "password1" in self.fields:
+            self.fields["password1"].help_text = ""
+        if "password2" in self.fields:
+            self.fields["password2"].help_text = ""
+
+    def clean_nickname(self):
+        """
+        Validate that the nickname is unique before saving the user.
+        This replicates what a ModelForm would normally do for a unique field.
+        """
+        # Get the nickname value that was submitted in the form
+        nickname = self.cleaned_data.get("nickname")
+
+        # Check if any existing user already has this nickname
+        if User.objects.filter(nickname=nickname).exists():
+            # Raise a validation error that will be shown on the form field
+            raise forms.ValidationError("This nickname is already taken.")
+
+        # Return the validated nickname value
+        return nickname
 
     def save(self, request):
         """

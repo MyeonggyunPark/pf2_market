@@ -3,12 +3,21 @@ from django.db import models
 # Reusable base class for a fully featured User model
 from django.contrib.auth.models import AbstractUser
 
+# Import the field-level validator from validators.py
+from .validators import validate_no_special_characters
+
+
 
 # Custom user model extending Django's default AbstractUser
 class User(AbstractUser):
 
     # Custom optional unique nickname field for each user
-    nickname = models.CharField(max_length=15, unique=True, null=True)
+    nickname = models.CharField(
+        max_length=15, 
+        unique=True, 
+        null=True,
+        validators=[validate_no_special_characters]    
+    )
 
     # Optional address field for each user
     address = models.CharField(max_length=50, null=True)
