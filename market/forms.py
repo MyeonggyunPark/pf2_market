@@ -11,31 +11,32 @@ from .models import User
 class CustomSignupForm(SignupForm):
     """
     Custom signup form extending django-allauth's SignupForm.
-    Adds a 'nickname' field and stores it on the custom User model.
+    Adds a 'nickname' and 'address' field and stores it on the custom User model.
     """
 
-    # Extra field displayed on the signup page (optional nickname for each user)
-    nickname = forms.CharField(
-        max_length=15,
-        required=False,
-        label="Nickname",
-    )
+    # Extra optional nickname displayed on the signup page
+    nickname = forms.CharField(max_length=15, required=False, label="Nickname")
+
+    # Required address field displayed on the signup page
+    address = forms.CharField(max_length=40, required=True, label="Address")
+
 
     def save(self, request):
         """
         Called by django-allauth when the signup form is submitted and valid.
-        Creates the user via the parent class, then attaches 'nickname'.
+        Creates the user via the parent class, then attaches 'nickname' and 'address'.
         """
         # First let allauth create the user object (email, password, etc.)
         user = super().save(request)
 
-        # Safely get the nickname value from the cleaned form data
+        # Safely get the values from the cleaned form data
         nickname = self.cleaned_data.get("nickname")
+        address = self.cleaned_data.get("address")
 
-        # Only update and save the user if a nickname was provided
-        if nickname:
-            user.nickname = nickname
-            user.save()
+        # Attach nickname and address to the user instance
+        user.nickname = nickname  # nickname may be None/empty if not provided
+        user.address = address    # address is required, so this should always be set
+        user.save()
 
         # Return the user instance to allauth's signup flow
         return user

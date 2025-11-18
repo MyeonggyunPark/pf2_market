@@ -18,7 +18,11 @@
 
   {% if user.is_authenticated %}
     <p>Hello! <strong>{{ user.nickname }}</strong></p>
-  {% else %}
+    <br>
+    <p>Your Info</p>
+    <p>Nickname - {{ user.nickname }}</p>
+    <p>Address - {{ user.address }}</p>
+  {% else %}`
     <p>Welcome, guest!</p>
   {% endif %}
 
