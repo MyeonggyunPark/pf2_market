@@ -10,5 +10,8 @@ class User(AbstractUser):
     # Custom optional unique nickname field for each user
     nickname = models.CharField(max_length=15, unique=True, null=True)
 
+    # Optional address field for each user
+    address = models.CharField(max_length=50, null=True)
+
     def __str__(self):
         return self.email
