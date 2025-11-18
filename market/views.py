@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse
 from allauth.account.views import PasswordChangeView
 
 
@@ -20,4 +20,4 @@ class CustomPasswordChangeView(PasswordChangeView):
         Return the URL to redirect to after a successful password change.
         Uses reverse_lazy so the URL is resolved only when needed.
         """
-        return reverse_lazy("home")
+        return reverse("home")
