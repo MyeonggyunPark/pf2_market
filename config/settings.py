@@ -175,7 +175,7 @@ ACCOUNT_LOGOUT_ON_GET = True
 # Use email as the only login method (replacement for ACCOUNT_AUTHENTICATION_METHOD)
 ACCOUNT_LOGIN_METHODS = {"email"}
 
-# Define required signup fields 
+# Define required signup fields
 # (replacement for ACCOUNT_EMAIL_REQUIRED and ACCOUNT_USERNAME_REQUIRED)
 # '*' marks the field as required.
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
@@ -195,6 +195,18 @@ ACCOUNT_SESSION_REMEMBER = True
 # when the form is re-rendered (e.g., after validation errors).
 # By default, password fields are cleared for security reasons.
 ACCOUNT_PASSWORD_INPUT_RENDER_VALUE = True
+
+# Require users to verify their email address before the account is fully active
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+
+# Confirm the email as soon as the confirmation link is opened (GET request)
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+
+# Where to redirect an authenticated user after confirming their email
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = ("account_email_confirmation_done")
+
+# Where to redirect an anonymous user after confirming their email
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "account_email_confirmation_done"
 
 # Use the console email backend so all emails are printed to the terminal instead of being sent
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

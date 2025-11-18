@@ -16,12 +16,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
 
 urlpatterns = [
     # Route for the Django admin interface
     path("admin/", admin.site.urls),
+    
+    
     # Include URLs for the local "market" app at the root path
     path("", include("market.urls")),
-    # Include all django-allauth URLs at the root
+    
+    
+    # Route shown after a successful email confirmation
+    path(
+        "email-confirmation-done/",
+        TemplateView.as_view(template_name="market/email_confirmation_done.html"),
+        name="account_email_confirmation_done",
+    ),
+    
+    # Include all django-allauth authentication URLs
     path("", include("allauth.urls")),
 ]
