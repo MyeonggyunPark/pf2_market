@@ -17,7 +17,7 @@
   <h1>Welcome to Podo Market</h1>
 
   {% if user.is_authenticated %}
-    <p>Hello! <strong>{{ user }}</strong></p>
+    <p>Hello! <strong>{{ user.nickname }}</strong></p>
   {% else %}
     <p>Welcome, guest!</p>
   {% endif %}
