@@ -186,6 +186,14 @@ ACCOUNT_EMAIL_REQUIRED = True
 # Do not require a username field; users authenticate only with their email
 ACCOUNT_USERNAME_REQUIRED = False
 
+# Tell django-allauth to use a custom signup form instead of the default one
+# The string value must be the full Python path to the custom form class
+ACCOUNT_FORMS = {
+    # Custom signup form that extends allauth's SignupForm
+    # and adds support for the "nickname" field on the User model
+    "signup": "market.forms.CustomSignupForm",
+}
+
 # Keep users logged in across browser sessions when "remember me" is used
 ACCOUNT_SESSION_REMEMBER = True
 
