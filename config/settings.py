@@ -172,14 +172,13 @@ ACCOUNT_LOGIN_REDIRECT_URL = "home"
 # Immediately log the user out on GET /accounts/logout/ without showing a confirmation page
 ACCOUNT_LOGOUT_ON_GET = True
 
-# Use email address as the primary credential for login instead of username
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+# Use email as the only login method (replacement for ACCOUNT_AUTHENTICATION_METHOD)
+ACCOUNT_LOGIN_METHODS = {"email"}
 
-# Require users to provide a valid email address during signup
-ACCOUNT_EMAIL_REQUIRED = True
-
-# Do not require a username field; users authenticate only with their email
-ACCOUNT_USERNAME_REQUIRED = False
+# Define required signup fields 
+# (replacement for ACCOUNT_EMAIL_REQUIRED and ACCOUNT_USERNAME_REQUIRED)
+# '*' marks the field as required.
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
 # Tell django-allauth to use a custom signup form instead of the default one
 # The string value must be the full Python path to the custom form class
