@@ -7,4 +7,6 @@ from django.contrib.auth.models import AbstractUser
 
 # Custom user model extending Django's default AbstractUser
 class User(AbstractUser):
-    pass
+    
+    def __str__(self):
+        return self.email
