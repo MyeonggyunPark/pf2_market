@@ -22,6 +22,7 @@
     <p>Your Info</p>
     <p>Nickname - {{ user.nickname }}</p>
     <p>Address - {{ user.address }}</p>
+    <a href="{% url 'account_password_change' %}">Password Change</a>
   {% else %}`
     <p>Welcome, guest!</p>
   {% endif %}
