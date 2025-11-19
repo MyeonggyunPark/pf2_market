@@ -15,7 +15,7 @@ class CustomSignupForm(SignupForm):
     """
 
     # Extra optional nickname displayed on the signup page
-    nickname = forms.CharField(max_length=15, required=False, label="Nickname")
+    nickname = forms.CharField(max_length=15, required=True, label="Nickname")
 
     # Required address field displayed on the signup page
     address = forms.CharField(max_length=40, required=True, label="Address")
