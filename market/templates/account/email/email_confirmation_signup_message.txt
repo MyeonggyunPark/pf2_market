@@ -1,0 +1,12 @@
+Hello {{ user.nickname }},
+
+Thank you for using Podo Market!
+
+To use our services normally, you need to verify your email address.
+Please verify your email by clicking the link below:
+
+{{ activate_url }}
+
+Thank you.
+
+Podo Market
