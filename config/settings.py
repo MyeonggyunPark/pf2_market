@@ -202,6 +202,9 @@ ACCOUNT_EMAIL_VERIFICATION = "optional"
 # Confirm the email as soon as the confirmation link is opened (GET request)
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
+# Automatically start the social login flow on GET (skip the intermediate confirmation page)
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 # Where to redirect an authenticated user after confirming their email
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = ("account_email_confirmation_done")
 
