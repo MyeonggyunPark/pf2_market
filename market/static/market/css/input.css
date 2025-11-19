@@ -1,1 +1,252 @@
+@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
+
 @import "tailwindcss";
+
+/* Tailwind 테마 정의 */
+@theme {
+  /* main text color */
+  --color-text-main: #2f2c28;
+
+  --color-border-default: #979797;
+  --color-border-light: #e3e1dc;
+
+  /* for layout */
+  --size-max-post-width: 880px;
+  --size-max-content-width: 1060px;
+
+  /* for background */
+  --color-body-bg: #fafafa;
+  --color-site-header-bg: #ffffff;
+  --color-site-body-border-top: #883ff9;
+  --color-site-header-border-bottom: #d9d9d9;
+  --color-site-header-user-menu-hover: #7644c3;
+  --color-site-header-guest-menu: #d9d9d9;
+  --color-site-footer-text: #adaab0;
+  --color-site-footer-bg: #f2f2f2;
+
+  /* for post */
+  --color-post-list-meta: #706e6c;
+  --color-post-list-pagination: #ffffff;
+  --color-post-list-pagination-bg: #7644c3;
+  --color-post-detail-date: #706e6c;
+  --color-post-sold: #b9b7ba;
+  --color-profile-pic-placeholder: #f3f3f3;
+  --color-post-status: #ffffff;
+  --color-post-status-bg: #b9b7ba;
+
+  --color-link: #7644c3;
+  --color-button-fg: #fff;
+  --color-button-bg: #7644c3;
+  --color-button-decoration: #4eda7d;
+  --color-button-hover-bg: #9264d8;
+  --color-button-hover-decoration: #89efab;
+  --color-button-negative-bg: #d62f50;
+  --color-button-negative-hover-fg: #fcd3d3;
+  --color-button-secondary-bg: #b9b7ba;
+  --color-button-secondary-hover-fg: #e0e0e0;
+  --color-button-purple-fg: #552899;
+  --color-button-purple-bg: #e4d4fa;
+  --color-button-darkpurple-bg: #552899;
+  --color-button-darkgray-bg: #c6c6cc;
+
+  --color-input-bg: #f3f3f3;
+  --color-input-placeholder: #8a95a0;
+  --color-input-focus-bg: #f5f0fc;
+  --color-input-focus-border: #7644c3;
+  --color-input-error-fg: #e6584e;
+  --color-input-error-bg: #fcf1f0;
+  --color-input-error-border: #d62f50;
+
+  --color-chip-primary-fg: #7644c3;
+  --color-chip-primary-bg: #f5f0fc;
+  --color-chip-primary-border: #7644c3;
+  --color-chip-border: #d9d9d9;
+
+  --color-card-bg: #fff;
+
+  --color-box-border: #e3e1dc;
+  --color-box-gray-bg: #f3f3f3;
+
+  --color-noti-bg: #f4f3f6;
+  --color-noti-purple-fg: #552899;
+  --color-noti-purple-bg: #f5f0fc;
+
+  --color-links-divider: #979797;
+
+  --transition-background-and-color: background-color 0.2s ease, color 0.2s ease;
+}
+
+@layer base {
+  .with-background {
+    background-image:
+      url('../assets/bg-left.svg'),
+      url('../assets/bg-right.svg');
+    background-position:
+      top 333px left 0,
+      top 109px right 0;
+    background-repeat: no-repeat;
+    background-size:
+      230px,
+      211px;
+  }
+}
+
+@layer components {
+  .user-menu-dot:hover::after {
+    content: ' ';
+    width: 5px;
+    height: 5px;
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    background-color: #7644c3;
+    border-radius: 9999px;
+  }
+}
+
+@layer components {
+  .podo-chip {
+    @apply inline-block rounded-full border px-[18px] py-[5px] text-[17px] leading-[25px];
+    border-color: var(--color-chip-border);
+  }
+}
+
+@layer components {
+
+  /* ====== podo-input ====== */
+  .podo-input {
+    @apply w-full rounded-[27px] border border-transparent outline-none;
+    @apply text-[17px] leading-[17px] px-[29px] py-[17px];
+    @apply bg-input-bg;
+    /* --color-input-bg → bg-input-bg */
+  }
+
+  .podo-input input {
+    @apply text-[17px];
+  }
+
+  textarea.podo-input {
+    @apply resize-none;
+    line-height: 2;
+  }
+
+  .podo-input:focus {
+    @apply border-input-focus-border bg-input-focus-bg transition-colors;
+    /* transition-colors는 bg/border 색 변경에 대한 트랜지션 */
+  }
+
+  /* placeholder 색 – Tailwind 유틸 대신 직접 지정 */
+  .podo-input::placeholder {
+    color: var(--color-input-placeholder);
+  }
+
+  /* 에러 상태 */
+  .podo-input.error {
+    @apply pr-[46px] border border-input-error-border bg-input-error-bg;
+    background-position: top 50% right 13px;
+    background-image: url('../icons/ic-error.svg');
+    background-size: 29px;
+    background-repeat: no-repeat;
+  }
+
+}
+
+@layer components {
+  /* ====== podo-button ====== */
+
+  a.podo-button {
+    @apply inline-block text-center no-underline;
+  }
+
+  .podo-button {
+    @apply relative rounded-full cursor-pointer font-medium border-0;
+    @apply bg-button-bg text-button-fg transition-colors;
+  }
+
+  .podo-button:hover {
+    @apply bg-button-hover-bg;
+  }
+
+  /* primary 버튼의 꼬리 장식 (::after) */
+  .podo-button.primary::after {
+    content: ' ';
+    position: absolute;
+    left: calc(100% - 20px);
+    top: 50%;
+    bottom: 0;
+    right: 0;
+    background-color: var(--color-button-decoration);
+    border-radius: 100% 0% 100% 0% / 100% 0% 100% 0%;
+    transition: var(--transition-background-and-color);
+  }
+
+  .podo-button.primary.large::after {
+    left: calc(100% - 30px);
+  }
+
+  .podo-button:hover::after,
+  .podo-button.primary:hover::after {
+    background-color: var(--color-button-hover-decoration);
+  }
+
+  .podo-button.negative::after,
+  .podo-button.secondary::after {
+    display: none;
+  }
+
+  .podo-button.negative {
+    @apply bg-button-negative-bg;
+  }
+
+  .podo-button.negative:hover {
+    color: var(--color-button-negative-hover-fg);
+  }
+
+  .podo-button.secondary {
+    @apply bg-button-secondary-bg;
+  }
+
+  .podo-button.secondary:hover {
+    color: var(--color-button-secondary-hover-fg);
+  }
+
+  /* 크기별 */
+  .podo-button.small {
+    @apply px-[18px] py-[8px] text-[16px] leading-[16px];
+  }
+
+  .podo-button,
+  .podo-button.medium {
+    @apply p-[14px] text-[17px] leading-[17px];
+  }
+
+  .podo-button.large {
+    @apply px-[27px] py-[18px] text-[21px] leading-[21px];
+  }
+
+  /* 색 변형 */
+  .podo-button.purple {
+    @apply px-[21px] py-[8px];
+    color: var(--color-button-purple-fg);
+    background-color: var(--color-button-purple-bg);
+  }
+
+  .podo-button.darkpurple,
+  .podo-button.darkgray {
+    @apply px-[31px] py-[13px];
+  }
+
+  .podo-button.darkpurple {
+    background-color: var(--color-button-darkpurple-bg);
+  }
+
+  .podo-button.darkgray {
+    background-color: var(--color-button-darkgray-bg);
+  }
+
+  .podo-links {
+    @apply flex items-center m-0 p-0 list-none text-[15px];
+    letter-spacing: -0.26px;
+  }
+}
+

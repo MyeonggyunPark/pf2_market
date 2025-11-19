@@ -1,0 +1,43 @@
+{% extends "market_base/base.html" %}
+
+{% load static %}
+
+{% block body_class %}{{ block.super }} border-t-[8px] border-t-site-body-border-top{% endblock %}
+
+{% block header %}
+<header class="pt-[22px] pb-[26px] border-b border-b-site-header-border-bottom bg-site-header-bg">
+  <a class="block w-min mx-auto" href="#">
+    <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket">
+  </a>
+  <nav>
+    <ul class="flex justify-center list-none mt-[26px] m-0 p-0">
+      {% if user.is_authenticated %}
+        <li class="mr-[54px] last:mr-0 leading-[25px]">
+          <a href="#" class="user-menu-dot hover:font-bold hover:text-site-header-user-menu-hover hover:no-underline relative">
+            Logout
+          </a>
+        </li>
+      {% else %}
+        <li class="mr-[18px] last:mr-0">
+          <a class="podo-chip" href="#">
+            Login
+          </a>
+        </li>
+        <li class="mr-[18px] last:mr-0">
+          <a class="podo-chip" href="#">
+            Signup
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</header>
+{% endblock header %}
+
+{% block footer %}
+<footer class="py-[26px] bg-site-footer-bg">
+  <div class="max-w-[1060px] min-h-6 mx-auto font-bold text-right text-site-footer-text">
+    <span>PODOMARKET</span>
+  </div>
+</footer>
+{% endblock footer %}

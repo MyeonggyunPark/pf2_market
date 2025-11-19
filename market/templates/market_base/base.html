@@ -1,0 +1,28 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'market/dist/output.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'market/favicon/favicon.ico' %}">
+
+    <title>{% block title %}Podo-Market{% endblock title %}</title>
+  </head>
+  <body class="{% block body_class %}flex min-h-screen flex-col m-0 text-[17px] text-text-main bg-body-bg break-keep{% endblock %}">
+
+    {% block header %}
+    {% endblock header %}
+
+    <main class="flex-1">
+      {% block content %}
+      {% endblock content %}
+    </main>
+    
+    {% block footer %}
+    {% endblock footer %}
+  
+  </body>
+</html>
