@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.urls import reverse
+
 from allauth.account.views import PasswordChangeView
 
+from .models import PostItem
+from django.views.generic import ListView
 
-def index(request):
-    """
-    Simple view that renders the main index page of the 'market' app.
-    """
-    return render(request, "market/index.html")
+
 
 class CustomPasswordChangeView(PasswordChangeView):
     """
@@ -21,3 +20,30 @@ class CustomPasswordChangeView(PasswordChangeView):
         Uses reverse_lazy so the URL is resolved only when needed.
         """
         return reverse("home")
+
+
+class IndexView(ListView):
+    """
+    Class-based list view that renders the main home page for the market.
+
+    - Uses PostItem as the underlying model.
+    - Renders the 'market/index.html' template.
+    - Exposes the object list in the template as 'items'.
+    - Paginates the list, showing 4 items per page.
+    - Orders items by creation date in descending order (newest first).
+    """
+
+    # The model providing the queryset for this list view
+    model = PostItem
+
+    # Template used to render the list of items
+    template_name = "market/index.html"
+
+    # Context variable name used in the template to access the object list
+    context_object_name = "items"
+
+    # Number of items displayed per page
+    paginate_by = 8
+
+    # Default ordering for the queryset (most recently created items first)
+    ordering = ["-dt_created"]

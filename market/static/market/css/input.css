@@ -278,3 +278,9 @@
   }
 }
 
+@layer components {
+  .podo-card {
+    @apply rounded-2xl bg-card-bg shadow-[0_0_14px_rgba(219,221,223,0.79)];
+  }
+
+}
