@@ -1,0 +1,13 @@
+{% extends "market_base/base_with_header.html" %}
+
+{% block content %}
+<div class="flex items-center justify-between w-full max-w-[750px] mx-auto my-[38px] text-[20px] leading-[34px] rounded-[60px]
+          bg-noti-purple-bg text-noti-purple-fg px-12 py-[30px]">
+  <p>Your email has been successfully verified. Thank you.</p>
+  {% if user.is_authenticated %}
+    <a class="podo-button darkpurple ml-[25px] whitespace-nowrap hover:bg-button-hover-bg" href="{% url 'home' %}">Go to Home</a>
+  {% else %}
+    <a class="podo-button darkpurple ml-[25px] whitespace-nowrap hover:bg-button-hover-bg" href="{% url 'account_login' %}">Log in</a>
+  {% endif %}
+</div>
+{% endblock content %}
