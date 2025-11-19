@@ -19,7 +19,7 @@ class CustomUserAdmin(BaseUserAdmin):
     # Extend the default fieldsets to show the custom "nickname" and "address" field
     # in the change form (edit existing user in the admin)
     fieldsets = BaseUserAdmin.fieldsets + (
-        ("Custom Fields", {"fields": ("nickname", "address")}),
+        ("Custom Fields", {"fields": ("nickname", "address", "city")}),
     )
 
     # Extend the add_fieldsets to include the custom "nickname" and "address" field
@@ -29,7 +29,7 @@ class CustomUserAdmin(BaseUserAdmin):
             "Custom Fields",
             {
                 "classes": ("wide",),
-                "fields": ("nickname", "address"),
+                "fields": ("nickname", "address", "city"),
             },
         ),
     )

@@ -20,6 +20,9 @@ class CustomSignupForm(SignupForm):
     # Required address field displayed on the signup page
     address = forms.CharField(max_length=40, required=True, label="Address")
 
+    # Required city field displayed on the signup page
+    city = forms.CharField(max_length=40, required=True, label="City")
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Remove all help text from password fields
@@ -47,7 +50,7 @@ class CustomSignupForm(SignupForm):
     def save(self, request):
         """
         Called by django-allauth when the signup form is submitted and valid.
-        Creates the user via the parent class, then attaches 'nickname' and 'address'.
+        Creates the user via the parent class, then attaches 'nickname' and 'address' and 'city'.
         """
         # First let allauth create the user object (email, password, etc.)
         user = super().save(request)
@@ -55,10 +58,12 @@ class CustomSignupForm(SignupForm):
         # Safely get the values from the cleaned form data
         nickname = self.cleaned_data.get("nickname")
         address = self.cleaned_data.get("address")
+        city = self.cleaned_data.get("city")
 
         # Attach nickname and address to the user instance
-        user.nickname = nickname  # nickname may be None/empty if not provided
-        user.address = address    # address is required, so this should always be set
+        user.nickname = nickname 
+        user.address = address    
+        user.city = city
         user.save()
 
         # Return the user instance to allauth's signup flow
