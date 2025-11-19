@@ -1,79 +1,97 @@
 {% extends "market_base/base_with_navbar.html" %}
+{% comment %} Use the shared base layout with navbar for the main market index page {% endcomment %}
 
 {% load static %}
 {% load humanize %}
 
+{% comment %} Main content {% endcomment %}
 {% block content %}
+
 <div class="w-full max-w-[1060px] mx-auto mt-[90px] mb-[260px]">
 
-  {# Header: title + write button #}
-  <div class="flex justify-between items-center mb-15 ml-5">
-    <h2 class="text-[24px] font-semibold">중고 상품</h2>
+  {% comment %} Header section: page title and "write post" button {% endcomment %}
+  <div class="flex justify-between items-center mb-15 px-5">
 
+    {% comment %} Page title {% endcomment %}
+    <h2 class="text-[24px] font-semibold">All Items</h2>
+
+    {% comment %} Link to the "create new post" page {% endcomment %}
     <a href="#"
       class="flex items-center text-[20px] font-medium text-text-main hover:text-link transition-colors">
       <img class="w-[29px] h-[29px] mr-1.5" src="{% static 'market/icons/ic-pen.svg' %}" alt="pen icon">
-      <span>글쓰기</span>
+      <span>Create</span>
     </a>
   </div>
 
-  {# Post list grid #}
+  {% comment %} item cards {% endcomment %}
   <div class="grid grid-cols-4 gap-x-5 gap-y-[30px]">
 
     {% for item in items %}
     <div class="podo-card flex flex-col p-3.5 bg-gray-100">
 
-      {# Thumbnail #}
+      {% comment %} Thumbnail image for the item {% endcomment %}
       <img class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]" src="{{ item.item_image1.url }}" alt="thumbnail">
 
-      {# Content area #}
+      {% comment %} Content area: title, price, meta info, and details button {% endcomment %}
       <div class="flex flex-col grow mx-[11px]">
 
-        {# Title (two-line clamp) #}
+        {% comment %} Item title {% endcomment %}
         <h2 class="font-normal text-[18px] leading-[22px] h-11 overflow-hidden text-ellipsis line-clamp-2">
           {{ item.item_title }}
         </h2>
 
-        {# Price #}
+        {% comment %} Price section {% endcomment %}
         <div class="flex items-center h-[30px] my-[19px]">
           <span class="text-[20px] font-bold truncate">
-            {{ item.item_price|intcomma }}
+            &euro;&nbsp;{{ item.item_price|intcomma }}
           </span>
         </div>
 
-        {# Date + Address #}
+        {% comment %} Meta information: creation date and seller city {% endcomment %}
         <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
-          {{ item.dt_created|date:"d.m.Y" }} | {{ item.item_author.address }}
+          {{ item.item_author.city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ item.dt_created|date:"d.m.Y" }} 
         </div>
 
-        {# Button #}
+        {% comment %} Button to view item details {% endcomment %}
         <a href="#" class="podo-button primary block mt-[22px] mb-4">
           View Details
         </a>
 
       </div>
     </div>
+
+    {% comment %} Fallback message shown when there are no items to display {% endcomment %}
     {% empty %}
       <p class="col-span-4 text-center text-[20px] font-bold my-[120px]">
-        판매중인 상품이 없습니다.
+        There are no items for sale.
       </p>
     {% endfor %}
 
   </div>
 
-  {# Pagination #}
+  {% comment %} Pagination controls: only render if the queryset is paginated {% endcomment %}
   {% if is_paginated %}
   <ul class="flex justify-center items-center list-none mt-[50px] p-0">
 
+    {% comment %} "First" and "Previous" links when there is a previous page {% endcomment %}
     {% if page_obj.has_previous %}
       <li class="mr-5">
-        <a href="?page=1" class="hover:underline">처음</a>
+        <a href="?page=1"
+          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg"
+          aria-label="Go to first page">
+          «
+        </a>
       </li>
       <li class="mr-5">
-        <a href="?page={{ page_obj.previous_page_number }}" class="hover:underline">이전</a>
+        <a href="?page={{ page_obj.previous_page_number }}"
+          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg"
+          aria-label="Go to previous page">
+          ‹
+        </a>
       </li>
     {% endif %}
-
+    
+    {% comment %} Page number links: show current page and a small range around it {% endcomment %}
     {% for num in page_obj.paginator.page_range %}
       {% if page_obj.number == num %}
         <li class="mr-5 px-[15px] py-[9px] rounded-full font-bold text-post-list-pagination bg-post-list-pagination-bg">
@@ -85,13 +103,20 @@
         </li>
       {% endif %}
     {% endfor %}
-
+    
+    {% comment %} "Next" and "Last" links when there is a next page {% endcomment %}
     {% if page_obj.has_next %}
       <li class="mr-5">
-        <a href="?page={{ page_obj.next_page_number }}" class="hover:underline">다음</a>
+        <a href="?page={{ page_obj.next_page_number }}"
+          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg" aria-label="Go to next page">
+          ›
+        </a>
       </li>
       <li>
-        <a href="?page={{ page_obj.paginator.num_pages }}" class="hover:underline">마지막</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}"
+          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg" aria-label="Go to last page">
+          »
+        </a>
       </li>
     {% endif %}
   </ul>
