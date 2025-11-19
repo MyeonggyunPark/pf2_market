@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     # Required by django-allauth to tie users to a Site object
     "django.contrib.sites",
     # Third-party apps
