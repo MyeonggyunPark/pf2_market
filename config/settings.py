@@ -211,6 +211,9 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = ("account_email_confirma
 # Where to redirect an anonymous user after confirming their email
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "account_email_confirmation_done"
 
+# Remove the default subject prefix from all django-allauth emails
+ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
+
 # Number of days a password reset link remains valid before it expires
 PASSWORD_RESET_TIMEOUT_DAYS = 1
 
