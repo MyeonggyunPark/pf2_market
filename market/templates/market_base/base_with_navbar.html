@@ -9,9 +9,9 @@
 {% comment %} header area {% endcomment %}
 {% block header %}
 
-<header class="pt-[22px] pb-[26px] border-b border-b-site-header-border-bottom bg-site-header-bg">
-  <a class="block w-min mx-auto" href="{% url 'home' %}">
-    <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket">
+<header class="flex flex-col items-center pt-[22px] pb-[26px] border-b border-b-site-header-border-bottom bg-site-header-bg">
+  <a class="" href="{% url 'home' %}">
+    <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket" class="w-[104px] h-[57px] mx-auto">
   </a>
 
   {% comment %} Show logout when the user is authenticated, otherwise show login/signup buttons {% endcomment %}
@@ -19,18 +19,19 @@
     <ul class="flex justify-center list-none mt-[26px] m-0 p-0">
       {% if user.is_authenticated %}
         <li class="mr-[54px] last:mr-0 leading-[25px]">
-          <a href="#" class="user-menu-dot hover:font-bold hover:text-site-header-user-menu-hover hover:no-underline relative">
+          <a href="{% url 'account_logout'%}" 
+            class="user-menu-dot hover:font-bold hover:text-site-header-user-menu-hover hover:no-underline relative">
             Logout
           </a>
         </li>
       {% else %}
         <li class="mr-[18px] last:mr-0">
-          <a class="podo-chip" href="#">
+          <a class="podo-chip hover:border-button-darkpurple-bg" href="{% url 'account_login' %}">
             Login
           </a>
         </li>
         <li class="mr-[18px] last:mr-0">
-          <a class="podo-chip" href="#">
+          <a class="podo-chip hover:border-button-darkpurple-bg" href="{% url 'account_signup'%}">
             Signup
           </a>
         </li>
