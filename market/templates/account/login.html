@@ -1,33 +1,51 @@
 {% extends "market_base/base.html" %}
+{% comment %} Use the shared base layout for the login page {% endcomment %}
 
 {% load static %}
 {% load widget_tweaks %}
 
+{% comment %} Page title shown in the browser tab {% endcomment %}
 {% block title %}Log In | Podo-Market{% endblock title %}
 
+{% comment %} Extend base body classes and add top border + background for the login page {% endcomment %}
 {% block body_class %}{{ block.super }} border-t-[8px] border-t-site-body-border-top with-background{% endblock %}
 
+
+{% comment %} Main content {% endcomment %}
 {% block content %}
+
 <div class="w-full max-w-[440px] mx-auto my-[196px]">
+  
+  {% comment %} Login form (email/username + password) {% endcomment %}
   <form method="post">
     <a href="{% url 'home' %}">
       <img class="block w-[164px] h-[90px] mx-auto mb-[47px]" src="{% static 'market/assets/logo.svg' %}" alt="podomarket">
     </a>
+
     {% csrf_token %}
+
+    {% comment %} Login identifier field {% endcomment %}
     <div class="mb-[15px]">
       {{ form.login|add_class:"podo-input"|attr:"placeholder:E-mail"}}
     </div>
+
+    {% comment %} Password field {% endcomment %}
     <div>
       {{ form.password|add_class:"podo-input"|attr:"placeholder:Password"}}
     </div>
+
+    {% comment %} Non-field errors shown below the inputs {% endcomment %}
     <div class="mt-[15px] text-[14px] leading-[1.7] text-center">
       {% for error in form.non_field_errors %}
       <div class="text-input-error-fg">{{ error }}</div>
       {% endfor %}
     </div>
+
+    {% comment %} Submit button for logging in {% endcomment %}
     <button class="podo-button large primary block w-full max-w-60 mx-auto mt-6" type="submit">Log In</button>
   </form>
 
+  {% comment %} Links for password reset and signup below the login form {% endcomment %}
   <ul class="podo-links flex justify-center text-[17px] leading-[25px] mt-6">
     <li>
       <a href="{% url 'account_reset_password' %}" class="hover:border-b-2 hover:border-links-divider">Forgot Password</a>
@@ -38,4 +56,5 @@
     </li>
   </ul>
 </div>
+
 {% endblock content %}

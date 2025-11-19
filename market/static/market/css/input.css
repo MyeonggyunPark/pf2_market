@@ -1,8 +1,18 @@
-@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
-
 @import "tailwindcss";
 
-/* Tailwind 테마 정의 */
+/* Import Spoqa Han Sans Neo webfont for global typography */
+@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
+
+/* Global base styles */
+/* Use Spoqa Han Sans Neo as the default font across the app */
+@layer base {
+  body {
+    font-family: 'Spoqa Han Sans Neo', system-ui, -apple-system, BlinkMacSystemFont,
+      'Segoe UI', sans-serif;
+  }
+}
+
+/* Design tokens: colors, sizes and shared transitions */
 @theme {
   /* main text color */
   --color-text-main: #2f2c28;
@@ -34,6 +44,7 @@
   --color-post-status: #ffffff;
   --color-post-status-bg: #b9b7ba;
 
+  /* for link and button */
   --color-link: #7644c3;
   --color-button-fg: #fff;
   --color-button-bg: #7644c3;
@@ -49,6 +60,7 @@
   --color-button-darkpurple-bg: #552899;
   --color-button-darkgray-bg: #c6c6cc;
 
+  /* for input */
   --color-input-bg: #f3f3f3;
   --color-input-placeholder: #8a95a0;
   --color-input-focus-bg: #f5f0fc;
@@ -73,24 +85,27 @@
 
   --color-links-divider: #979797;
 
+  /* shared transition for background + text color changes */
   --transition-background-and-color: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Background illustration helper for auth and landing pages */
 @layer base {
   .with-background {
     background-image:
-      url('../assets/bg-left.svg'),
-      url('../assets/bg-right.svg');
+    url('../assets/bg-left.svg'),
+    url('../assets/bg-right.svg');
     background-position:
-      top 333px left 0,
-      top 109px right 0;
+    top 333px left 0,
+    top 109px right 0;
     background-repeat: no-repeat;
     background-size:
-      230px,
-      211px;
+    230px,
+    211px;
   }
 }
 
+/* Header user menu hover dot indicator */
 @layer components {
   .user-menu-dot:hover::after {
     content: ' ';
@@ -104,6 +119,7 @@
   }
 }
 
+/* Small pill-shaped chip used for header actions (Login/Signup) */
 @layer components {
   .podo-chip {
     @apply inline-block rounded-full border px-[18px] py-[5px] text-[17px] leading-[25px];
@@ -111,36 +127,38 @@
   }
 }
 
+/* Form input styles (used on login/signup/post forms) */
 @layer components {
 
-  /* ====== podo-input ====== */
+  /* Base rounded input */
   .podo-input {
     @apply w-full rounded-[27px] border border-transparent outline-none;
     @apply text-[17px] leading-[17px] px-[29px] py-[17px];
     @apply bg-input-bg;
-    /* --color-input-bg → bg-input-bg */
   }
 
+    /* Ensure nested input keeps consistent font size */
   .podo-input input {
     @apply text-[17px];
   }
 
+    /* Multiline textarea variant */
   textarea.podo-input {
     @apply resize-none;
     line-height: 2;
   }
 
+    /* Focused input state with purple border and soft background */
   .podo-input:focus {
     @apply border-input-focus-border bg-input-focus-bg transition-colors;
-    /* transition-colors는 bg/border 색 변경에 대한 트랜지션 */
   }
 
-  /* placeholder 색 – Tailwind 유틸 대신 직접 지정 */
+    /* Placeholder color styling */
   .podo-input::placeholder {
     color: var(--color-input-placeholder);
   }
 
-  /* 에러 상태 */
+    /* Error state with icon, red border, and error background */
   .podo-input.error {
     @apply pr-[46px] border border-input-error-border bg-input-error-bg;
     background-position: top 50% right 13px;
@@ -151,23 +169,26 @@
 
 }
 
+/* Button system: primary/secondary/negative + sizes */
 @layer components {
-  /* ====== podo-button ====== */
 
+  /* Anchor tag styled as button */
   a.podo-button {
     @apply inline-block text-center no-underline;
   }
 
+   /* Base button style */
   .podo-button {
     @apply relative rounded-full cursor-pointer font-medium border-0;
     @apply bg-button-bg text-button-fg transition-colors;
   }
 
+   /* Hover background for main buttons */
   .podo-button:hover {
     @apply bg-button-hover-bg;
   }
 
-  /* primary 버튼의 꼬리 장식 (::after) */
+  /* Decorative right-side blob for primary buttons */
   .podo-button.primary::after {
     content: ' ';
     position: absolute;
@@ -180,20 +201,24 @@
     transition: var(--transition-background-and-color);
   }
 
+  /* Larger decoration offset for large primary buttons */
   .podo-button.primary.large::after {
     left: calc(100% - 30px);
   }
 
+  /* Hover color for the decoration blob */
   .podo-button:hover::after,
   .podo-button.primary:hover::after {
     background-color: var(--color-button-hover-decoration);
   }
 
+/* Negative and secondary buttons do not use the decoration blob */
   .podo-button.negative::after,
   .podo-button.secondary::after {
     display: none;
   }
 
+  /* Destructive button variant */
   .podo-button.negative {
     @apply bg-button-negative-bg;
   }
@@ -202,6 +227,7 @@
     color: var(--color-button-negative-hover-fg);
   }
 
+  /* Neutral secondary button variant */
   .podo-button.secondary {
     @apply bg-button-secondary-bg;
   }
@@ -210,7 +236,7 @@
     color: var(--color-button-secondary-hover-fg);
   }
 
-  /* 크기별 */
+  /* Size variants */
   .podo-button.small {
     @apply px-[18px] py-[8px] text-[16px] leading-[16px];
   }
@@ -224,13 +250,14 @@
     @apply px-[27px] py-[18px] text-[21px] leading-[21px];
   }
 
-  /* 색 변형 */
+  /* Purple badge-like button */
   .podo-button.purple {
     @apply px-[21px] py-[8px];
     color: var(--color-button-purple-fg);
     background-color: var(--color-button-purple-bg);
   }
 
+  /* Dark solid button variants for special actions */
   .podo-button.darkpurple,
   .podo-button.darkgray {
     @apply px-[31px] py-[13px];
@@ -244,6 +271,7 @@
     background-color: var(--color-button-darkgray-bg);
   }
 
+  /* Inline link group */
   .podo-links {
     @apply flex items-center m-0 p-0 list-none text-[15px];
     letter-spacing: -0.26px;

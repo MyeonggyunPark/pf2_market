@@ -1,14 +1,20 @@
 {% extends "market_base/base.html" %}
+{% comment %} Use the shared base layout for pages with a header and footer {% endcomment %}
 
 {% load static %}
 
+{% comment %} Extend the default body classes from base.html and add a top border {% endcomment %}
 {% block body_class %}{{ block.super }} border-t-[8px] border-t-site-body-border-top{% endblock %}
 
+{% comment %} header area {% endcomment %}
 {% block header %}
+
 <header class="pt-[22px] pb-[26px] border-b border-b-site-header-border-bottom bg-site-header-bg">
-  <a class="block w-min mx-auto" href="#">
+  <a class="block w-min mx-auto" href="{% url 'home' %}">
     <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket">
   </a>
+
+  {% comment %} Show logout when the user is authenticated, otherwise show login/signup buttons {% endcomment %}
   <nav>
     <ul class="flex justify-center list-none mt-[26px] m-0 p-0">
       {% if user.is_authenticated %}
@@ -32,12 +38,18 @@
     </ul>
   </nav>
 </header>
+
 {% endblock header %}
 
+
+{% comment %} footer area {% endcomment %}
 {% block footer %}
+
 <footer class="py-[26px] bg-site-footer-bg">
+  {% comment %} Simple footer with brand text aligned to the right {% endcomment %}
   <div class="max-w-[1060px] min-h-6 mx-auto font-bold text-right text-site-footer-text">
     <span>PODOMARKET</span>
   </div>
 </footer>
+
 {% endblock footer %}

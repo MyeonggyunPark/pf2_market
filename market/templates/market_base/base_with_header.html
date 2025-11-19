@@ -1,11 +1,16 @@
 {% extends "market_base/base.html" %}
+{% comment %} Use the shared base layout without the default header {% endcomment %}
 
 {% load static %}
 
+{% comment %} header area {% endcomment %}
 {% block header %}
+
+{% comment %} Simple header with centered container and clickable logo {% endcomment %}
 <div class="w-full max-w-[1060px] mx-auto p-[19px]">
-  <a href="#">
+  <a href="{% url 'home' %}">
     <img class="w-[92px] h-[50px]" src="{% static 'market/assets/logo.svg' %}" alt="podomarket">
   </a>
 </div>
+
 {% endblock header %}

@@ -1,20 +1,31 @@
 {% extends "market_base/base.html" %}
+{% comment %} Use the shared base layout for the signup page {% endcomment %}
 
 {% load static %}
 {% load widget_tweaks %}
 {% load socialaccount %}
 
+{% comment %} Page title shown in the browser tab {% endcomment %}
 {% block title %}Sign Up | Podo-Market{% endblock title %}
 
+{% comment %} Extend base body classes and add top border + background for the signup page {% endcomment %}
 {% block body_class %}{{ block.super }} border-t-[8px] border-t-site-body-border-top with-background{% endblock %}
 
+
+{% comment %} Main content {% endcomment %}
 {% block content %}
+
 <div class="w-full max-w-[440px] mx-auto my-[196px]">
+  
+  {% comment %} Signup form (email, nickname, address, password fields) {% endcomment %}
   <form method="post">
     <a href="{% url 'home' %}">
       <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket" class="block w-[164px] h-[90px] mx-auto mb-[47px]">
     </a>
+
     {% csrf_token %}
+    
+    {% comment %} Email field with validation error messages {% endcomment %}
     <div class="mb-5">
       {{ form.email|add_class:"podo-input"|attr:"placeholder:E-mail"|add_error_class:"error" }}
       {% for error in form.email.errors %}
@@ -23,6 +34,8 @@
         </div>
       {% endfor %}
     </div>
+
+    {% comment %} Nickname field with validation error messages {% endcomment %}
     <div class="mb-5">
       {{ form.nickname|add_class:"podo-input"|attr:"placeholder:Nickname"|add_error_class:"error" }}
       {% for error in form.nickname.errors %}
@@ -31,9 +44,13 @@
         </div>
       {% endfor %}
     </div>
+
+    {% comment %} Address field (no custom error rendering) {% endcomment %}
     <div class="mb-5">
       {{ form.address|add_class:"podo-input"|attr:"placeholder:Address" }}
     </div>
+
+    {% comment %} Password field with validation error messages {% endcomment %}
     <div class="mb-5">
       {{ form.password1|add_class:"podo-input"|attr:"placeholder:Password"|add_error_class:"error" }}
       {% for error in form.password1.errors %}
@@ -42,6 +59,8 @@
         </div>
       {% endfor %}
     </div>
+
+    {% comment %} Password confirmation field with validation error messages {% endcomment %}
     <div class="mb-5">
       {{ form.password2|add_class:"podo-input"|attr:"placeholder:Confirm Password"|add_error_class:"error" }}
       {% for error in form.password2.errors %}
@@ -50,14 +69,20 @@
         </div>
       {% endfor %}
     </div>
+
+    {% comment %} Submit button for standard email-based signup {% endcomment %}
     <button class="podo-button large primary block w-full max-w-60 mx-auto mt-6" type="submit">Sign Up</button>
   </form>
 
+  {% comment %} Divider text between email signup and social signup options {% endcomment %}
   <div class="mt-8 mb-4 text-center text-[16px] text-post-list-meta border-t border-post-list-meta py-6">
     Or sign up with a social account
   </div>
 
+  {% comment %} Social login buttons using django-allauth providers {% endcomment %}
   <div class="space-y-5">
+
+    {% comment %} Google social login {% endcomment %}
     <a
       href="{% provider_login_url 'google' %}"
       class="group podo-button medium w-full bg-white text-[#3c4043] border-2 border-border-light hover:border-2"
@@ -72,6 +97,7 @@
       >
     </a>
 
+    {% comment %} GitHub social login {% endcomment %}
     <a
       href="{% provider_login_url 'github' %}"
       class="group podo-button medium w-full bg-[#181717] text-white border-2 border-[#181717]"
@@ -86,6 +112,7 @@
       >
     </a>
 
+    {% comment %} Kakaotalk social login {% endcomment %}
     <a
       href="{% provider_login_url 'kakao' %}"
       class="group podo-button medium w-full bg-[#FEE500] text-black"
@@ -100,6 +127,7 @@
       >
     </a>
 
+    {% comment %} Naver social login {% endcomment %}
     <a
       href="{% provider_login_url 'naver' %}"
       class="group podo-button medium w-full bg-[#03C75A] text-white"
@@ -115,6 +143,7 @@
     </a>
   </div>
 
+  {% comment %} Link to the login page for users who already have an account {% endcomment %}
   <div class="text-center mt-6">
     Already have an account?
     <a class="text-xl text-link font-bold ml-4 hover:border-b-3 hover:border-link" href="{% url 'account_login' %}">Log In</a>
