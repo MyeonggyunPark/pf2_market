@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from allauth.account.views import PasswordChangeView
+from django.views.generic import ListView, DetailView, CreateView
 
 from .models import PostItem
-from django.views.generic import ListView, DetailView
+from .forms import PostItemForm
 
 
 class CustomPasswordChangeView(PasswordChangeView):
@@ -65,3 +66,43 @@ class ItemDetailView(DetailView):
 
     # Name of the URL keyword argument used to look up the object (e.g. path('item/<int:id>/'))
     pk_url_kwarg = "id"
+
+
+class ItemCreateView(CreateView):
+    """
+    Class-based create view for posting a new item to the market.
+
+    - Uses PostItem as the underlying model.
+    - Uses PostItemForm to render and validate the form fields.
+    - Renders the 'market/item_form.html' template.
+    - Automatically sets the current logged-in user as the item_author.
+    - After a successful create, redirects to the item detail page for the new item.
+    """
+
+    # The model that will be created when the form is submitted successfully
+    model = PostItem
+
+    # The ModelForm used to render and validate input for a new PostItem
+    form_class = PostItemForm
+
+    # Template used to render the "create item" form page
+    template_name = "market/item_form.html"
+
+    def form_valid(self, form):
+        """
+        Called when the submitted form is valid.
+
+        - Assigns the current logged-in user as the author of the item.
+        - Then delegates to the parent implementation to save the object.
+        """
+        # Attach the currently authenticated user as the item author
+        form.instance.item_author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """
+        Return the URL to redirect to after successfully creating a new item.
+
+        - Redirects to the item detail page using the newly created object's ID.
+        """
+        return reverse("item-detail", kwargs={"id": self.object.id})

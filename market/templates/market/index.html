@@ -16,7 +16,7 @@
     <h2 class="text-[24px] font-semibold">All Items</h2>
 
     {% comment %} Link to the "create new post" page {% endcomment %}
-    <a href="#"
+    <a href="{% url 'item-create' %}"
       class="flex items-center text-[20px] font-medium text-text-main hover:text-link transition-colors">
       <img class="w-[29px] h-[29px] mr-1.5" src="{% static 'market/icons/ic-pen.svg' %}" alt="pen icon">
       <span>Create</span>
