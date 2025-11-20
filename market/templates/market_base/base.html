@@ -13,7 +13,10 @@
     {% comment %} Global stylesheet (Tailwind build output)  {% endcomment %}
     <link rel="stylesheet" type="text/css" href="{% static 'market/dist/output.css' %}">
 
-    {% comment %} Page title; child templates can override this block {% endcomment %}
+    {% comment %} Main JavaScript file for market-specific interactive behavior {% endcomment %}
+    <script src="{% static 'market/js/main.js'%}" defer></script>
+
+    {% comment %} Page title (child templates can override this block) {% endcomment %}
     <title>{% block title %}Podo-Market{% endblock title %}</title>
   </head>
   <body class="{% block body_class %}flex min-h-screen flex-col m-0 text-[17px] text-text-main bg-body-bg break-keep{% endblock %}">
