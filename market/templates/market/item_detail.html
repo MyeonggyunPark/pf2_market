@@ -20,7 +20,7 @@
 
     {% comment %} Action buttons for the current item {% endcomment %}
     <div class="flex space-x-2">
-      <a class="podo-button small negative" href="#">Delete</a>
+      <a class="podo-button small negative" href="{% url 'item-delete' postitem.id %}">Delete</a>
       <a class="podo-button small secondary" href="{% url 'item-update' postitem.id %}">Edit</a>
     </div>
   </div>

@@ -1,0 +1,41 @@
+{% extends "market_base/base_with_header.html" %}
+{% comment %} Use the shared base layout with a simple header for the delete confirmation page {% endcomment %}
+
+{% comment %} Page title: show post title followed by site name {% endcomment %}
+{% block title %}{{ postitem.title }} | Podo-Market{% endblock title %}
+
+{% comment %} Main content {% endcomment %}
+{% block content %}
+
+{% comment %} Centered container for the delete confirmation card {% endcomment %}
+<div class="w-full max-w-[740px] mx-auto my-20">
+
+  {% comment %} Delete confirmation form (POST with CSRF protection) {% endcomment %}
+  <form method="post"
+        class="flex items-center justify-between rounded-[60px] bg-noti-bg px-10 py-[30px] text-[20px] leading-[34px]">
+
+    {% csrf_token %}
+
+    {% comment %} Warning text asking the user to confirm deletion {% endcomment %}
+    <p>Are you sure you want to delete this post?</p>
+
+    {% comment %} Action buttons: confirm delete or cancel and go back to detail page {% endcomment %}
+    <div class="flex items-center space-x-[15px]">
+
+      {% comment %} Submit button: permanently delete the item {% endcomment %}
+      <button type="submit" class="podo-button bg-button-negative-bg px-[31px] py-[13px] hover:text-button-negative-hover-fg">
+        Delete
+      </button>
+
+      {% comment %} Cancel link: navigate back to the item detail page without deleting {% endcomment %}
+      <a href="{% url 'item-detail' postitem.id %}" 
+        class="podo-button bg-button-secondary-bg px-[31px] py-[13px]  hover:text-button-secondary-hover-fg">
+        Cancel
+      </a>
+    </div>
+
+  </form>
+
+</div>
+
+{% endblock content %}

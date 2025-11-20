@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from allauth.account.views import PasswordChangeView
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from .models import PostItem
 from .forms import PostItemForm
@@ -138,3 +138,31 @@ class ItemUpdateView(UpdateView):
         - Redirects to the item detail page using the updated object's ID.
         """
         return reverse("item-detail", kwargs={"id": self.object.id})
+
+
+class ItemDeleteView(DeleteView):
+    """
+    Class-based delete view for removing an existing PostItem.
+
+    - Uses PostItem as the underlying model.
+    - Renders a confirmation page using 'market/item_confirm_delete.html'.
+    - Retrieves the item to delete based on the 'id' parameter from the URL.
+    - After successful deletion, redirects back to the home (item list) page.
+    """
+
+    # The model instance that will be retrieved and deleted
+    model = PostItem
+
+    # Template used to render the delete confirmation page
+    template_name = "market/item_confirm_delete.html"
+
+    # Name of the URL keyword argument used to look up the object to delete
+    pk_url_kwarg = "id"
+
+    def get_success_url(self):
+        """
+        Return the URL to redirect to after successfully deleting an item.
+
+        - Redirects to the home page that lists all items.
+        """
+        return reverse("home")

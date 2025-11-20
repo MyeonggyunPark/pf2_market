@@ -16,4 +16,7 @@ urlpatterns = [
     
     # Update page: shows a form to edit an existing item using ItemUpdateView
     path("item/<int:id>/edit/", views.ItemUpdateView.as_view(), name="item-update"),
+    
+    # Delete page: handles deleting an existing item using ItemDeleteView
+    path("item/<int:id>/delete/", views.ItemDeleteView.as_view(), name="item-delete"),
 ]
