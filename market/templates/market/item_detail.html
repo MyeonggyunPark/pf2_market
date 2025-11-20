@@ -1,0 +1,104 @@
+{% extends "market_base/base_with_navbar.html" %}
+{% comment %} Use the shared base layout with navbar for the item detail page {% endcomment %}
+
+{% load static %}
+{% load humanize %}
+
+{% comment %} Page title: show item title followed by site name {% endcomment %}
+{% block title %}{{ postitem.item_title }} | Podo-Market{% endblock title %}
+
+{% comment %} Main content {% endcomment %}
+{% block content %}
+
+<div class="w-full max-w-[880px] mx-auto mt-[67px] mb-[120px]">
+
+  {% comment %} Top bar: back link and action buttons (Delete / Edit) {% endcomment %}
+  <div class="flex justify-between items-center text-[20px] mb-[23px] mx-[7px]">
+
+    {% comment %} Link to navigate back to the item list (home page) {% endcomment %}
+    <a href="{% url 'home' %}" class="hover:text-link">&lt; Back to List</a>
+
+    {% comment %} Action buttons for the current item {% endcomment %}
+    <div class="flex space-x-2">
+      <a class="podo-button small negative" href="#">Delete</a>
+      <a class="podo-button small secondary" href="#">Edit</a>
+    </div>
+  </div>
+
+  {% comment %} Main item image (first image is required) {% endcomment %}
+  <img class="w-full h-auto max-h-[645px] object-cover rounded-[11px]" 
+      src="{{ postitem.item_image1.url }}" alt="item-image-1">
+
+  {% comment %} Optional second image: only render if item_image2 exists {% endcomment %}
+  {% if postitem.item_image2 %}
+  <img class="w-full h-auto max-h-[645px] object-cover rounded-[11px] mt-[15px]"
+      src="{{ postitem.item_image2.url }}" alt="item-image-2">
+  {% endif %}
+
+  {% comment %} Optional third image: only render if item_image3 exists {% endcomment %}
+  {% if postitem.item_image3 %}
+  <img class="w-full h-auto max-h-[645px] object-cover rounded-[11px] mt-[15px]"
+      src="{{ postitem.item_image3.url }}" alt="item-image-3">
+  {% endif %}
+
+  {% comment %} Item header section: title, price, condition, and creation date {% endcomment %}
+  <div class="mt-[30px] mb-[42px] mx-[15px]">
+
+    {% comment %} Item title {% endcomment %}
+    <h1 class="text-[22px] font-normal mb-[15px] truncate">
+      {{ postitem.item_title }}
+    </h1>
+
+    {% comment %} Price, condition, and creation date {% endcomment %}
+    <div class="flex items-center">
+
+      {% comment %} Item price {% endcomment %}
+      <span class="text-[25px] font-bold mr-[15px]">
+        &euro;&nbsp;{{ postitem.item_price|intcomma }}
+      </span>
+
+      {% comment %} Item condition {% endcomment %}
+      <span class="podo-chip font-bold text-chip-primary-fg bg-chip-primary-bg border-chip-primary-border">
+        {{ postitem.item_condition }}
+      </span>
+
+      {% comment %} Creation date of the item {% endcomment %}
+      <span class="ml-auto text-[15px] text-post-detail-date">
+        {{ postitem.dt_created|date:"d.m.Y" }}
+      </span>
+    </div>
+  </div>
+
+  {% comment %} Seller information box: profile image, nickname, and location {% endcomment %}
+  <a href="#" class="no-underline">
+    <div class="podo-box gray-background flex items-center px-5 py-[25px] mx-[15px] rounded-[27px]">
+
+      {% comment %} Seller profile image {% endcomment %}
+      <div class="w-[79px] h-[79px] mr-[23px] rounded-full bg-profile-pic-placeholder bg-cover bg-center"
+        style="background-image:url('{{ postitem.item_author.profile_image|default:'' }}')">
+      </div>
+
+      {% comment %} Seller nickname and address/city info {% endcomment %}
+      <div>
+        <div class="text-[20px] font-bold mb-[5px]">
+          {{ postitem.item_author.nickname }}
+        </div>
+
+        <ul class="podo-links">
+          <li>{{ postitem.item_author.address }}</li>
+          <li class="divider"></li>
+          <li>{{ postitem.item_author.city }}</li>
+        </ul>
+      </div>
+
+    </div>
+  </a>
+
+  {% comment %} Item description {% endcomment %}
+  <p class="text-[17px] leading-[30px] mx-[15px] mt-9 px-9 mb-[300px]">
+    {{ postitem.item_detail|linebreaksbr }}
+  </p>
+
+</div>
+
+{% endblock content %}

@@ -4,8 +4,7 @@ from django.urls import reverse
 from allauth.account.views import PasswordChangeView
 
 from .models import PostItem
-from django.views.generic import ListView
-
+from django.views.generic import ListView, DetailView
 
 
 class CustomPasswordChangeView(PasswordChangeView):
@@ -47,3 +46,22 @@ class IndexView(ListView):
 
     # Default ordering for the queryset (most recently created items first)
     ordering = ["-dt_created"]
+
+
+class ItemDetailView(DetailView):
+    """
+    Class-based detail view for a single PostItem.
+
+    - Uses PostItem as the underlying model.
+    - Renders the 'market/item_detail.html' template.
+    - Retrieves a single item based on the 'id' parameter from the URL.
+    """
+
+    # The model that this detail view will retrieve a single instance of
+    model = PostItem
+
+    # Template used to render the detail page for a single item
+    template_name = "market/item_detail.html"
+
+    # Name of the URL keyword argument used to look up the object (e.g. path('item/<int:id>/'))
+    pk_url_kwarg = "id"

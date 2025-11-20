@@ -53,7 +53,7 @@
         </div>
 
         {% comment %} Button to view item details {% endcomment %}
-        <a href="#" class="podo-button primary block mt-[22px] mb-4">
+        <a href="{% url 'item-detail' item.id %}" class="podo-button primary block mt-[22px] mb-4">
           View Details
         </a>
 
