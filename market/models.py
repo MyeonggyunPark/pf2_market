@@ -4,10 +4,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 # Import the field-level validator from validators.py
-from .validators import validate_no_special_characters
+from .validators import validate_no_special_characters, validate_image_mime_type
 
-# Validator used to enforce a minimum numeric value
-from django.core.validators import MinValueValidator
+# Validators used to enforce minimum numeric values and restrict allowed file extensions
+from django.core.validators import MinValueValidator, FileExtensionValidator
 
 # Used to create safe folder names and timestamp-based subfolders for uploads
 from django.utils import timezone
@@ -78,7 +78,9 @@ class PostItem(models.Model):
     item_title = models.CharField(max_length=60)
 
     # Item price in whole currency units (must be at least 1)
-    item_price = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
+    item_price = models.PositiveIntegerField(
+        validators=[MinValueValidator(1, message="Price must be at least 1 €.")]
+    )
 
     #  Available condition choices for the item
     CONDITION_CHOICHES = [
@@ -95,12 +97,46 @@ class PostItem(models.Model):
     # Optional detailed description of the item
     item_detail = models.TextField(blank=True, null=True)
 
-    # First image is required
-    item_image1 = models.ImageField(upload_to=item_image_upload_to)
+    # First image is required and must be a JPEG or PNG file
+    item_image1 = models.ImageField(
+        upload_to=item_image_upload_to,
+        # Validate by file extension first, then by actual MIME type for extra safety
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png"]),
+            validate_image_mime_type,
+        ],
+        # Custom error message when the uploaded file is not recognized as a valid image
+        error_messages={
+            "invalid_image": "Please upload a valid image. This file is either not an image or is corrupted.",
+        },
+    )
 
-    # Second and third images are optional
-    item_image2 = models.ImageField(upload_to=item_image_upload_to, blank=True, null=True)
-    item_image3 = models.ImageField(upload_to=item_image_upload_to, blank=True, null=True)
+    # Second and third images are optional, but must still be valid JPEG or PNG files if provided
+    item_image2 = models.ImageField(
+        upload_to=item_image_upload_to,
+        blank=True,
+        null=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png"]),
+            validate_image_mime_type,
+        ],
+        error_messages={
+            "invalid_image": "Please upload a valid image. This file is either not an image or is corrupted.",
+        },
+    )
+
+    item_image3 = models.ImageField(
+        upload_to=item_image_upload_to,
+        blank=True,
+        null=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png"]),
+            validate_image_mime_type,
+        ],
+        error_messages={
+            "invalid_image": "Please upload a valid image. This file is either not an image or is corrupted.",
+        },
+    )
 
     # Author of the item post (the user who created the listing)
     item_author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")

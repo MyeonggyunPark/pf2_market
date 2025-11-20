@@ -93,3 +93,21 @@ def validate_no_special_characters(value):
     # If the value contains any special character, reject it
     if contains_special_character(value):
         raise ValidationError("Special characters are not allowed.")
+
+
+def validate_image_mime_type(value):
+    """
+    Custom validator to ensure the uploaded file has a valid image MIME type.
+
+    This adds an extra validation layer on top of the file extension check,
+    so that files renamed to end with .jpg/.png but not actually images are rejected.
+    """
+    # List of allowed MIME types for uploaded image files
+    valid_mime_types = ["image/jpeg", "image/png"]
+
+    # Get the MIME type from the uploaded file object (may be None in some edge cases)
+    file_mime_type = getattr(value, "content_type", None)
+
+    # Reject the file if its MIME type is not one of the allowed image types
+    if file_mime_type not in valid_mime_types:
+        raise ValidationError("Only JPEG and PNG images are allowed.")
