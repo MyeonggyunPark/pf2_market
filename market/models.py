@@ -51,11 +51,11 @@ def item_image_upload_to(instance, filename):
     # Priority 1: use the user's nickname if available
     if author.nickname:
         base_name = author.nickname
-        
+
     # Priority 2: fall back to username (email), using only the part before '@'
     elif author.username:
         base_name = author.username.split("@")[0]
-        
+
     # Fallback name if both nickname and username are unexpectedly missing
     else:
         base_name = "user"
@@ -70,58 +70,102 @@ def item_image_upload_to(instance, filename):
     return f"item_pics/{folder_name}/{month_folder}/{filename}"
 
 
-# Post model for items listed in the market
+## Post model for items listed in the market
 class PostItem(models.Model):
-    """Represents a single item posted for sale in the market."""
+    """
+    Represents a single item posted for sale in the market.
 
-    # Short title displayed in listings and detail pages
-    item_title = models.CharField(max_length=60)
+    Each PostItem instance corresponds to one listing created by a user and
+    includes basic information such as title, price, condition, description,
+    images and author, along with timestamps.
+    """
 
-    # Item price in whole currency units (must be at least 1)
-    item_price = models.PositiveIntegerField(
-        validators=[MinValueValidator(1, message="Price must be at least 1 €.")]
+    # Short title displayed in item listings and on the detail page
+    item_title = models.CharField(
+        max_length=60,
+        error_messages={
+            "blank": "Please enter a title for your item.",
+            "max_length": "Title is too long.",
+            "invalid": "Please enter a valid title.",
+        },
     )
 
-    #  Available condition choices for the item
-    CONDITION_CHOICHES = [
+    # Item price in whole currency units
+    item_price = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)],
+        error_messages={
+            "blank": "Please enter a price for your item.",
+            "invalid": "Please enter a valid number.",
+            "min_value": "Price must be at least 1 €.",
+        },
+    )
+
+    # Available condition choices for the item
+    # These values are stored in the database and rendered as a select/radio in forms.
+    CONDITION_CHOICES = [
         ("new", "NEW"),
         ("excellent", "EXCELLENT"),
         ("good", "GOOD"),
         ("fair", "FAIR"),
-        ("poor", "POOR")
+        ("poor", "POOR"),
     ]
 
-    # Condition of the item, restricted to the choices above
-    item_condition = models.CharField(max_length=10, choices=CONDITION_CHOICHES, default="good")
-
-    # Optional detailed description of the item
-    item_detail = models.TextField(blank=True, null=True)
-
-    # First image is required and must be a JPEG or PNG file
-    item_image1 = models.ImageField(
-        upload_to=item_image_upload_to,
-        # Validate by file extension first, then by actual MIME type for extra safety
-        validators=[
-            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png"]),
-            validate_image_mime_type,
-        ],
-        # Custom error message when the uploaded file is not recognized as a valid image
+    # Condition of the item, restricted to the choices above.
+    item_condition = models.CharField(
+        max_length=10,
+        choices=CONDITION_CHOICES,
+        default=None,
         error_messages={
-            "invalid_image": "Please upload a valid image. This file is either not an image or is corrupted.",
+            "blank": "Please select a condition for your item.",
+            "invalid_choice": "Invalid condition selected.",
         },
     )
 
-    # Second and third images are optional, but must still be valid JPEG or PNG files if provided
+    # Detailed description of the item shown on the detail page.
+    item_detail = models.TextField(
+        default="No description provided",
+        error_messages={
+            "blank": "Please enter a description for your item.",
+            "invalid": "Please enter a valid description.",
+        },
+    )
+
+    # Main image for the item (required).
+    item_image1 = models.ImageField(
+        upload_to=item_image_upload_to,
+        
+        # Validate by file extension first, then by actual MIME type for extra safety
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=["jpg", "jpeg", "png"],
+                message="Please upload a JPEG or PNG image.",
+            ),
+            validate_image_mime_type,
+        ],
+        
+        # Custom error message when the uploaded file is not recognized as a valid image
+        error_messages={
+            "blank": "Please upload a main image for your item.",
+            "invalid": "Please upload a valid image file.",
+            "invalid_image": "Please upload a valid JPEG or PNG image.",
+        },
+    )
+
+    # Second and third images are optional.
     item_image2 = models.ImageField(
         upload_to=item_image_upload_to,
         blank=True,
         null=True,
         validators=[
-            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png"]),
+            FileExtensionValidator(
+                allowed_extensions=["jpg", "jpeg", "png"],
+                message="Please upload a JPEG or PNG image.",
+            ),
             validate_image_mime_type,
         ],
         error_messages={
-            "invalid_image": "Please upload a valid image. This file is either not an image or is corrupted.",
+            "invalid": "Please upload a valid image file.",
+            "invalid_image": "Please upload a valid JPEG or PNG image.",
         },
     )
 
@@ -130,21 +174,25 @@ class PostItem(models.Model):
         blank=True,
         null=True,
         validators=[
-            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png"]),
+            FileExtensionValidator(
+                allowed_extensions=["jpg", "jpeg", "png"],
+                message="Please upload a JPEG or PNG image.",
+            ),
             validate_image_mime_type,
         ],
         error_messages={
-            "invalid_image": "Please upload a valid image. This file is either not an image or is corrupted.",
+            "invalid": "Please upload a valid image file.",
+            "invalid_image": "Please upload a valid JPEG or PNG image.",
         },
     )
 
-    # Author of the item post (the user who created the listing)
+    # Author of the item post
     item_author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
 
-    # Timestamps for creation and last update
+    # Timestamps
     dt_created = models.DateTimeField(auto_now_add=True)
     dt_updated = models.DateTimeField(auto_now=True)
 
-    # Use the item title as the string representation
+    # Use the item title as the string representation in admin and shell.
     def __str__(self):
         return self.item_title

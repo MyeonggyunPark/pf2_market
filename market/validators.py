@@ -97,17 +97,29 @@ def validate_no_special_characters(value):
 
 def validate_image_mime_type(value):
     """
-    Custom validator to ensure the uploaded file has a valid image MIME type.
+    Custom validator to ensure the uploaded file has an image MIME type.
 
-    This adds an extra validation layer on top of the file extension check,
-    so that files renamed to end with .jpg/.png but not actually images are rejected.
+    This validator is intended to be used together with FileExtensionValidator:
+    - FileExtensionValidator checks the file extension (e.g. .jpg, .jpeg, .png).
+    - This validator checks the MIME type and ensures it starts with "image/".
+
+    If the MIME type is missing, the check is skipped and other validators
+    (such as ImageField's internal validation) are expected to handle it.
+
+    When the MIME type does not indicate an image, a ValidationError is raised
+    with the code "invalid_image" so that model or form error_messages can
+    provide a user-friendly message.
     """
-    # List of allowed MIME types for uploaded image files
-    valid_mime_types = ["image/jpeg", "image/png"]
+    # Try to read the MIME type from the uploaded file (may be empty in some cases)
+    raw_mime = getattr(value, "content_type", "") or ""
+    
+    # Normalize the MIME type: remove any parameters (e.g. "; charset=binary") and lowercase it
+    mime = raw_mime.split(";")[0].lower()
 
-    # Get the MIME type from the uploaded file object (may be None in some edge cases)
-    file_mime_type = getattr(value, "content_type", None)
+    # If no MIME type is available, skip this check and let other validators handle the file
+    if not mime:
+        return
 
-    # Reject the file if its MIME type is not one of the allowed image types
-    if file_mime_type not in valid_mime_types:
-        raise ValidationError("Only JPEG and PNG images are allowed.")
+    # Reject the file if its MIME type does not indicate an image
+    if not mime.startswith("image/"):
+        raise ValidationError(code="invalid_image")
