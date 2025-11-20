@@ -123,7 +123,6 @@ class PostItem(models.Model):
 
     # Detailed description of the item shown on the detail page.
     item_detail = models.TextField(
-        default="No description provided",
         error_messages={
             "blank": "Please enter a description for your item.",
             "invalid": "Please enter a valid description.",
