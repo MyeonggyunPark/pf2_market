@@ -1,16 +1,23 @@
 {% extends "market_base/base_with_navbar.html" %}
-{% comment %} Use the shared base layout with navbar for the item create page {% endcomment %}
+{% comment %} Use the shared base layout with navbar for the item create/edit page {% endcomment %}
 
 {% load static %}
 {% load widget_tweaks %}
+{% load market_extras %}
 
-{% comment %} Page title: "Create" followed by site name {% endcomment %}
-{% block title %}Create | Podo-Market{% endblock title %}
++{% comment %} Page title: show item title on edit, or "Create" on new item {% endcomment %}
+{% block title %}
+  {% if postitem %}
+    {{ postitem.item_title }}  
+  {% else %}
+    Create 
+  {% endif %} | Podo-Market
+{% endblock title %}
 
 {% comment %} Main content {% endcomment %}
 {% block content %}
 
-{% comment %} Item create form: POST with file upload and server-side validation only (novalidate) {% endcomment %}
+{% comment %} Item create/update form: POST with file upload and server-side validation only (novalidate) {% endcomment %}
 <form method="post" autocomplete="off" enctype="multipart/form-data" novalidate
       class="grid grid-cols-2 w-full max-w-[880px] mx-auto mt-[90px] mb-[250px] gap-x-[43px] gap-y-[27px]">
 
@@ -111,8 +118,8 @@
       {% comment %} First (main) image upload {% endcomment %}
       <div>
 
-        {% comment %} Hidden file input; label below acts as the visible button {% endcomment %}
-        {{ form.item_image1|add_class:"hidden" }}
+        {% comment %} File input (hidden by widget); label below acts as the visible button {% endcomment %}
+        {{ form.item_image1 }}
         <label for="{{ form.item_image1.id_for_label }}"
               class="podo-input flex flex-col items-center justify-center cursor-pointer {% if form.item_image1.errors %} error{% endif %}">
           
@@ -121,10 +128,20 @@
               alt="Upload image 1"
               class="w-6 h-6">
 
-          {% comment %} Dynamic filename text for selected file {% endcomment %}
+          {% comment %} Dynamic filename text for selected or existing main image {% endcomment %}
           <span id="file-name-1"
-                class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 hidden">
+                class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 
+                {% if form.instance.item_image1 %}{% else %}hidden{% endif %}">
+            {% if form.instance.item_image1 %}
+            {{ form.instance.item_image1.name|filename_filter }}
+            {% endif %}
           </span>
+
+          {% comment %} Existing main image preview (edit mode only) {% endcomment %}
+          {% if form.instance.item_image1 %}
+            <img src="{{ form.instance.item_image1.url }}" alt="First-image" class="w-full h-40 object-cover rounded-lg mt-3">
+          {% endif %}
+
         </label>
 
         {% comment %} Validation errors for main image {% endcomment %}
@@ -139,8 +156,8 @@
       {% comment %} Second (optional) image upload {% endcomment %}
       <div>
 
-        {% comment %} Hidden file input; label below acts as the visible button {% endcomment %}
-        {{ form.item_image2|add_class:"hidden" }}
+        {% comment %} File input (hidden by widget); label below acts as the visible button {% endcomment %}
+        {{ form.item_image2 }}
         <label for="{{ form.item_image2.id_for_label }}"
               class="podo-input flex flex-col items-center justify-center cursor-pointer {% if form.item_image2.errors %} error{% endif %}">
           
@@ -149,10 +166,20 @@
               alt="Upload image 2"
               class="w-6 h-6">
 
-          {% comment %} Dynamic filename text for selected file {% endcomment %}
+          {% comment %} Dynamic filename text for selected or existing second image {% endcomment %}
           <span id="file-name-2"
-                class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 hidden">
+                class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 
+                {% if form.instance.item_image2 %}{% else %}hidden{% endif %}">
+            {% if form.instance.item_image2 %}
+              {{ form.instance.item_image2.name|filename_filter }}
+            {% endif %}
           </span>
+
+          {% comment %} Existing second image preview (edit mode only) {% endcomment %}
+          {% if form.instance.item_image2 %}
+            <img src="{{ form.instance.item_image2.url }}" alt="Second-image" class="w-full h-40 object-cover rounded-lg mt-3">
+          {% endif %}
+
         </label>
         
         {% comment %} Validation errors for second image {% endcomment %}
@@ -167,8 +194,8 @@
       {% comment %} Third (optional) image upload {% endcomment %}
       <div>
 
-        {% comment %} Hidden file input; label below acts as the visible button {% endcomment %}
-        {{ form.item_image3|add_class:"hidden" }}
+        {% comment %} File input (hidden by widget); label below acts as the visible button {% endcomment %}
+        {{ form.item_image3 }}
         <label for="{{ form.item_image3.id_for_label }}"
               class="podo-input flex flex-col items-center justify-center cursor-pointer {% if form.item_image3.errors %} error{% endif %}">
           
@@ -177,10 +204,20 @@
               alt="Upload image 3"
               class="w-6 h-6">
 
-          {% comment %} Dynamic filename text for selected file {% endcomment %}
+          {% comment %} Dynamic filename text for selected or existing third image {% endcomment %}
           <span id="file-name-3"
-                class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 hidden">
+                class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 
+                {% if form.instance.item_image3 %}{% else %}hidden{% endif %}">
+            {% if form.instance.item_image3 %}
+              {{ form.instance.item_image3.name|filename_filter }}
+            {% endif %}
           </span>
+
+          {% comment %} Existing third image preview (edit mode only) {% endcomment %}
+          {% if form.instance.item_image3 %}
+            <img src="{{ form.instance.item_image3.url }}" alt="Third-image" class="w-full h-40 object-cover rounded-lg mt-3">
+          {% endif %}
+
         </label>
 
         {% comment %} Validation errors for third image {% endcomment %}
@@ -198,8 +235,9 @@
   {% comment %} Form action buttons: Cancel (back to list) and Save (submit form) {% endcomment %}
   <div class="col-span-2 flex max-w-[600px] mx-auto mt-4">
 
-    {% comment %} Cancel button: navigate back to the home (item list) page {% endcomment %}
-    <a href="{% url 'home' %}" class="podo-button large secondary flex-1 mr-[15px] text-center">
+    {% comment %} Cancel button: go back to item detail on edit, or home (item list) on create {% endcomment %}
+    <a href="{% if postitem %}{% url 'item-detail' postitem.id %}{% else %}{% url 'home' %}{% endif %}" 
+      class="podo-button large secondary flex-1 mr-[15px] text-center">
       Cancel
     </a>
 

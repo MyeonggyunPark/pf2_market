@@ -95,9 +95,12 @@ class PostItemForm(forms.ModelForm):
             "item_detail",
         ]
 
-        # Widgets override: use radio buttons for the condition field
+        # Widgets override: render condition as radios and hide native file inputs
         widgets = {
             "item_condition": forms.RadioSelect(),
+            "item_image1": forms.FileInput(attrs={"class": "hidden"}),
+            "item_image2": forms.FileInput(attrs={"class": "hidden"}),
+            "item_image3": forms.FileInput(attrs={"class": "hidden"}),
         }
 
     def __init__(self, *args, **kwargs):

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from allauth.account.views import PasswordChangeView
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from .models import PostItem
 from .forms import PostItemForm
@@ -104,5 +104,37 @@ class ItemCreateView(CreateView):
         Return the URL to redirect to after successfully creating a new item.
 
         - Redirects to the item detail page using the newly created object's ID.
+        """
+        return reverse("item-detail", kwargs={"id": self.object.id})
+
+
+class ItemUpdateView(UpdateView):
+    """
+    Class-based update view for editing an existing PostItem.
+
+    - Uses PostItem as the underlying model.
+    - Uses PostItemForm to render and validate the form fields.
+    - Renders the same 'market/item_form.html' template as the create view.
+    - Retrieves the item to edit based on the 'id' parameter from the URL.
+    - After a successful update, redirects to the updated item's detail page.
+    """
+
+    # The model instance that will be retrieved and updated
+    model = PostItem
+
+    # The ModelForm used to render and validate input for an existing PostItem
+    form_class = PostItemForm
+
+    # Template used to render the "edit item" form page (shared with create view)
+    template_name = "market/item_form.html"
+
+    # Name of the URL keyword argument used to look up the object
+    pk_url_kwarg = "id"
+
+    def get_success_url(self):
+        """
+        Return the URL to redirect to after successfully updating an item.
+
+        - Redirects to the item detail page using the updated object's ID.
         """
         return reverse("item-detail", kwargs={"id": self.object.id})
