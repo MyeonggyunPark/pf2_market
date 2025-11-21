@@ -233,16 +233,16 @@
 
 
   {% comment %} Form action buttons: Cancel (back to list) and Save (submit form) {% endcomment %}
-  <div class="col-span-2 flex max-w-[600px] mx-auto mt-4">
+  <div class="col-span-2 flex w-full max-w-[600px] mx-auto mt-4">
 
     {% comment %} Cancel button: go back to item detail on edit, or home (item list) on create {% endcomment %}
     <a href="{% if postitem %}{% url 'item-detail' postitem.id %}{% else %}{% url 'home' %}{% endif %}" 
-      class="podo-button large secondary flex-1 mr-[15px] text-center">
+      class="podo-button large secondary grow mr-[15px] text-center">
       Cancel
     </a>
 
     {% comment %} Save button: submit the form and create a new item {% endcomment %}
-    <button type="submit" class="podo-button large primary flex-6 text-center">
+    <button type="submit" class="podo-button large primary grow-6 text-center">
       Save
     </button>
   </div>
