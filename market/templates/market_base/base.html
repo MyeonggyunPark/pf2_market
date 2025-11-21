@@ -10,6 +10,12 @@
     {% comment %} Favicon for the market app {% endcomment %}
     <link rel="shortcut icon" type="image/png" href="{% static 'market/favicon/favicon.ico' %}">
 
+    {% comment %} Font Awesome CDN for icon fonts used across the site {% endcomment %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+          integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer">
+
     {% comment %} Global stylesheet (Tailwind build output)  {% endcomment %}
     <link rel="stylesheet" type="text/css" href="{% static 'market/dist/output.css' %}">
 

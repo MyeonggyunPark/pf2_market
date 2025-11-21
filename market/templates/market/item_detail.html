@@ -3,6 +3,7 @@
 
 {% load static %}
 {% load humanize %}
+{% load market_extras %}
 
 {% comment %} Page title: show item title followed by site name {% endcomment %}
 {% block title %}{{ postitem.item_title }} | Podo-Market{% endblock title %}
@@ -89,28 +90,45 @@
     
   </div>
 
-  {% comment %} Seller information box: profile image, nickname, and location {% endcomment %}
+  {% comment %} Seller information box: profile image, nickname, rating, and location {% endcomment %}
   <a href="#" class="no-underline">
-    <div class="podo-box gray-background flex items-center px-5 py-[25px] mx-[15px] rounded-[27px]">
+    <div class="podo-box gray-background flex justify-center items-center px-5 mx-[15px] py-[25px] rounded-[27px]">
 
-      {% comment %} Seller profile image {% endcomment %}
-      <div class="w-[79px] h-[79px] mr-[23px] rounded-full bg-profile-pic-placeholder bg-cover bg-center"
-        style="background-image:url('{{ postitem.item_author.profile_image|default:'' }}')">
-      </div>
+      <div class="flex justify-around w-full">
 
-      {% comment %} Seller nickname and address/city info {% endcomment %}
-      <div>
-        <div class="text-[20px] font-bold mb-[5px]">
-          {{ postitem.item_author.nickname }}
+        {% comment %} Seller profile image {% endcomment %}
+        <div class="flex">
+          <img class="w-[79px] h-[79px] mr-[23px] rounded-full bg-profile-pic-placeholder bg-cover bg-center "
+            src="{{ postitem.item_author.profile_pic.url|default:'' }}">
+          </img>
+    
+          {% comment %} Seller nickname {% endcomment %}      
+          <div class="text-[20px] font-bold flex items-center">
+            {{ postitem.item_author.nickname }}
+          </div>
         </div>
 
+        {% comment %}
+          Seller rating: render a number of filled and empty stars based on
+          the author's seller_rating value using the filled_stars/empty_stars filters
+        {% endcomment %}
+        <p class="flex items-center">
+          {% for _ in postitem.item_author.seller_rating|filled_stars %}
+          <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
+          {% endfor %}
+          {% for _ in postitem.item_author.seller_rating|empty_stars %}
+          <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
+          {% endfor %}
+        </p>
+        
+        {% comment %} Seller location: address and city {% endcomment %}
         <ul class="podo-links">
           <li>{{ postitem.item_author.address }}</li>
           <li class="divider"></li>
           <li>{{ postitem.item_author.city }}</li>
         </ul>
-      </div>
 
+      </div>
     </div>
   </a>
 
