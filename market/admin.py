@@ -34,6 +34,9 @@ class CustomUserAdmin(BaseUserAdmin):
         ),
     )
 
+    # Columns shown in the list view
+    list_display = ("nickname", "username", "email", "address", "city", "is_staff")
+
 
 # Register the PostItem model with a basic ModelAdmin configuration
 @admin.register(PostItem)
