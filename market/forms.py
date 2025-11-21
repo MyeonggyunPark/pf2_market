@@ -1,16 +1,13 @@
 from django import forms
+from allauth.account.forms import SignupForm, LoginForm, ResetPasswordForm, ResetPasswordKeyForm, ChangePasswordForm
 
-# Base signup form provided by django-allauth
-from allauth.account.forms import SignupForm 
-
-# Custom User model extending AbstractUser
 from .models import User, PostItem  
 
 
 class CustomSignupForm(SignupForm):
     """
     Custom signup form extending django-allauth's SignupForm.
-    Adds a 'nickname' and 'address' field and stores it on the custom User model.
+    Adds a 'nickname', 'address' and 'city' field and stores it on the custom User model.
     """
 
     # Extra optional nickname displayed on the signup page
@@ -24,11 +21,29 @@ class CustomSignupForm(SignupForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # remove HTML5 `required` attribute from all widgets
+        for field in self.fields.values():
+            field.widget.attrs.pop("required", None)
+
         # Remove all help text from password fields
         if "password1" in self.fields:
             self.fields["password1"].help_text = ""
         if "password2" in self.fields:
             self.fields["password2"].help_text = ""
+
+        # custom "required" error messages
+        field_msgs = {
+            "email": "Please enter your e-mail address.",
+            "nickname": "Please enter your nickname.",
+            "address": "Please enter your address.",
+            "city": "Please enter your city.",
+            "password1": "Please choose a password.",
+            "password2": "Please confirm your password.",
+        }
+        for name, msg in field_msgs.items():
+            if name in self.fields:
+                self.fields[name].error_messages["required"] = msg
 
     def clean_nickname(self):
         """
@@ -67,6 +82,73 @@ class CustomSignupForm(SignupForm):
 
         # Return the user instance to allauth's signup flow
         return user
+
+class CustomLoginForm(LoginForm):
+    """Login form with HTML5 `required` removed and custom error messages."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # remove HTML `required` attributes
+        for field in self.fields.values():
+            field.widget.attrs.pop("required", None)
+
+        # custom required messages
+        self.fields["login"].error_messages[
+            "required"
+        ] = "Please enter your e-mail address."
+        self.fields["password"].error_messages[
+            "required"
+        ] = "Please enter your password."
+
+class CustomResetPasswordForm(ResetPasswordForm):
+    """Password reset form with custom required message and no HTML5 validation."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.widget.attrs.pop("required", None)
+
+        self.fields["email"].error_messages[
+            "required"
+        ] = "Please enter the e-mail address of your account."
+
+
+class CustomResetPasswordFromKeyForm(ResetPasswordKeyForm):
+    """Form used after clicking the reset link; sets a new password."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.widget.attrs.pop("required", None)
+
+        self.fields["password1"].error_messages[
+            "required"
+        ] = "Please enter a new password."
+        self.fields["password2"].error_messages[
+            "required"
+        ] = "Please confirm your new password."
+
+
+class CustomChangePasswordForm(ChangePasswordForm):
+    """Change password form shown to logged-in users."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.widget.attrs.pop("required", None)
+
+        msgs = {
+            "oldpassword": "Please enter your current password.",
+            "password1": "Please enter a new password.",
+            "password2": "Please confirm your new password.",
+        }
+        for name, msg in msgs.items():
+            if name in self.fields:
+                self.fields[name].error_messages["required"] = msg
 
 
 class BasePostItemForm(forms.ModelForm):

@@ -187,9 +187,17 @@ ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 # Tell django-allauth to use a custom signup form instead of the default one
 # The string value must be the full Python path to the custom form class
 ACCOUNT_FORMS = {
-    # Custom signup form that extends allauth's SignupForm
-    # and adds support for the "nickname" field on the User model
+    # Custom form that extends allauth's Form
+    # signup page
     "signup": "market.forms.CustomSignupForm",
+    # login.html
+    "login": "market.forms.CustomLoginForm",
+    # password_reset.html
+    "reset_password": "market.forms.CustomResetPasswordForm",
+    # password_reset_from_key.html
+    "reset_password_from_key": "market.forms.CustomResetPasswordFromKeyForm",
+    # password_change.html
+    "change_password": "market.forms.CustomChangePasswordForm",
 }
 
 # Keep users logged in across browser sessions when "remember me" is used

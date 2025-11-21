@@ -18,7 +18,7 @@
 <div class="w-full max-w-[440px] mx-auto my-[196px]">
   
   {% comment %} Signup form (email, nickname, address, city, password fields) {% endcomment %}
-  <form method="post">
+  <form method="post" novalidate>
     <a href="{% url 'home' %}">
       <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket" class="block w-[164px] h-[90px] mx-auto mb-[47px]">
     </a>
@@ -45,14 +45,24 @@
       {% endfor %}
     </div>
 
-    {% comment %} Address field (no custom error rendering) {% endcomment %}
+    {% comment %} Address field with validation error messages {% endcomment %}
     <div class="mb-5">
-      {{ form.address|add_class:"podo-input"|attr:"placeholder:Address" }}
+      {{ form.address|add_class:"podo-input"|attr:"placeholder:Address"|add_error_class:"error" }}
+      {% for error in form.address.errors %}
+        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
+          {{ error }}
+        </div>
+      {% endfor %}
     </div>
 
-    {% comment %} City field (no custom error rendering) {% endcomment %}
+    {% comment %} City field with validation error messages {% endcomment %}
     <div class="mb-5">
       {{ form.city|add_class:"podo-input"|attr:"placeholder:City"|add_error_class:"error" }}
+      {% for error in form.city.errors %}
+        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
+          {{ error }}
+        </div>
+      {% endfor %}
     </div>
 
     {% comment %} Password field with validation error messages {% endcomment %}
