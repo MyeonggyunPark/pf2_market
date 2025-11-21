@@ -2,11 +2,13 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from allauth.account.views import PasswordChangeView
+from allauth.account.models import EmailAddress
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, UserPassesTestMixin
 
-from .models import PostItem
-from .forms import PostItemCreateForm, PostItemUpdateForm
+from market.models import PostItem
+from market.forms import PostItemCreateForm, PostItemUpdateForm
+from market.utils import confirmation_required_redirect
 
 
 class CustomPasswordChangeView(PasswordChangeView):
@@ -69,11 +71,13 @@ class ItemDetailView(DetailView):
     pk_url_kwarg = "id"
 
 
-class ItemCreateView(LoginRequiredMixin, CreateView):
+class ItemCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """
     Class-based create view for posting a new item to the market.
 
     - Requires the user to be logged in (via LoginRequiredMixin).
+    - Requires the user to have at least one verified email address 
+        (via UserPassesTestMixin + test_func).
     - Uses PostItem as the underlying model.
     - Uses PostItemCreateForm to render and validate the form fields.
     - Renders the 'market/item_form.html' template.
@@ -90,6 +94,13 @@ class ItemCreateView(LoginRequiredMixin, CreateView):
 
     # Template used to render the "create item" form page
     template_name = "market/item_form.html"
+
+    # When the email verification test fails, redirect instead of returning HTTP 403
+    redirect_unauthenticated_users = True
+
+    # Custom redirect handler that sends a confirmation email
+    # and forwards the user to the "email confirmation required" page
+    raise_exception = confirmation_required_redirect
 
     def form_valid(self, form):
         """
@@ -110,6 +121,15 @@ class ItemCreateView(LoginRequiredMixin, CreateView):
         """
         return reverse("item-detail", kwargs={"id": self.object.id})
 
+    def test_func(self, user):
+        """
+        Permission check used by UserPassesTestMixin.
+
+        - Returns True only if the given user has a verified email address.
+        - If this returns False, the view uses confirmation_required_redirect
+            instead of rendering the form.
+        """
+        return EmailAddress.objects.filter(user=user, verified=True).exists()
 
 class ItemUpdateView(UpdateView):
     """

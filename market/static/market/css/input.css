@@ -417,3 +417,37 @@ input.no-spin[type="number"]::-webkit-outer-spin-button {
     opacity: 1;
   }
 }
+
+@layer utilities {
+  .text-post-list-meta {
+    color: var(--color-post-list-meta);
+  }
+
+  .text-post-detail-date {
+    color: var(--color-post-detail-date);
+  }
+
+  .text-button-fg {
+    color: var(--color-button-fg);
+  }
+
+  .bg-card-bg {
+    background-color: var(--color-card-bg);
+  }
+
+  .bg-box-gray-bg {
+    background-color: var(--color-box-gray-bg);
+  }
+
+  .bg-post-list-pagination-bg {
+    background-color: var(--color-post-list-pagination-bg);
+  }
+
+  .bg-noti-purple-bg {
+    background-color: var(--color-noti-purple-bg);
+  }
+
+  .text-noti-purple-fg {
+    color: var(--color-noti-purple-fg);
+  }
+}

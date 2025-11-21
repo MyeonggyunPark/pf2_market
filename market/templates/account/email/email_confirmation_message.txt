@@ -1,0 +1,8 @@
+Hello {{ user.email }},
+
+Please verify your email address by clicking the link below:
+
+{{ activate_url }}
+
+Thank you,
+Podo Market

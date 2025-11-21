@@ -24,12 +24,20 @@ from market.views import CustomPasswordChangeView
 
 
 urlpatterns = [
+    
     # Route for the Django admin interface
     path("admin/", admin.site.urls),
-
+    
     # Include URLs for the local "market" app at the root path
     path("", include("market.urls")),
-        
+    
+    # Shown when a logged-in user without a verified email hits a protected view
+    path(
+        "email-confirmation-required/",
+        TemplateView.as_view(template_name="account/email_confirmation_required.html"),
+        name="account_email_confirmation_required",
+    ),
+    
     # Route shown after a successful email confirmation
     path(
         "email-confirmation-done/",
@@ -44,9 +52,10 @@ urlpatterns = [
         name="account_password_change",
     ),
     
-    # Include all django-allauth authentication URLs
+    # Authentication and account management routes provided by django-allauth
     path("", include("allauth.urls")),
 ]
 
+# Serve uploaded media files from MEDIA_URL during local development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
