@@ -12,17 +12,22 @@
 
 <div class="w-full max-w-[880px] mx-auto mt-[67px] mb-[120px]">
 
-  {% comment %} Top bar: back link and action buttons (Delete / Edit) {% endcomment %}
+  {% comment %} Top bar: back link and (optional) Edit/Delete actions {% endcomment %}
   <div class="flex justify-between items-center text-[20px] mb-[23px] mx-[7px]">
 
     {% comment %} Link to navigate back to the item list (home page) {% endcomment %}
-    <a href="{% url 'home' %}" class="hover:text-link font-semibold"><span class="text-[28px]">«</span> To List</a>
+    <a href="{% url 'home' %}" class="hover:text-link font-semibold">
+      <span class="text-[28px]">«</span> 
+      Go to Home
+    </a>
 
-    {% comment %} Action buttons for the current item {% endcomment %}
+    {% comment %} Show Edit/Delete buttons only when the logged-in user is the author {% endcomment %}
+    {% if postitem.item_author == user %}
     <div class="flex space-x-2">
       <a class="podo-button small negative" href="{% url 'item-delete' postitem.id %}">Delete</a>
       <a class="podo-button small secondary" href="{% url 'item-update' postitem.id %}">Edit</a>
     </div>
+    {% endif %}
   </div>
 
   {% comment %} Main item image (first image is required) {% endcomment %}

@@ -52,10 +52,11 @@ class IndexView(ListView):
     ordering = ["-dt_created"]
 
 
-class ItemDetailView(DetailView):
+class ItemDetailView(LoginRequiredMixin, DetailView):
     """
     Class-based detail view for a single PostItem.
 
+    - Requires the user to be logged in (via LoginRequiredMixin).
     - Uses PostItem as the underlying model.
     - Renders the 'market/item_detail.html' template.
     - Retrieves a single item based on the 'id' parameter from the URL.
@@ -131,12 +132,16 @@ class ItemCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         """
         return EmailAddress.objects.filter(user=user, verified=True).exists()
 
-class ItemUpdateView(UpdateView):
+class ItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Class-based update view for editing an existing PostItem.
 
+    - Requires the user to be logged in (via LoginRequiredMixin).
+    - Restricts access so that only the original author can edit the item
+        (via UserPassesTestMixin + test_func).
     - Uses PostItem as the underlying model.
-    - Uses PostItemUpdateForm to render and validate the form fields, including the 'is_sold' flag.
+    - Uses PostItemUpdateForm to render and validate the form fields,
+        including the 'is_sold' flag.
     - Renders the same 'market/item_form.html' template as the create view.
     - Retrieves the item to edit based on the 'id' parameter from the URL.
     - After a successful update, redirects to the updated item's detail page.
@@ -154,6 +159,9 @@ class ItemUpdateView(UpdateView):
     # Name of the URL keyword argument used to look up the object
     pk_url_kwarg = "id"
 
+    # With UserPassesTestMixin: return HTTP 403 instead of redirect when test_func fails
+    raise_exception = True
+
     def get_success_url(self):
         """
         Return the URL to redirect to after successfully updating an item.
@@ -162,15 +170,28 @@ class ItemUpdateView(UpdateView):
         """
         return reverse("item-detail", kwargs={"id": self.object.id})
 
+    def test_func(self, user):
+        """
+        Permission check used by UserPassesTestMixin.
 
-class ItemDeleteView(DeleteView):
+        - Allows access only if the current user is the author of the PostItem.
+        """
+        post_item = self.get_object()
+        return post_item.item_author == user
+
+
+class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
     Class-based delete view for removing an existing PostItem.
 
+    - Requires the user to be logged in (via LoginRequiredMixin).
+    - Restricts access so that only the original author can delete the item
+        (via UserPassesTestMixin + test_func).
     - Uses PostItem as the underlying model.
     - Renders a confirmation page using 'market/item_confirm_delete.html'.
     - Retrieves the item to delete based on the 'id' parameter from the URL.
     - After successful deletion, redirects back to the home (item list) page.
+        cessful deletion, redirects back to the home (item list) page.
     """
 
     # The model instance that will be retrieved and deleted
@@ -182,6 +203,9 @@ class ItemDeleteView(DeleteView):
     # Name of the URL keyword argument used to look up the object to delete
     pk_url_kwarg = "id"
 
+    # With UserPassesTestMixin: return HTTP 403 instead of redirect when test_func fails
+    raise_exception = True
+
     def get_success_url(self):
         """
         Return the URL to redirect to after successfully deleting an item.
@@ -189,3 +213,12 @@ class ItemDeleteView(DeleteView):
         - Redirects to the home page that lists all items.
         """
         return reverse("home")
+
+    def test_func(self, user):
+        """
+        Permission check used by UserPassesTestMixin.
+
+        - Allows access only if the current user is the author of the PostItem.
+        """
+        post_item = self.get_object()
+        return post_item.item_author == user
