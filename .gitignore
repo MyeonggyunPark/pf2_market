@@ -37,6 +37,3 @@ dist/
 
 # Node modules
 node_modules/
-
-# uv
-uv.lock
