@@ -3,6 +3,7 @@
 
 {% load static %}
 {% load widget_tweaks %}
+{% load socialaccount %}
 
 {% comment %} Page title shown in the browser tab {% endcomment %}
 {% block title %}Log In | Podo-Market{% endblock title %}
@@ -65,6 +66,75 @@
       <a href="{% url 'account_signup' %}" class="hover:border-b-2 hover:border-links-divider">Sign Up</a>
     </li>
   </ul>
+
+  {% comment %} Divider text between email login and social login options {% endcomment %}
+  <div class="mt-8 mb-4 text-center text-[16px] text-post-list-meta border-t border-post-list-meta py-6">
+    Or log in with a social account
+  </div>
+
+  {% comment %} Social login buttons using django-allauth providers (same UI as signup page) {% endcomment %}
+  <div class="space-y-5">
+
+    {% comment %} Google social login {% endcomment %}
+    <a
+      href="{% provider_login_url 'google' %}"
+      class="group podo-button medium w-full bg-white text-[#3c4043] border-2 border-border-light hover:border-2"
+    >
+      <span class="block w-full text-center">
+        Continue with <span class="hidden group-hover:inline-block">Google</span>
+      </span>
+      <img
+        src="{% static 'market/icons/google-logo.svg' %}"
+        alt=""
+        class="absolute right-6 top-1/2 -translate-y-1/2 size-7"
+      >
+    </a>
+
+    {% comment %} GitHub social login {% endcomment %}
+    <a
+      href="{% provider_login_url 'github' %}"
+      class="group podo-button medium w-full bg-[#181717] text-white border-2 border-[#181717]"
+    >
+      <span class="block w-full text-center">
+        Continue with <span class="hidden group-hover:inline-block">GitHub</span>
+      </span>
+      <img
+        src="{% static 'market/icons/github-logo.svg' %}"
+        alt=""
+        class="absolute right-6 top-1/2 -translate-y-1/2 size-[25px]"
+      >
+    </a>
+
+    {% comment %} Kakaotalk social login {% endcomment %}
+    <a
+      href="{% provider_login_url 'kakao' %}"
+      class="group podo-button medium w-full bg-[#FEE500] text-black"
+    >
+      <span class="block w-full text-center">
+        Continue with <span class="hidden group-hover:inline-block">Kakaotalk</span>
+      </span>
+      <img
+        src="{% static 'market/icons/kakao-logo.svg' %}"
+        alt=""
+        class="absolute right-6 top-1/2 -translate-y-1/2 size-[26px] rounded-sm"
+      >
+    </a>
+
+    {% comment %} Naver social login {% endcomment %}
+    <a
+      href="{% provider_login_url 'naver' %}"
+      class="group podo-button medium w-full bg-[#03C75A] text-white"
+    >
+      <span class="block w-full text-center">
+        Continue with <span class="hidden group-hover:inline-block">Naver</span>
+      </span>
+      <img
+        src="{% static 'market/icons/naver-logo.svg' %}"
+        alt=""
+        class="absolute right-6 top-1/2 -translate-y-1/2 size-7 rounded-lg"
+      >
+    </a>
+  </div>
 </div>
 
 {% endblock content %}
