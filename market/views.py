@@ -5,7 +5,7 @@ from allauth.account.views import PasswordChangeView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from .models import PostItem
-from .forms import PostItemForm
+from .forms import PostItemCreateForm, PostItemUpdateForm
 
 
 class CustomPasswordChangeView(PasswordChangeView):
@@ -83,7 +83,7 @@ class ItemCreateView(CreateView):
     model = PostItem
 
     # The ModelForm used to render and validate input for a new PostItem
-    form_class = PostItemForm
+    form_class = PostItemCreateForm
 
     # Template used to render the "create item" form page
     template_name = "market/item_form.html"
@@ -113,7 +113,7 @@ class ItemUpdateView(UpdateView):
     Class-based update view for editing an existing PostItem.
 
     - Uses PostItem as the underlying model.
-    - Uses PostItemForm to render and validate the form fields.
+    - Uses PostItemUpdateForm to render and validate the form fields, including the 'is_sold' flag.
     - Renders the same 'market/item_form.html' template as the create view.
     - Retrieves the item to edit based on the 'id' parameter from the URL.
     - After a successful update, redirects to the updated item's detail page.
@@ -123,7 +123,7 @@ class ItemUpdateView(UpdateView):
     model = PostItem
 
     # The ModelForm used to render and validate input for an existing PostItem
-    form_class = PostItemForm
+    form_class = PostItemUpdateForm
 
     # Template used to render the "edit item" form page (shared with create view)
     template_name = "market/item_form.html"

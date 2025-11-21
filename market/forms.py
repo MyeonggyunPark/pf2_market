@@ -69,32 +69,20 @@ class CustomSignupForm(SignupForm):
         return user
 
 
-class PostItemForm(forms.ModelForm):
+class BasePostItemForm(forms.ModelForm):
     """
-    ModelForm for creating and editing PostItem instances.
+    Base ModelForm for PostItem used by both create and update forms.
 
-    This form:
-    - Exposes the main PostItem fields used on the "create item" page.
-    - Renders item_condition as a group of radio buttons.
-    - Removes HTML5 'required' attributes so that validation and error messages are handled consistently by Django on the server side.
-    - Maps model-level 'blank' error messages to form-level 'required' messages, so the same text is reused in both layers.
+    - Renders item_condition as radio buttons.
+    - Hides native file inputs for item_image1/2/3 (custom UI in template).
+    - Removes HTML5 'required' so that validation is handled by Django only.
+    - Reuses model-level 'blank' messages as form-level 'required' messages.
     """
 
     class Meta:
         # Underlying model for this form
         model = PostItem
-
-        # Fields that will be rendered and processed in the form
-        fields = [
-            "item_title",
-            "item_price",
-            "item_condition",
-            "item_image1",
-            "item_image2",
-            "item_image3",
-            "item_detail",
-        ]
-
+        fields = "__all__"
         # Widgets override: render condition as radios and hide native file inputs
         widgets = {
             "item_condition": forms.RadioSelect(),
@@ -140,3 +128,45 @@ class PostItemForm(forms.ModelForm):
             # If a blank message exists, apply it to the form field's 'required' error
             if blank_msg:
                 self.fields[name].error_messages["required"] = blank_msg
+
+
+class PostItemCreateForm(BasePostItemForm):
+    """
+    Form used for creating new PostItem instances.
+
+    Does NOT expose 'is_sold' – new items are created as unsold by default.
+    """
+
+    class Meta(BasePostItemForm.Meta):
+        # Fields that will be rendered and processed in the create form
+        fields = [
+            "item_title",
+            "item_price",
+            "item_condition",
+            "item_image1",
+            "item_image2",
+            "item_image3",
+            "item_detail",
+        ]
+
+
+class PostItemUpdateForm(BasePostItemForm):
+    """
+    Form used for updating existing PostItem instances.
+
+    Same as the create form, but includes the 'is_sold' field so that
+    the seller can mark the item as sold.
+    """
+
+    class Meta(BasePostItemForm.Meta):
+        # Same fields as create form + is_sold
+        fields = [
+            "item_title",
+            "item_price",
+            "item_condition",
+            "item_image1",
+            "item_image2",
+            "item_image3",
+            "item_detail",
+            "is_sold",
+        ]

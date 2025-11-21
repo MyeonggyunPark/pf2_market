@@ -342,3 +342,78 @@ input.no-spin[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+@layer components {
+
+  /* Wrapper for the SOLD toggle */
+  .sold-toggle-wrapper {
+    @apply inline-flex items-center cursor-pointer;
+  }
+
+  /* Hide the real BooleanField checkbox visually */
+  .sold-toggle-input {
+    @apply sr-only;
+  }
+
+    /* Outer track (green / gray background) */
+  .sold-toggle-track {
+    @apply relative flex items-center rounded-full;
+    width: 124px;
+    height: 44px;
+    padding: 4px;
+    background-color: var(--color-button-decoration);
+    /* default: SALE = green */
+    transition: background-color 0.2s ease;
+  }
+
+  /* White capsule that slides left/right inside the track */
+  .sold-toggle-thumb {
+    @apply flex items-center justify-center rounded-full bg-white shadow;
+    width: 72px;
+    height: 36px;
+    position: relative;
+    transform: translateX(0);
+    /* default: left (SALE) */
+    transition: transform 0.2s ease;
+  }
+
+  /* SALE / SOLD text: stacked in the center of the capsule and toggled via opacity */
+  .sold-toggle-text {
+    @apply absolute inset-0 flex items-center justify-center text-[14px] font-bold;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  /* green */
+  .sold-toggle-text-sale {
+    color: var(--color-button-decoration);
+  }
+
+  /* gray */
+  .sold-toggle-text-sold {
+    color: var(--color-button-secondary-bg);
+  }
+
+  /* === unchecked → SALE state === */
+  .sold-toggle-input:not(:checked)+.sold-toggle-track .sold-toggle-text-sale {
+    opacity: 1;
+  }
+
+  /* === checked → SOLD state === */
+  .sold-toggle-input:checked+.sold-toggle-track {
+    background-color: var(--color-button-secondary-bg);
+    /* gray background */
+  }
+
+  .sold-toggle-input:checked+.sold-toggle-track .sold-toggle-thumb {
+    transform: translateX(44px);
+  }
+
+  .sold-toggle-input:checked+.sold-toggle-track .sold-toggle-text-sale {
+    opacity: 0;
+  }
+
+  .sold-toggle-input:checked+.sold-toggle-track .sold-toggle-text-sold {
+    opacity: 1;
+  }
+}

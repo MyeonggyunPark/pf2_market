@@ -38,30 +38,46 @@
   </div>
 
 
-  {% comment %} Row containing price field and condition radio buttons {% endcomment %}
-  <div class="col-span-2 flex items-center">
-    <div class="w-full grid grid-cols-2 gap-x-6">
-      
-      {% comment %} Item price input (left column) {% endcomment %}
-      <div>
+  {# Row containing sold toggle, price field and condition radio buttons #}
+  <div class="col-span-2">
+
+    <div class="flex items-center gap-6 w-full">
+
+      {# Optional "sold" toggle: only rendered when is_sold field exists (update form) #}
+      {% if form.is_sold %}
+        <div class="flex items-center">
+          <label class="sold-toggle-wrapper">
+
+            {% comment %} Hide the real checkbox visually; it only holds the state {% endcomment %}
+            {{ form.is_sold|add_class:"sold-toggle-input" }}
+
+            {% comment %} Colored track (green/gray) with the white capsule that slides left/right {% endcomment %}
+            <span class="sold-toggle-track">
+              <span class="sold-toggle-thumb">
+                <span class="sold-toggle-text sold-toggle-text-sale">SALE</span>
+                <span class="sold-toggle-text sold-toggle-text-sold">SOLD</span>
+              </span>
+            </span>
+
+          </label>
+        </div>
+      {% endif %}
+
+      {# Item price input (center) #}
+      <div class="flex-1">
         {{ form.item_price|add_class:"podo-input no-spin"|attr:"placeholder:Item Price"|add_error_class:"error" }}
       </div>
 
-      {% comment %} Item condition radio buttons (right column) {% endcomment %}
+      {# Item condition radio buttons (right side) #}
       <div class="flex flex-nowrap justify-end items-center gap-3">
         {% for value, label in form.item_condition.field.choices %}
-          
           <label class="cursor-pointer shrink-0">
-
-            {% comment %} Hidden native radio input used for form submission {% endcomment %}
             <input
               type="radio"
               name="{{ form.item_condition.html_name }}"
               value="{{ value }}"
               class="sr-only peer"
               {% if form.item_condition.value == value|stringformat:"s" %}checked{% endif %}>
-
-            {% comment %} Styled chip acting as the visible radio control {% endcomment %}
             <span class="podo-chip text-[15px] text-chip-border font-semibold px-3 py-1.5 leading-5
               peer-checked:text-chip-primary-fg
               peer-checked:bg-chip-primary-bg
@@ -70,11 +86,13 @@
               {{ label }}
             </span>
           </label>
-
         {% endfor %}
       </div>
 
-      {% comment %} Validation errors for item price {% endcomment %}
+    </div>
+
+    {% comment %} Validation errors for price (left) and condition (right) under the row {% endcomment %}
+    <div class="mt-1 grid grid-cols-2 gap-x-6">
       <div>
         {% for error in form.item_price.errors %}
           <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
@@ -83,7 +101,6 @@
         {% endfor %}
       </div>
 
-      {% comment %} Validation errors for item condition {% endcomment %}
       <div>
         {% for error in form.item_condition.errors %}
           <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
@@ -91,7 +108,6 @@
           </div>
         {% endfor %}
       </div>
-
     </div>
   </div>
 
@@ -230,7 +246,6 @@
 
     </div>
   </div>
-
 
   {% comment %} Form action buttons: Cancel (back to list) and Save (submit form) {% endcomment %}
   <div class="col-span-2 flex w-full max-w-[600px] mx-auto mt-4">

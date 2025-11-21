@@ -129,6 +129,9 @@ class PostItem(models.Model):
         },
     )
 
+    # Whether this item has been sold (used to display sold status / styling)
+    is_sold = models.BooleanField(default=False)
+    
     # Main image for the item (required).
     item_image1 = models.ImageField(
         upload_to=item_image_upload_to,
