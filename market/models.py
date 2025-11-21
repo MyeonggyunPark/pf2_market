@@ -4,21 +4,28 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 # Import the field-level validator from validators.py
-from .validators import validate_no_special_characters, validate_image_mime_type
+from market.validators import validate_no_special_characters, validate_image_mime_type
 
-# Validators used to enforce minimum numeric values and restrict allowed file extensions
+# Reusable upload path builders for user profile images and item images
+from market.utils import item_image_upload_to, profile_image_upload_to
+
+#  Core validators for numeric ranges and file extensions
 from django.core.validators import MinValueValidator, FileExtensionValidator
-
-# Used to create safe folder names and timestamp-based subfolders for uploads
-from django.utils import timezone
-from django.utils.text import slugify
 
 
 # Custom user model extending Django's default AbstractUser
 class User(AbstractUser):
-    """Custom user model with additional fields like nickname and address."""
+    """
+    Custom user model that extends Django's AbstractUser.
 
-    # Custom optional unique nickname field for each user
+    Adds:
+    - nickname: unique display name shown in the UI
+    - address, city: basic location information
+    - profile_pic: user avatar image with a sensible default
+    - intro: short user bio shown on the profile page
+    """
+
+    # Optional unique nickname field for each user
     nickname = models.CharField(
         max_length=15, 
         unique=True, 
@@ -32,42 +39,27 @@ class User(AbstractUser):
     # Optional city field for each user
     city = models.CharField(max_length=40, null=True)
 
+    # Profile picture shown on the user's profile and listings
+    # Uses a default image and uploads to a per-user folder via profile_image_upload_to()
+    profile_pic = models.ImageField(default="default_profile_pic.jpg", upload_to=profile_image_upload_to)
+
+    # Short self-introduction text shown on the profile page
+    intro = models.CharField(max_length=60, blank=True)
+
+    # Available 1–5 rating choices for the seller rating
+    RATING_CHOICES = [
+        ("1", "1"),
+        ("2", "2"),
+        ("3", "3"),
+        ("4", "4"),
+        ("5", "5"),
+    ]
+    # Seller rating score (1–5) used to display seller reputation (e.g. stars)
+    # Defaults to 1 for newly created users
+    seller_rating = models.CharField(max_length=5, choices=RATING_CHOICES, default=1)
+
     def __str__(self):
         return self.email
-
-
-def item_image_upload_to(instance, filename):
-    """
-    Build the upload path for item images based on the post author and creation month.
-
-    Resulting path pattern:
-    media/item_pics/<nickname-or-email-local-part>/<year-month>/<filename>
-
-    Example:
-    item_pics/podo-user/202511/my_photo.jpg
-    """
-    author = instance.item_author
-
-    # Priority 1: use the user's nickname if available
-    if author.nickname:
-        base_name = author.nickname
-
-    # Priority 2: fall back to username (email), using only the part before '@'
-    elif author.username:
-        base_name = author.username.split("@")[0]
-
-    # Fallback name if both nickname and username are unexpectedly missing
-    else:
-        base_name = "user"
-
-    # Convert the base name into a filesystem- and URL-safe slug
-    folder_name = slugify(base_name)
-
-    # Use current year+month (e.g. "202511") as a subfolder for upload date
-    month_folder = timezone.now().strftime("%Y%m")
-
-    # Final upload path relative to MEDIA_ROOT
-    return f"item_pics/{folder_name}/{month_folder}/{filename}"
 
 
 ## Post model for items listed in the market

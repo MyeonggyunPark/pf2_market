@@ -13,29 +13,47 @@ from .models import User, PostItem
 class CustomUserAdmin(BaseUserAdmin):
     """
     Admin configuration for the custom User model.
-    Inherits all default user management features from Django's built-in UserAdmin.
+
+    - Inherits all default user management features from Django's built-in UserAdmin.
+    - Adds support for custom profile fields (nickname, address, city, profile_pic, intro).
     """
 
-    # Extend the default fieldsets to show the custom "nickname" and "address" field
+    # Extend the default fieldsets to show custom fields
     # in the change form (edit existing user in the admin)
     fieldsets = BaseUserAdmin.fieldsets + (
-        ("Custom Fields", {"fields": ("nickname", "address", "city")}),
+        ("Custom Fields", {"fields": ("nickname", "address", "city", "profile_pic", "intro", "seller_rating")}),
     )
 
-    # Extend the add_fieldsets to include the custom "nickname" and "address" field
+    # Extend the add_fieldsets to include custom fields
     # in the add form (create a new user in the admin)
     add_fieldsets = BaseUserAdmin.add_fieldsets + (
         (
             "Custom Fields",
             {
                 "classes": ("wide",),
-                "fields": ("nickname", "address", "city"),
+                "fields": (
+                    "nickname",
+                    "address",
+                    "city",
+                    "profile_pic",
+                    "intro",
+                    "seller_rating",
+                ),
             },
         ),
     )
 
-    # Columns shown in the list view
-    list_display = ("nickname", "username", "email", "address", "city", "is_staff")
+    # Columns shown in the user list view in the admin.
+    list_display = (
+        "nickname",
+        "username",
+        "email",
+        "seller_rating",
+        "profile_pic",
+        "address",
+        "city",
+        "is_staff",
+    )
 
 
 # Register the PostItem model with a basic ModelAdmin configuration
