@@ -165,6 +165,10 @@ AUTHENTICATION_BACKENDS = [
 # This resolves to the "home" view defined in market/urls.py
 LOGIN_REDIRECT_URL = "home"
 
+# URL name of the login view.
+# Used by LoginRequiredMixin and Django's auth system when redirecting anonymous users.
+LOGIN_URL = "account_login"
+
 # URL name to redirect to after a successful logout
 # Used by django-allauth when a user logs out
 ACCOUNT_LOGOUT_REDIRECT_URL = "home"
@@ -184,19 +188,17 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 # '*' marks the field as required.
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
-# Tell django-allauth to use a custom signup form instead of the default one
-# The string value must be the full Python path to the custom form class
+# Override default django-allauth forms with custom forms in the market app.
 ACCOUNT_FORMS = {
-    # Custom form that extends allauth's Form
-    # signup page
+    # Custom signup form (rendered on signup page).
     "signup": "market.forms.CustomSignupForm",
-    # login.html
+    # Custom login form (rendered on login page).
     "login": "market.forms.CustomLoginForm",
-    # password_reset.html
+    # Custom password reset request form (password_reset.html).
     "reset_password": "market.forms.CustomResetPasswordForm",
-    # password_reset_from_key.html
+    # Custom "set new password" form (password_reset_from_key.html).
     "reset_password_from_key": "market.forms.CustomResetPasswordFromKeyForm",
-    # password_change.html
+    # Custom password change form (password_change.html, when user is logged in).
     "change_password": "market.forms.CustomChangePasswordForm",
 }
 
@@ -229,5 +231,6 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
 # Number of days a password reset link remains valid before it expires
 PASSWORD_RESET_TIMEOUT_DAYS = 1
 
-# Use the console email backend so all emails are printed to the terminal instead of being sent
+# Use the console email backend so all emails are printed to the terminal
+# instead of being sent (useful for local development).
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

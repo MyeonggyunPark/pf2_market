@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from allauth.account.views import PasswordChangeView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from braces.views import LoginRequiredMixin
 
 from .models import PostItem
 from .forms import PostItemCreateForm, PostItemUpdateForm
@@ -68,12 +69,13 @@ class ItemDetailView(DetailView):
     pk_url_kwarg = "id"
 
 
-class ItemCreateView(CreateView):
+class ItemCreateView(LoginRequiredMixin, CreateView):
     """
     Class-based create view for posting a new item to the market.
 
+    - Requires the user to be logged in (via LoginRequiredMixin).
     - Uses PostItem as the underlying model.
-    - Uses PostItemForm to render and validate the form fields.
+    - Uses PostItemCreateForm to render and validate the form fields.
     - Renders the 'market/item_form.html' template.
     - Automatically sets the current logged-in user as the item_author.
     - After a successful create, redirects to the item detail page for the new item.
@@ -83,6 +85,7 @@ class ItemCreateView(CreateView):
     model = PostItem
 
     # The ModelForm used to render and validate input for a new PostItem
+    # (create-only fields: does not expose `is_sold`)
     form_class = PostItemCreateForm
 
     # Template used to render the "create item" form page
