@@ -66,8 +66,8 @@ class PostItemAdmin(admin.ModelAdmin):
 
     # Columns shown in the list view
     list_display = (
-        "is_sold",
         "item_title",
+        "is_sold",
         "item_price",
         "item_condition",
         "item_author",

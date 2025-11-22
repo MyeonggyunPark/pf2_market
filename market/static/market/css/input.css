@@ -192,7 +192,7 @@
   }
 
   /* Decorative right-side blob for primary buttons */
-  .podo-button.primary::after {
+  .podo-button.primary:not(.no-after)::after {
     content: ' ';
     position: absolute;
     left: calc(100% - 20px);

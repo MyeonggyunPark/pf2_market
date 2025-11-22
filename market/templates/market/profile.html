@@ -85,11 +85,17 @@
             {{ postitem.item_title }}
           </h2>
 
-          {% comment %} Price section {% endcomment %}
-          <div class="flex items-center h-[30px] my-[19px]">
-            <span class="text-[20px] font-bold truncate">
+          {% comment %} Price section with sold styling and a SOLD badge when the item is marked as sold {% endcomment %}
+          <div class="flex justify-between items-center h-[30px] my-[19px]">
+            <span class="text-[20px] font-bold truncate {% if postitem.is_sold %} line-through text-post-sold {% endif %}">
               &euro;&nbsp;{{ postitem.item_price|intcomma }}
             </span>
+            
+            {% if postitem.is_sold %}
+            <span class="rounded-full px-3 py-1 bg-post-sold text-white font-semibold">
+              SOLD
+            </span>
+            {% endif %}
           </div>
 
           {% comment %} Meta information: seller city and creation date {% endcomment %}
@@ -97,8 +103,8 @@
             {{ postitem.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ postitem.dt_created|date:"d.m.Y" }} 
           </div>
 
-          {% comment %} Button to view item details {% endcomment %}
-          <a href="{% url 'item-detail' postitem.id %}" class="podo-button primary block mt-[22px] mb-4">
+          {% comment %} Button to view item details (uses sold-specific styling and no-after effect when the item is sold) {% endcomment %}
+          <a href="{% url 'item-detail' postitem.id %}" class="podo-button primary block mt-[22px] mb-4 {%if postitem.is_sold %} bg-post-sold no-after{% endif %}">
             View Details
           </a>
 

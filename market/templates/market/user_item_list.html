@@ -48,11 +48,17 @@
           {{ item.item_title }}
         </h2>
 
-        {% comment %} Price section: euro symbol + formatted price {% endcomment %}
-        <div class="flex items-center h-[30px] my-[19px]">
-          <span class="text-[20px] font-bold truncate">
+        {% comment %} Price section with sold styling and a SOLD badge when the item is marked as sold {% endcomment %}
+        <div class="flex justify-between items-center h-[30px] my-[19px]">
+          <span class="text-[20px] font-bold truncate {% if item.is_sold %} line-through text-post-sold {% endif %}">
             &euro;&nbsp;{{ item.item_price|intcomma }}
           </span>
+
+          {% if item.is_sold %}
+            <span class="rounded-full px-3 py-1 bg-post-sold text-white font-semibold">
+              SOLD
+            </span>
+          {% endif %}
         </div>
 
         {% comment %} Meta information: city  and creation date {% endcomment %}
@@ -60,8 +66,10 @@
           {{ item.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ item.dt_created|date:"d.m.Y" }} 
         </div>
 
-        {% comment %} Button to navigate to the item detail page {% endcomment %}
-        <a class="podo-button primary podo-button primary block mt-[22px] mb-4" href="{% url 'item-detail' item.id %}">View Details</a>
+        {% comment %} 
+        Button to navigate to the item detail page (uses sold-specific styling and no-after effect when the item is sold) 
+        {% endcomment %}
+        <a class="podo-button primary block mt-[22px] mb-4 {%if item.is_sold %} bg-post-sold no-after{% endif %}" href="{% url 'item-detail' item.id %}">View Details</a>
       </div>
     </div>
 

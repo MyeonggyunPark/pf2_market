@@ -64,22 +64,17 @@
         &euro;&nbsp;{{ postitem.item_price|intcomma }}
       </span>
 
-      {% comment %} Item condition {% endcomment %}
-      <span class="podo-chip font-bold text-chip-primary-fg bg-chip-primary-bg border-chip-primary-border
-          {% if postitem.is_sold %} hidden {% endif %}">
-        {{ postitem.get_item_condition_display }}
-      </span>
-
-      {% comment %} Sold status text shown when the item is marked as sold {% endcomment %}
+      {% comment %} Sold status badge shown next to the price when the item is marked as sold {% endcomment %}
       {% if postitem.is_sold %}
-        <span class="podo-chip font-bold text-post-sold border-3 border-post-sold">
-        {{ postitem.get_item_condition_display }}
-        </span>
-
-        <span class="ml-[15px] podo-chip font-bold text-chip-primary-fg bg-chip-primary-bg border-chip-primary-border">
-          Sold
+        <span class="rounded-full px-[18px] py-[5px] text-[17px] leading-[25px] text-white font-semibold bg-post-sold mr-2">
+          SOLD
         </span>
       {% endif %}
+
+      {% comment %} Item condition {% endcomment %}
+      <span class="podo-chip font-bold text-chip-primary-fg bg-chip-primary-bg border-chip-primary-border">
+        {{ postitem.get_item_condition_display }}
+      </span>
 
       {% comment %} Creation date of the item {% endcomment %}
       <span class="ml-auto text-[15px] text-post-detail-date">

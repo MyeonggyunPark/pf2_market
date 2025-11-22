@@ -32,7 +32,8 @@ class IndexView(ListView):
     - Uses PostItem as the underlying model.
     - Renders the 'market/index.html' template.
     - Exposes the object list in the template as 'items'.
-    - Paginates the list, showing 4 items per page.
+    - Paginates the list, showing 8 items per page.
+    - Shows only items that are not marked as sold (is_sold=False).
     - Orders items by creation date in descending order (newest first).
     """
 
@@ -48,8 +49,15 @@ class IndexView(ListView):
     # Number of items displayed per page
     paginate_by = 8
 
-    # Default ordering for the queryset (most recently created items first)
-    ordering = ["-dt_created"]
+    def get_queryset(self):
+        """
+        Return the queryset for the index page.
+
+        - Filters out items that are already sold (is_sold=True).
+        - Orders remaining items by creation date in descending order.
+        """
+        
+        return PostItem.objects.filter(is_sold=False).order_by("-dt_created")
 
 
 class ItemDetailView(LoginRequiredMixin, DetailView):
