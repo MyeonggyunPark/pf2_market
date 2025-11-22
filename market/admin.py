@@ -66,6 +66,7 @@ class PostItemAdmin(admin.ModelAdmin):
 
     # Columns shown in the list view
     list_display = (
+        "is_sold",
         "item_title",
         "item_price",
         "item_condition",
@@ -75,7 +76,7 @@ class PostItemAdmin(admin.ModelAdmin):
     )
 
     # Filters in the right sidebar
-    list_filter = ("item_price","item_condition", "dt_created", "dt_updated")
+    list_filter = ("is_sold", "item_price","item_condition", "dt_created", "dt_updated")
 
     # Fields that can be searched via the search box
     search_fields = (
