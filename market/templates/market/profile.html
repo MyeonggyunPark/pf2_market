@@ -60,7 +60,8 @@
 
       {% comment %} Show "View All Listings" link only if there are items for this user {% endcomment %}
       {% if user_postitems %}
-      <a class="flex items-center text-[20px] font-semibold hover:text-link transition-colors" href="{% url 'home' %}">
+      <a class="flex items-center text-[20px] font-semibold hover:text-link transition-colors" 
+          href="{% url 'user-item-list' profile_user.id %}">
         <span>View All Listings</span>
         <img class="w-[15px] h-[15px] ml-1.5" src="{% static 'market/icons/ic-triangle.svg' %}" alt="triangle icon">
       </a>

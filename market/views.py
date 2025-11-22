@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
 from allauth.account.views import PasswordChangeView
@@ -260,6 +260,60 @@ class ProfileView(DetailView):
         profile_user = self.object
 
         # Latest 4 items posted by this user, ordered by creation date (newest first)
-        context["user_postitems"] = PostItem.objects.filter(item_author=profile_user).order_by("-dt_created")[:4]
+        context["user_postitems"] = profile_user.posts.order_by("-dt_created")[:4]
+
+        return context
+
+
+class UserPostItemListView(ListView):
+    """
+    List view for displaying all PostItem objects authored by a specific user.
+
+    - Uses PostItem as the underlying model.
+    - Expects a URL kwarg 'id' containing the User primary key.
+    - Paginates the result set, showing 8 items per page.
+    - Additionally exposes the profile owner as 'profile_user' in the template context
+        so the template can render user-specific information (nickname, avatar, etc.).
+    """
+
+    # Model that this list view will query
+    model = PostItem
+
+    # Template used to render the user's item list
+    template_name = "market/user_item_list.html"
+
+    # Context variable name used in the template for the queryset of PostItem objects
+    context_object_name = "user_postitems"
+
+    # Number of PostItem objects per page
+    paginate_by = 8
+
+    def get_queryset(self):
+        """
+        Return the queryset of PostItem objects for the given user.
+
+        - Resolves the User instance from the 'id' URL kwarg.
+        - Stores the resolved user on 'self.profile_user' for later reuse.
+        - Returns all PostItem objects authored by this user, ordered by newest first.
+        """
+        # Look up the profile owner (User) based on the URL parameter 'id';
+        # raise 404 if no such user exists.
+        self.profile_user = get_object_or_404(User, pk=self.kwargs.get("id"))
+
+        # Return all posts authored by this user, newest first
+        return self.profile_user.posts.order_by("-dt_created")
+
+    def get_context_data(self, **kwargs):
+        """
+        Extend the default context with the profile owner.
+
+        - Adds 'profile_user' so the template can access user information
+            (nickname, profile picture, etc.) alongside the item list.
+        """
+        # Start with the default context from ListView (which includes 'user_postitems')
+        context = super().get_context_data(**kwargs)
+
+        # Add the current profile owner (User instance) to the context
+        context["profile_user"] = self.profile_user
 
         return context

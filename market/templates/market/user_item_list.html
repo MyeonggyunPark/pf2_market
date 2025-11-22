@@ -1,0 +1,128 @@
+{% extends "market_base/base_with_navbar.html" %}
+{% comment %} Use the shared base layout with navbar for the profile items page {% endcomment %}
+
+{% load static %}
+{% load humanize %}
+{% load market_extras %}
+
+{% comment %} Page title: show user's nickname in the browser tab {% endcomment %}
+{% block title %}{{ profile_user.nickname }}'s Items | Podo-Market{% endblock title %}
+
+{% comment %} Main content {% endcomment %}
+{% block content %}
+<div class="w-full max-w-[1060px] mx-auto mt-[90px] mb-[260px]">
+  
+  {% comment %} Header row: "Back to Profile" link and page title with badges {% endcomment %}
+  <div class="flex justify-between items-center mb-[50px] px-5">
+
+    {% comment %} Back link: navigate to the selected user's profile page {% endcomment %}
+    <a class="flex items-center text-[20px] font-semibold hover:text-link transition-colors" href="{% url 'profile' profile_user.id %}">
+      <img class="w-[15px] h-[15px] mr-2 -scale-x-100" src="{% static 'market/icons/ic-triangle.svg' %}" alt="Back icon">
+      <span>Back to Profile</span>
+    </a>
+
+    {% comment %} Page title: show nickname and total number of items with pill badges {% endcomment %}
+    <h2 class="text-[22px] flex items-center gap-3">
+      All Sale Items of 
+      <span class="rounded-full px-[18px] py-[5px] text-[17px] leading-[25px] font-semibold border-2 border-button-darkpurple-bg">{{ profile_user.nickname }}</span> 
+      <span>|</span>
+      <span class="rounded-full px-[18px] py-[5px] text-[17px] leading-[25px] font-semibold border-2 border-button-decoration">{{ paginator.count }}</span>
+    </h2>
+  </div>
+
+  {% comment %} Item cards grid: 4 columns with spacing {% endcomment %}
+  <div class="grid grid-cols-4 gap-x-5 gap-y-[30px]">
+
+    {% comment %} Loop through each item posted by the user {% endcomment %}
+    {% for item in user_postitems %}
+    <div class="podo-card flex flex-col p-3.5 bg-gray-100">
+
+      {% comment %} Thumbnail image for the item (main image) {% endcomment %}
+      <img class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]" src="{{ item.item_image1.url }}" alt="thumbnail">
+      
+      {% comment %} Card content: title, price, meta info, and details button {% endcomment %}
+      <div class="flex flex-col flex-1 mx-[11px]">
+        
+        {% comment %} Item title with two-line clamp {% endcomment %}
+        <h2 class="font-normal text-[18px] leading-[22px] h-11 overflow-hidden text-ellipsis line-clamp-2">
+          {{ item.item_title }}
+        </h2>
+
+        {% comment %} Price section: euro symbol + formatted price {% endcomment %}
+        <div class="flex items-center h-[30px] my-[19px]">
+          <span class="text-[20px] font-bold truncate">
+            &euro;&nbsp;{{ item.item_price|intcomma }}
+          </span>
+        </div>
+
+        {% comment %} Meta information: city  and creation date {% endcomment %}
+        <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
+          {{ item.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ item.dt_created|date:"d.m.Y" }} 
+        </div>
+
+        {% comment %} Button to navigate to the item detail page {% endcomment %}
+        <a class="podo-button primary podo-button primary block mt-[22px] mb-4" href="{% url 'item-detail' item.id %}">View Details</a>
+      </div>
+    </div>
+
+    {% comment %} Fallback message when there are no items to display {% endcomment %}
+    {% empty %}
+      <p class="col-span-4 text-center text-[20px] font-bold my-[120px]">There are no items for sale.</p>
+    {% endfor %}
+  </div>
+
+  {% comment %} Pagination controls: only render when the item list is paginated {% endcomment %}
+  {% if is_paginated %}
+  <ul class="flex justify-center items-center list-none mt-[50px] p-0">
+
+    {% comment %} "First" and "Previous" buttons when a previous page exists {% endcomment %}
+    {% if page_obj.has_previous %}
+      <li class="mr-5">
+        <a href="?page=1"
+          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg"
+          aria-label="Go to first page">
+          «
+        </a>
+      </li>
+      <li class="mr-5">
+        <a href="?page={{ page_obj.previous_page_number }}"
+          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg"
+          aria-label="Go to previous page">
+          ‹
+        </a>
+      </li>
+    {% endif %}
+    
+    {% comment %} Page number links: current page highlighted, nearby pages shown {% endcomment %}
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <li class="mr-5 px-[15px] py-[9px] rounded-full font-bold text-post-list-pagination bg-post-list-pagination-bg">
+          {{ num }}
+        </li>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <li class="mr-5">
+          <a href="?page={{ num }}" class="hover:underline">{{ num }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+    
+    {% comment %} "Next" and "Last" buttons when a next page exists {% endcomment %}
+    {% if page_obj.has_next %}
+      <li class="mr-5">
+        <a href="?page={{ page_obj.next_page_number }}"
+          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg" aria-label="Go to next page">
+          ›
+        </a>
+      </li>
+      <li>
+        <a href="?page={{ page_obj.paginator.num_pages }}"
+          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg" aria-label="Go to last page">
+          »
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+  {% endif %}
+
+</div>
+{% endblock content %}

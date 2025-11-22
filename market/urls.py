@@ -22,4 +22,7 @@ urlpatterns = [
 
     # Profile page: shows a user's profile by their ID using ProfileView
     path("users/<int:id>/", views.ProfileView.as_view(), name="profile"),
+
+    # User's items page: shows a paginated list of all items posted by a specific user
+    path("user/<int:id>/items/", views.UserPostItemListView.as_view(), name="user-item-list"),
 ]
