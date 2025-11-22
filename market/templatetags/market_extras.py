@@ -47,3 +47,36 @@ def empty_stars(rating, max_stars=5):
 
     rating = max(0, min(rating, max_stars))
     return range(max_stars - rating)
+
+
+@register.filter
+def get_city(value):
+    """
+    Extracts the city part from a 'City, State' formatted string.
+    Example: 'Essen, NRW' -> 'Essen'
+    Returns an empty string if the value is empty or not properly formatted.
+    """
+    if not value:
+        return ""
+
+    parts = value.split(",", 1)
+    city = parts[0].strip()
+    return city
+
+
+@register.filter
+def get_state(value):
+    """
+    Extracts the state/region part from a 'City, State' formatted string.
+    Example: 'Essen, NRW' -> 'NRW'
+    Returns an empty string if the string does not contain a comma or is invalid.
+    """
+    if not value:
+        return ""
+
+    parts = value.split(",", 1)
+    if len(parts) < 2:
+        return ""
+
+    state = parts[1].strip()
+    return state

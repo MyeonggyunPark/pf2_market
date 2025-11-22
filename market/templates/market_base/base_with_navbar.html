@@ -19,7 +19,13 @@
     <ul class="flex justify-center list-none mt-[26px] m-0 p-0">
       {% if user.is_authenticated %}
         <li class="mr-[54px] last:mr-0 leading-[25px]">
-          <a href="{% url 'account_logout'%}" 
+          <a href="{% url 'profile' user.id %}" 
+            class="user-menu-dot hover:font-bold hover:text-site-header-user-menu-hover hover:no-underline relative">
+            Profile
+          </a>
+        </li>
+        <li class="mr-[54px] last:mr-0 leading-[25px]">
+          <a href="{% url 'account_logout' %}" 
             class="user-menu-dot hover:font-bold hover:text-site-header-user-menu-hover hover:no-underline relative">
             Logout
           </a>

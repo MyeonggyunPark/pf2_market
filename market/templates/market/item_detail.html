@@ -19,7 +19,7 @@
     {% comment %} Link to navigate back to the item list (home page) {% endcomment %}
     <a href="{% url 'home' %}" class="hover:text-link font-semibold">
       <span class="text-[28px]">«</span> 
-      Go to Home
+      Go to List
     </a>
 
     {% comment %} Show Edit/Delete buttons only when the logged-in user is the author {% endcomment %}
@@ -91,7 +91,7 @@
   </div>
 
   {% comment %} Seller information box: profile image, nickname, rating, and location {% endcomment %}
-  <a href="#" class="no-underline">
+  <a href="{% url "profile" postitem.item_author.id %}" class="no-underline">
     <div class="podo-box gray-background flex justify-center items-center px-5 mx-[15px] py-[25px] rounded-[27px]">
 
       <div class="flex justify-around w-full">
@@ -121,11 +121,11 @@
           {% endfor %}
         </p>
         
-        {% comment %} Seller location: address and city {% endcomment %}
+        {% comment %} Seller location: city and state {% endcomment %}
         <ul class="podo-links">
-          <li>{{ postitem.item_author.address }}</li>
+          <li>{{ postitem.item_author.city|get_city }}</li>
           <li class="divider"></li>
-          <li>{{ postitem.item_author.city }}</li>
+          <li>{{ postitem.item_author.city|get_state }}</li>
         </ul>
 
       </div>

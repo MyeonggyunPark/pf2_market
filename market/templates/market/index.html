@@ -3,6 +3,7 @@
 
 {% load static %}
 {% load humanize %}
+{% load market_extras %}
 
 {% comment %} Main content {% endcomment %}
 {% block content %}
@@ -49,7 +50,7 @@
 
         {% comment %} Meta information: creation date and seller city {% endcomment %}
         <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
-          {{ item.item_author.city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ item.dt_created|date:"d.m.Y" }} 
+          {{ item.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ item.dt_created|date:"d.m.Y" }} 
         </div>
 
         {% comment %} Button to view item details {% endcomment %}

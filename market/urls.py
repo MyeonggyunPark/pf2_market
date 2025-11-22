@@ -19,4 +19,7 @@ urlpatterns = [
     
     # Delete page: handles deleting an existing item using ItemDeleteView
     path("item/<int:id>/delete/", views.ItemDeleteView.as_view(), name="item-delete"),
+
+    # Profile page: shows a user's profile by their ID using ProfileView
+    path("users/<int:id>/", views.ProfileView.as_view(), name="profile"),
 ]

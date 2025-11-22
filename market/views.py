@@ -6,7 +6,7 @@ from allauth.account.models import EmailAddress
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from braces.views import LoginRequiredMixin, UserPassesTestMixin
 
-from market.models import PostItem
+from market.models import PostItem, User
 from market.forms import PostItemCreateForm, PostItemUpdateForm
 from market.utils import confirmation_required_redirect
 
@@ -222,3 +222,44 @@ class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         """
         post_item = self.get_object()
         return post_item.item_author == user
+
+
+class ProfileView(DetailView):
+    """
+    Class-based detail view for displaying a user's profile page.
+
+    - Uses the custom User model as the underlying model.
+    - Renders the 'market/profile.html' template.
+    - Exposes the User instance in the template as 'profile_user'.
+    - Additionally provides the latest 4 PostItem objects authored by this user.
+    """
+
+    # The model that this detail view will retrieve a single instance of
+    model = User
+
+    # Template used to render the profile page
+    template_name = "market/profile.html"
+
+    # Name of the URL keyword argument used to look up the user
+    pk_url_kwarg = "id"
+
+    # Context variable name used in the template for the user instance
+    context_object_name = "profile_user"
+
+    def get_context_data(self, **kwargs):
+        """
+        Extend the default context with the user's recent PostItem listings.
+
+        - Adds 'user_postitems' containing the 4 most recently created posts
+            authored by the profile user.
+        """
+        # Start with the default context provided by DetailView
+        context = super().get_context_data(**kwargs)
+
+        # Current profile owner (User instance for this page)
+        profile_user = self.object
+
+        # Latest 4 items posted by this user, ordered by creation date (newest first)
+        context["user_postitems"] = PostItem.objects.filter(item_author=profile_user).order_by("-dt_created")[:4]
+
+        return context

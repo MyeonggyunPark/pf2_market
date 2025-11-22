@@ -1,0 +1,115 @@
+{% extends "market_base/base_with_navbar.html" %}
+
+{% load static %}
+{% load humanize %}
+{% load market_extras %}
+
+{% comment %} Page title: show profile nickname followed by site name {% endcomment %}
+{% block title %}{{ profile_user.nickname }} | Podo-Market{% endblock title %}
+
+{% comment %} Main content {% endcomment %}
+{% block content %}
+
+  {% comment %} Profile header card: avatar, nickname, intro, rating and location {% endcomment %}
+  <div class="podo-card flex items-center justify-around w-full max-w-[1060px] mx-auto my-15 px-5 py-[25px]">
+    
+    {% comment %} Left side: profile picture and nickname {% endcomment %}
+    <div class="flex items-center gap-2">
+      <img src="{{ profile_user.profile_pic.url|default:'' }}" alt="Profile picture of {{ profile_user.nickname }}"
+          class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0"></img>    
+      <div class="text-[20px] font-bold">
+        {{ profile_user.nickname }}
+      </div>
+    </div>
+
+    {% comment %} Center: intro text if provided, fallback message otherwise {% endcomment %}
+    {% if profile_user.intro %}
+      <p class="text-gray-500 font-semibold">
+        {{ profile_user.intro }}
+      </p>
+    {% else %}
+      <p class="text-gray-500 font-semibold">
+        No introduction.
+      </p>    
+    {% endif %}
+
+    {% comment %} Seller rating block: filled and empty stars based on seller_rating {% endcomment %}
+    <p class="flex items-center">
+      {% for _ in profile_user.seller_rating|filled_stars %}
+      <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
+      {% endfor %}
+      {% for _ in profile_user.seller_rating|empty_stars %}
+      <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
+      {% endfor %}
+    </p>
+
+    {% comment %} Right side: location split into city and state via template filters {% endcomment %}
+    <ul class="podo-links">
+      <li>{{ profile_user.city|get_city }}</li>
+      <li class="divider"></li>
+      <li>{{ profile_user.city|get_state }}</li>
+    </ul>
+  </div>
+
+  {% comment %} Latest listings section: heading and optional "view all" link {% endcomment %}
+  <div class="w-full max-w-[1060px] mx-auto mb-[200px]">
+    <div class="flex justify-between items-center mb-15 px-5">
+      <h2 class="text-[24px] font-semibold">
+        Latest Listings
+      </h2>
+
+      {% comment %} Show "View All Listings" link only if there are items for this user {% endcomment %}
+      {% if user_postitems %}
+      <a class="flex items-center text-[20px] font-semibold hover:text-link transition-colors" href="{% url 'home' %}">
+        <span>View All Listings</span>
+        <img class="w-[15px] h-[15px] ml-1.5" src="{% static 'market/icons/ic-triangle.svg' %}" alt="triangle icon">
+      </a>
+      {% endif %}
+    </div>
+
+    {% comment %} Grid of item cards for the user's latest PostItem objects {% endcomment %}  
+    <div class="grid grid-cols-4 gap-x-5 gap-y-[30px]">
+
+      {% for postitem in user_postitems %}
+      <div class="podo-card flex flex-col p-3.5 bg-gray-100">
+
+        {% comment %} Thumbnail image for the item {% endcomment %}
+        <img class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]" src="{{ postitem.item_image1.url }}" alt="thumbnail">
+
+        {% comment %} Content area: title, price, meta info, and details button {% endcomment %}
+        <div class="flex flex-col grow mx-[11px]">
+
+          {% comment %} Item title {% endcomment %}
+          <h2 class="font-normal text-[18px] leading-[22px] h-11 overflow-hidden text-ellipsis line-clamp-2">
+            {{ postitem.item_title }}
+          </h2>
+
+          {% comment %} Price section {% endcomment %}
+          <div class="flex items-center h-[30px] my-[19px]">
+            <span class="text-[20px] font-bold truncate">
+              &euro;&nbsp;{{ postitem.item_price|intcomma }}
+            </span>
+          </div>
+
+          {% comment %} Meta information: seller city and creation date {% endcomment %}
+          <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
+            {{ postitem.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ postitem.dt_created|date:"d.m.Y" }} 
+          </div>
+
+          {% comment %} Button to view item details {% endcomment %}
+          <a href="{% url 'item-detail' postitem.id %}" class="podo-button primary block mt-[22px] mb-4">
+            View Details
+          </a>
+
+        </div>
+      </div>
+      {% comment %} Fallback message shown when there are no items to display {% endcomment %}
+      {% empty %}
+        <p class="col-span-4 text-center text-[20px] font-bold my-[120px]">
+          There are no items for sale.
+        </p>
+      {% endfor %}
+
+    </div>
+
+{% endblock content %}
