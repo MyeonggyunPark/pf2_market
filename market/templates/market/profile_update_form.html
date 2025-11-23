@@ -21,8 +21,13 @@
 
     {% comment %} Profile picture: current avatar preview + upload control {% endcomment %}
     <div class="flex items-center justify-center mb-[35px]">
-      <img src="{{ user.profile_pic.url|default:'' }}" alt="Profile picture"
-        class="size-20 mr-[21px] rounded-full bg-profile-pic-placeholder bg-cover bg-center object-cover">
+      {% if user.profile_pic %}
+        <img src="{{ user.profile_pic.url }}" alt="Profile picture"
+            class="size-20 mr-[21px] rounded-full bg-profile-pic-placeholder bg-cover bg-center object-cover"></img>    
+      {% else %}
+        <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="Default profile picture"
+            class="size-20 mr-[21px] rounded-full bg-profile-pic-placeholder bg-cover bg-center object-cover"></img>
+      {% endif %}
       <div class="flex-1 leading-loose overflow-hidden text-ellipsis whitespace-nowrap">
         {{ form.profile_pic }}
 

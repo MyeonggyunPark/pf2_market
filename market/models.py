@@ -41,7 +41,7 @@ class User(AbstractUser):
 
     # Profile picture shown on the user's profile and listings
     # Uses a default image and uploads to a per-user folder via profile_image_upload_to()
-    profile_pic = models.ImageField(default="default_profile_pic.jpg", upload_to=profile_image_upload_to)
+    profile_pic = models.ImageField(upload_to=profile_image_upload_to, blank=True, null=True)
 
     # Short self-introduction text shown on the profile page
     intro = models.CharField(max_length=60, blank=True)

@@ -16,8 +16,13 @@
     
     {% comment %} Left side: profile picture and nickname {% endcomment %}
     <div class="flex items-center gap-2">
-      <img src="{{ profile_user.profile_pic.url|default:'' }}" alt="Profile picture of {{ profile_user.nickname }}"
-          class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0"></img>    
+      {% if profile_user.profile_pic %}
+        <img src="{{ profile_user.profile_pic.url }}" alt="Profile picture"
+            class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0"></img>    
+      {% else %}
+        <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="Default profile picture"
+            class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0"></img>
+      {% endif %}
       <div class="text-[20px] font-bold">
         {{ profile_user.nickname }}
       </div>
