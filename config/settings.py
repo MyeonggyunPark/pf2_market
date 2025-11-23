@@ -78,6 +78,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -280,5 +281,15 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_LOGO_PATH = "market/assets/logo.png"
 EMAIL_LOGO_URL = os.environ.get(
     "EMAIL_LOGO_URL",
-    f"http://127.0.0.1:8000/{STATIC_URL}{EMAIL_LOGO_PATH}", 
+    f"podo-market.up.railway.app/{STATIC_URL}{EMAIL_LOGO_PATH}",
 )
+
+# Use WhiteNoise for serving static files with compression and cache-busting
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
