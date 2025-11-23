@@ -9,18 +9,29 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from the .env file located in BASE_DIR.
+# This makes keys such as SECRET_KEY, EMAIL_HOST_USER and EMAIL_HOST_PASSWORD
+# available through os.environ.get(...) when Django starts.
+load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-i$qxx!trdx411z=k=prgjabad87c+^rl)mk0g%gz71nsfv70v6'
+# Read SECRET_KEY from the environment instead of hard-coding it.
+# If SECRET_KEY is not set, fail fast with a clear error so the project
+# never runs with an empty or insecure secret key.
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    raise ImproperlyConfigured("SECRET_KEY environment variable is not set.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -239,6 +250,30 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
 # Number of days a password reset link remains valid before it expires
 PASSWORD_RESET_TIMEOUT_DAYS = 1
 
-# Use the console email backend so all emails are printed to the terminal
-# instead of being sent (useful for local development).
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Configure Django to send email using Gmail's SMTP server.
+# Sensitive values such as EMAIL_HOST_USER and EMAIL_HOST_PASSWORD
+# must be provided via environment variables
+# and should never be hard-coded in this settings module.
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Email account used to authenticate with the SMTP server.
+# These values should be set via environment variables:
+#   EMAIL_HOST_USER        - the Gmail address used to send emails
+#   EMAIL_HOST_PASSWORD    - the app password associated with that account
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+# Configure the logo used in HTML email templates.
+# EMAIL_LOGO_PATH points to the logo file inside the static directory.
+# EMAIL_LOGO_URL is the absolute URL used in templates as the <img src="..."> value.
+# In development we fall back to a localhost URL, but in production this value
+# should be provided via the EMAIL_LOGO_URL environment variable so that it
+# uses the deployed site's domain.
+EMAIL_LOGO_PATH = "market/assets/logo.png"
+EMAIL_LOGO_URL = os.environ.get(
+    "EMAIL_LOGO_URL",
+    f"http://127.0.0.1:8000/{STATIC_URL}{EMAIL_LOGO_PATH}", 
+)
