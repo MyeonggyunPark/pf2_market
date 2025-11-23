@@ -69,8 +69,13 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    
+    # Redirect authenticated users with incomplete profiles to 'profile-set'.
+    "market.middleware.ProfileRequiredMiddleware",
+    
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    
     # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
 ]
