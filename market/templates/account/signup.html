@@ -35,7 +35,11 @@
       {% endfor %}
     </div>
 
-    {% comment %} Nickname field with validation error messages {% endcomment %}
+    {% comment %}
+      Nickname field (previously collected on signup).
+      Now handled on the profile setup page, so this block is kept
+      only for reference and is not rendered.
+    
     <div class="mb-5">
       {{ form.nickname|add_class:"podo-input"|attr:"placeholder:Nickname"|add_error_class:"error" }}
       {% for error in form.nickname.errors %}
@@ -43,9 +47,13 @@
           {{ error }}
         </div>
       {% endfor %}
-    </div>
+    </div>  
+    {% endcomment %}
 
-    {% comment %} Address field with validation error messages {% endcomment %}
+    {% comment %}
+      Address field (previously collected on signup).
+      Now handled on the profile setup page.
+
     <div class="mb-5">
       {{ form.address|add_class:"podo-input"|attr:"placeholder:Address"|add_error_class:"error" }}
       {% for error in form.address.errors %}
@@ -53,9 +61,13 @@
           {{ error }}
         </div>
       {% endfor %}
-    </div>
+    </div> 
+    {% endcomment %}
+    
+    {% comment %}
+      City field (previously collected on signup).
+      Now handled on the profile setup page.
 
-    {% comment %} City field with validation error messages {% endcomment %}
     <div class="mb-5">
       {{ form.city|add_class:"podo-input"|attr:"placeholder:City"|add_error_class:"error" }}
       {% for error in form.city.errors %}
@@ -63,7 +75,8 @@
           {{ error }}
         </div>
       {% endfor %}
-    </div>
+    </div> 
+    {% endcomment %}
 
     {% comment %} Password field with validation error messages {% endcomment %}
     <div class="mb-5">

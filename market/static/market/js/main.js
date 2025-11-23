@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { input: "id_item_image1", output: "file-name-1" },
     { input: "id_item_image2", output: "file-name-2" },
     { input: "id_item_image3", output: "file-name-3" },
+    { input: "id_profile_pic", output: "profile-file-name" },
   ];
 
   // For each file input → output span pair
@@ -16,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const output = document.getElementById(f.output);
 
     // Only attach the listener if the input exists on the current page
-    if (input) {
+    if (input && output) {
 
       // When the user selects or clears a file
       input.addEventListener("change", () => {

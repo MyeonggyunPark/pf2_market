@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from braces.views import LoginRequiredMixin, UserPassesTestMixin
 
 from market.models import PostItem, User
-from market.forms import PostItemCreateForm, PostItemUpdateForm
+from market.forms import PostItemCreateForm, PostItemUpdateForm , ProfileForm
 from market.utils import confirmation_required_redirect
 
 
@@ -325,3 +325,40 @@ class UserPostItemListView(ListView):
         context["profile_user"] = self.profile_user
 
         return context
+
+
+class ProfileSetView(LoginRequiredMixin, UpdateView):
+    """
+    View for editing the currently logged-in user's profile.
+
+    - Uses the custom User model as the underlying model.
+    - Renders 'market/profile_form.html' with ProfileForm.
+    - Always edits request.user (no pk in URL).
+    """
+
+    # Underlying model: custom User
+    model = User
+
+    # Form used to edit the profile fields 
+    form_class = ProfileForm
+
+    # Template for the profile edit page
+    template_name = "market/profile_set_form.html"
+
+    def get_object(self, queryset=None):
+        """
+        Always return the currently logged-in user.
+
+        This ensures users can only edit their own profile, even if someone
+        tries to guess another user's ID.
+        """
+        return self.request.user
+
+    def get_success_url(self):
+        """
+        Where to redirect after a successful profile update.
+
+        - Here we redirect to 'home', but you can change it to 'profile'
+            if you want to go back to the profile detail page instead.
+        """
+        return reverse("home")

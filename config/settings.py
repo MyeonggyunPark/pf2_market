@@ -202,6 +202,9 @@ ACCOUNT_FORMS = {
     "change_password": "market.forms.CustomChangePasswordForm",
 }
 
+# Use a custom account adapter to control login/signup redirect behavior
+ACCOUNT_ADAPTER = "market.adapters.CustomAccountAdapter"
+
 # Keep users logged in across browser sessions when "remember me" is used
 ACCOUNT_SESSION_REMEMBER = True
 

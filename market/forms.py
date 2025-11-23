@@ -7,17 +7,20 @@ from .models import User, PostItem
 class CustomSignupForm(SignupForm):
     """
     Custom signup form extending django-allauth's SignupForm.
-    Adds a 'nickname', 'address' and 'city' field and stores it on the custom User model.
+
+    - Removes HTML5 `required` attributes from all widgets.
+    - Clears default password help texts.
+    - Provides custom "required" error messages for email and password fields.
     """
 
     # Extra optional nickname displayed on the signup page
-    nickname = forms.CharField(max_length=15, required=True, label="Nickname")
+    # nickname = forms.CharField(max_length=15, required=True, label="Nickname")
 
     # Required address field displayed on the signup page
-    address = forms.CharField(max_length=40, required=True, label="Address")
+    # address = forms.CharField(max_length=40, required=True, label="Address")
 
     # Required city field displayed on the signup page
-    city = forms.CharField(max_length=40, required=True, label="City")
+    # city = forms.CharField(max_length=40, required=True, label="City")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,12 +35,12 @@ class CustomSignupForm(SignupForm):
         if "password2" in self.fields:
             self.fields["password2"].help_text = ""
 
-        # custom "required" error messages
+        # Custom "required" error messages for signup fields
         field_msgs = {
             "email": "Please enter your e-mail address.",
-            "nickname": "Please enter your nickname.",
-            "address": "Please enter your address.",
-            "city": "Please enter your city.",
+            # "nickname": "Please enter your nickname.",
+            # "address": "Please enter your address.",
+            # "city": "Please enter your city.",
             "password1": "Please choose a password.",
             "password2": "Please confirm your password.",
         }
@@ -45,43 +48,114 @@ class CustomSignupForm(SignupForm):
             if name in self.fields:
                 self.fields[name].error_messages["required"] = msg
 
+    # def clean_nickname(self):
+    #     """
+    #     Validate that the nickname is unique before saving the user.
+    #     This replicates what a ModelForm would normally do for a unique field.
+    #     """
+    #     # Get the nickname value that was submitted in the form
+    #     nickname = self.cleaned_data.get("nickname")
+
+    #     # Check if any existing user already has this nickname
+    #     if User.objects.filter(nickname=nickname).exists():
+    #         # Raise a validation error that will be shown on the form field
+    #         raise forms.ValidationError("This nickname is already taken.")
+
+    #     # Return the validated nickname value
+    #     return nickname
+
+    # def save(self, request):
+    #     """
+    #     Called by django-allauth when the signup form is submitted and valid.
+    #     Creates the user via the parent class, then attaches 'nickname' and 'address' and 'city'.
+    #     """
+    #     # First let allauth create the user object (email, password, etc.)
+    #     user = super().save(request)
+
+    #     # Safely get the values from the cleaned form data
+    #     nickname = self.cleaned_data.get("nickname")
+    #     address = self.cleaned_data.get("address")
+    #     city = self.cleaned_data.get("city")
+
+    #     # Attach nickname and address to the user instance
+    #     user.nickname = nickname
+    #     user.address = address
+    #     user.city = city
+    #     user.save()
+
+    #     # Return the user instance to allauth's signup flow
+    #     return user
+
+
+class ProfileForm(forms.ModelForm):
+    """
+    Form used for editing the user's profile after signup.
+
+    - Lets the user set profile_pic, nickname, address, city, and intro.
+    - Removes HTML5 `required` attributes from widgets (server-side validation only).
+    - Provides custom "required" error messages for key profile fields.
+    - Ensures nickname is unique, excluding the current user.
+    """
+    class Meta:
+        model = User
+        fields = [
+            "profile_pic",
+            "nickname",
+            "address",
+            "city",
+            "intro",
+        ]
+
+        widgets = {
+            "profile_pic": forms.FileInput(attrs={"class": "hidden"}),
+            "intro": forms.Textarea,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Remove HTML5 `required` attribute from all widgets
+        for field in self.fields.values():
+            field.widget.attrs.pop("required", None)
+
+        # Custom "required" error messages for profile fields
+        field_msgs = {
+            "nickname": "Please enter your nickname.",
+            "address": "Please enter your address.",
+            "city": "Please enter your city and state.",
+        }
+        for name, msg in field_msgs.items():
+            if name in self.fields:
+                self.fields[name].error_messages["required"] = msg
+
     def clean_nickname(self):
         """
-        Validate that the nickname is unique before saving the user.
-        This replicates what a ModelForm would normally do for a unique field.
+        Validate that the nickname is not empty and is unique.
+
+        Excludes the current user instance when checking for duplicates,
+        so users can keep their existing nickname.
         """
-        # Get the nickname value that was submitted in the form
+        # Value submitted for the nickname field
         nickname = self.cleaned_data.get("nickname")
 
-        # Check if any existing user already has this nickname
-        if User.objects.filter(nickname=nickname).exists():
-            # Raise a validation error that will be shown on the form field
+        # Guard against missing nickname (required message is also set above)
+        if not nickname:
+            raise forms.ValidationError("Please enter your nickname.")
+
+        # Base queryset of users with the same nickname
+        qs = User.objects.filter(nickname=nickname)
+
+        # Exclude the current user when editing an existing profile
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        # If any other user already has this nickname, raise an error
+        if qs.exists():
             raise forms.ValidationError("This nickname is already taken.")
 
-        # Return the validated nickname value
+        # Return the validated nickname
         return nickname
 
-    def save(self, request):
-        """
-        Called by django-allauth when the signup form is submitted and valid.
-        Creates the user via the parent class, then attaches 'nickname' and 'address' and 'city'.
-        """
-        # First let allauth create the user object (email, password, etc.)
-        user = super().save(request)
-
-        # Safely get the values from the cleaned form data
-        nickname = self.cleaned_data.get("nickname")
-        address = self.cleaned_data.get("address")
-        city = self.cleaned_data.get("city")
-
-        # Attach nickname and address to the user instance
-        user.nickname = nickname 
-        user.address = address    
-        user.city = city
-        user.save()
-
-        # Return the user instance to allauth's signup flow
-        return user
 
 class CustomLoginForm(LoginForm):
     """Login form with HTML5 `required` removed and custom error messages."""
