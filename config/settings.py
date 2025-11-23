@@ -41,6 +41,10 @@ DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 hosts = os.environ.get("ALLOWED_HOSTS", "")
 ALLOWED_HOSTS = hosts.split(",") if hosts else []
 
+# --- CSRF settings for production HTTPS (Railway) ---
+# Allow POST requests from the Railway domain.
+CSRF_TRUSTED_ORIGINS = ["https://podo-market.up.railway.app"]
+
 # Application definition
 
 INSTALLED_APPS = [
