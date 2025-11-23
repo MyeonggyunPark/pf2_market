@@ -33,7 +33,6 @@ Thumbs.db
 # Build
 build/
 *.egg-info/
-dist/
 
 # Node modules
 node_modules/

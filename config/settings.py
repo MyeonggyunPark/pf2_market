@@ -34,10 +34,12 @@ if not SECRET_KEY:
     raise ImproperlyConfigured("SECRET_KEY environment variable is not set.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = []
-
+# Allowed hostnames for this Django site.
+# Read from ALLOWED_HOSTS environment variable as a comma-separated list.
+hosts = os.environ.get("ALLOWED_HOSTS", "")
+ALLOWED_HOSTS = hosts.split(",") if hosts else []
 
 # Application definition
 
@@ -152,6 +154,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Directory where 'collectstatic' will gather all static files for production.
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
