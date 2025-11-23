@@ -4,7 +4,7 @@
     "tailwindcss": "^4.1.17"
   },
   "scripts": {
-    "dev": "tailwindcss -i ./market/static/market/css/input.css -o ./market/static/market/dist/output.css --watch",
-    "build": "tailwindcss ./market/static/market/css/input.css -o ./market/static/market/dist/output.css"
+    "dev": "tailwindcss -i ./market/tailwind/css/input.css -o ./market/static/market/dist/output.css --watch",
+    "build": "tailwindcss -i ./market/tailwind/css/input.css -o ./market/static/market/dist/output.css --minify"
   }
 }
