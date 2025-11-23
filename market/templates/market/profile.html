@@ -11,7 +11,8 @@
 {% block content %}
 
   {% comment %} Profile header card: avatar, nickname, intro, rating and location {% endcomment %}
-  <div class="podo-card flex items-center justify-around w-full max-w-[1060px] mx-auto my-15 px-5 py-[25px]">
+  <div class="podo-card flex items-center justify-around w-full max-w-[1060px] mx-auto px-5 py-[25px] 
+      {% if user == profile_user %} mt-15 {% else %} my-15 {% endif %}">
     
     {% comment %} Left side: profile picture and nickname {% endcomment %}
     <div class="flex items-center gap-2">
@@ -51,7 +52,21 @@
     </ul>
   </div>
 
-  {% comment %} Latest listings section: heading and optional "view all" link {% endcomment %}
+  {% comment %} Action buttons shown only to the profile owner (edit profile & change password) {% endcomment %}
+  {% if user == profile_user %}
+  <div class="flex justify-end w-full max-w-[1060px] mx-auto mt-5 mb-15 px-5">
+    <div class="buttons space-x-3">
+      <a class="podo-button small secondary" href="{% url 'profile-update' %}">
+        Edit Profile
+      </a>
+      <a class="podo-button small secondary" href="{% url 'account_change_password' %}">
+        Change Password
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  {% comment %} Latest listings section: heading and optional "View All Listings" link {% endcomment %}
   <div class="w-full max-w-[1060px] mx-auto mb-[200px]">
     <div class="flex justify-between items-center mb-15 px-5">
       <h2 class="text-[24px] font-semibold">
@@ -110,7 +125,8 @@
 
         </div>
       </div>
-      {% comment %} Fallback message shown when there are no items to display {% endcomment %}
+
+      {% comment %} Fallback message shown when this user has no listings {% endcomment %}
       {% empty %}
         <p class="col-span-4 text-center text-[20px] font-bold my-[120px]">
           There are no items for sale.

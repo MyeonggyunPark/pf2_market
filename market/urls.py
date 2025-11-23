@@ -12,10 +12,10 @@ urlpatterns = [
     
     # Detail page: shows a single item by its ID using ItemDetailView
     path("item/<int:id>/", views.ItemDetailView.as_view(), name="item-detail"),
-    
+
     # Create page: shows a form to create a new item using ItemCreateView
     path("item/create/", views.ItemCreateView.as_view(), name="item-create"),
-    
+
     # Update page: shows a form to edit an existing item using ItemUpdateView
     path("item/<int:id>/edit/", views.ItemUpdateView.as_view(), name="item-update"),
     
@@ -34,4 +34,7 @@ urlpatterns = [
     
     # Profile settings page: allows the currently logged-in user to edit their profile using ProfileSetView
     path("set-profile/", views.ProfileSetView.as_view(), name="profile-set"),
+    
+    # Profile update page: allows the currently logged-in user to update their existing profile using ProfileUpdateView
+    path("update-profile/", views.ProfileUpdateView.as_view(), name="profile-update"),
 ]

@@ -11,18 +11,22 @@ from market.forms import PostItemCreateForm, PostItemUpdateForm , ProfileForm
 from market.utils import confirmation_required_redirect
 
 
-class CustomPasswordChangeView(PasswordChangeView):
+class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     """
-    Custom password change view that extends django-allauth's PasswordChangeView.
-    Overrides the success URL to redirect to the 'home' page after the password is changed.
+    Custom password change view for logged-in users.
+
+    - Requires authentication via LoginRequiredMixin.
+    - Extends django-allauth's PasswordChangeView.
+    - After a successful password change, redirects to the user's profile page.
     """
 
     def get_success_url(self):
         """
         Return the URL to redirect to after a successful password change.
-        Uses reverse_lazy so the URL is resolved only when needed.
+
+        - Redirects to the profile detail page for the current user.
         """
-        return reverse("home")
+        return reverse("profile", kwargs=(({"id": self.request.user.id})))
 
 
 class IndexView(ListView):
@@ -339,7 +343,7 @@ class ProfileSetView(LoginRequiredMixin, UpdateView):
     # Underlying model: custom User
     model = User
 
-    # Form used to edit the profile fields 
+    # Form used to edit the profile fields
     form_class = ProfileForm
 
     # Template for the profile edit page
@@ -362,3 +366,40 @@ class ProfileSetView(LoginRequiredMixin, UpdateView):
             if you want to go back to the profile detail page instead.
         """
         return reverse("home")
+
+
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    View for editing the currently logged-in user's profile.
+
+    - Uses the custom User model as the underlying model.
+    - Renders 'market/profile_update_form.html' with ProfileForm.
+    - Always edits request.user (no pk in URL).
+    - After a successful update, redirects to the profile detail page.
+    """
+
+    # Underlying model: custom User
+    model = User
+
+    # Form used to edit the profile fields
+    form_class = ProfileForm
+
+    # Template for the profile edit page
+    template_name = "market/profile_update_form.html"
+
+    def get_object(self, queryset=None):
+        """
+        Always return the currently logged-in user.
+
+        This ensures users can only edit their own profile, even if someone
+        tries to guess another user's ID.
+        """
+        return self.request.user
+
+    def get_success_url(self):
+        """
+        Where to redirect after a successful profile update.
+
+        - Redirects to the 'profile' detail page of the current user.
+        """
+        return reverse("profile", kwargs=(({"id": self.request.user.id})))
