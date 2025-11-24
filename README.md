@@ -65,7 +65,7 @@ docker run -p 8000:8000 \
 | `/`                            | Main market index (latest items, SOLD hidden)     |
 | `/login/`                      | Login page (email + social login buttons)         |
 | `/signup/`                     | Signup page                                       |
-| `/email/confirm/`              | Email confirmation links (django-allauth)         |
+| `/email-confirmation-required/`| Email confirmation links (django-allauth)         |
 | `/password/reset/`             | Request password reset email                      |
 | `/password/change/`            | Change password (logged-in users)                 |
 | `/item/<id>/`                  | Item detail page                                  |
@@ -155,4 +155,5 @@ CMD ["uv", "run", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000
 
 Built with ❤️ by **Myeonggyun Park**  
 This project is part of a backend web development learning journey and serves as a portfolio-ready Django application.
+
 
