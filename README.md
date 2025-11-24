@@ -55,6 +55,7 @@ docker run -p 8000:8000 \
   -e EMAIL_HOST_PASSWORD=your-gmail-app-password \
   podo-market
 ```
+
 ---
 
 ## 📂 Routes Overview
@@ -62,22 +63,19 @@ docker run -p 8000:8000 \
 | Route / Page                   | Description                                       |
 |--------------------------------|---------------------------------------------------|
 | `/`                            | Main market index (latest items, SOLD hidden)     |
-| `/accounts/login/`             | Login page (email + social login buttons)         |
-| `/accounts/signup/`            | Signup page                                       |
-| `/accounts/email/confirm/...`  | Email confirmation links (django-allauth)         |
-| `/accounts/password/reset/`    | Request password reset email                      |
-| `/accounts/password/change/`   | Change password (logged-in users)                 |
-| `/items/<id>/`                 | Item detail page                                  |
-| `/items/create/`               | Create new item                                   |
-| `/items/<id>/update/`          | Edit existing item                                |
-| `/items/<id>/delete/`          | Delete item with confirmation                     |
-| `/users/<id>/items/`           | User-specific item list                           |
-| `/profile/`                    | Current user profile page                         |
-| `/profile/set/`                | Initial profile setup (required after signup)     |
-| `/profile/update/`             | Edit profile info and avatar                      |
-
-> Exact URL names may vary slightly depending on your `urls.py`,  
-> but the app is structured around these core pages.
+| `/login/`                      | Login page (email + social login buttons)         |
+| `/signup/`                     | Signup page                                       |
+| `/email/confirm/`              | Email confirmation links (django-allauth)         |
+| `/password/reset/`             | Request password reset email                      |
+| `/password/change/`            | Change password (logged-in users)                 |
+| `/item/<id>/`                  | Item detail page                                  |
+| `/item/create/`                | Create new item                                   |
+| `/item/<id>/edit/`             | Edit existing item                                |
+| `/item/<id>/delete/`           | Delete item with confirmation                     |
+| `/user/id//`                   | Current user profile page                         |
+| `/user/<id>/items/`            | User-specific item list                           |
+| `/set-profile/`                | Initial profile setup (required after signup)     |
+| `/update-profile/`             | Edit profile info and avatar                      |
 
 ---
 
@@ -157,3 +155,4 @@ CMD ["uv", "run", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000
 
 Built with ❤️ by **Myeonggyun Park**  
 This project is part of a backend web development learning journey and serves as a portfolio-ready Django application.
+
