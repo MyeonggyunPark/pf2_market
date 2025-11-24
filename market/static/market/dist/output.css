@@ -491,6 +491,9 @@
   .hidden {
     display: none;
   }
+  .inline {
+    display: inline;
+  }
   .size-6 {
     width: calc(var(--spacing) * 6);
     height: calc(var(--spacing) * 6);
