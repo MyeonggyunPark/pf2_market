@@ -65,14 +65,14 @@ docker run -p 8000:8000 \
 | `/`                            | Main market index (latest items, SOLD hidden)     |
 | `/login/`                      | Login page (email + social login buttons)         |
 | `/signup/`                     | Signup page                                       |
-| `/email-confirmation-required/`| Email confirmation links (django-allauth)         |
+| `/email-confirmation-required/`| Email verification required notice before creating items|
 | `/password/reset/`             | Request password reset email                      |
 | `/password/change/`            | Change password (logged-in users)                 |
 | `/item/<id>/`                  | Item detail page                                  |
 | `/item/create/`                | Create new item                                   |
 | `/item/<id>/edit/`             | Edit existing item                                |
 | `/item/<id>/delete/`           | Delete item with confirmation                     |
-| `/user/id//`                   | Current user profile page                         |
+| `/user/<id>/`                  | User profile page                                 |
 | `/user/<id>/items/`            | User-specific item list                           |
 | `/set-profile/`                | Initial profile setup (required after signup)     |
 | `/update-profile/`             | Edit profile info and avatar                      |
@@ -105,6 +105,7 @@ docker run -p 8000:8000 \
 
 - Entire index page refactored to Tailwind-based card layout
 - Reusable button, input, notification and layout components
+- Responsive layouts for auth, profile, and item pages with mobile-friendly spacing and typography
 
 ### Environment-based config
 
@@ -155,5 +156,6 @@ CMD ["uv", "run", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000
 
 Built with ❤️ by **Myeonggyun Park**  
 This project is part of a backend web development learning journey and serves as a portfolio-ready Django application.
+
 
 
