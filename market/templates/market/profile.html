@@ -14,76 +14,78 @@
     Profile header card: avatar, nickname, intro, rating and location.
     Uses a column layout on mobile and a row layout on desktop.
   {% endcomment %}
-  <div class="podo-card flex flex-col md:flex-row items-center md:justify-around gap-4 md:gap-0 
-        w-full max-w-[1060px] mx-auto px-4 md:px-5 py-[25px]
-      {% if user == profile_user %} mt-15 {% else %} my-15 {% endif %}"> 
-
-    {% comment %}
-      Seller rating block (mobile only):
-      Stars are shown above the main row on small screens for better stacking.
-    {% endcomment %}
-    <div class="md:hidden">
-      <p class="flex items-center">
-        {% for _ in profile_user.seller_rating|filled_stars %}
-          <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
-        {% endfor %}
-        {% for _ in profile_user.seller_rating|empty_stars %}
-          <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
-        {% endfor %}
-      </p>
-    </div>
-
-    {% comment %} Left side: profile picture and nickname {% endcomment %}
-    <div class="flex items-center gap-2">
-      {% if profile_user.profile_pic %}
-        <img src="{{ profile_user.profile_pic.url }}" alt="Profile picture"
-          class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
-      {% else %}
-        <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="Default profile picture"
-          class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
-      {% endif %}
-      <div class="text-[20px] font-bold">
-        {{ profile_user.nickname }}
+  <div class="w-full px-2 md:px-0">
+    <div class="podo-card flex flex-col md:flex-row items-center md:justify-around gap-4 md:gap-0 
+          w-full max-w-[1060px] mx-auto md:px-5 py-[25px]
+        {% if user == profile_user %} mt-15 {% else %} my-15 {% endif %}"> 
+  
+      {% comment %}
+        Seller rating block (mobile only):
+        Stars are shown above the main row on small screens for better stacking.
+      {% endcomment %}
+      <div class="md:hidden">
+        <p class="flex items-center">
+          {% for _ in profile_user.seller_rating|filled_stars %}
+            <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
+          {% endfor %}
+          {% for _ in profile_user.seller_rating|empty_stars %}
+            <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
+          {% endfor %}
+        </p>
       </div>
-    </div>
-
-    {% comment %}
-      Center: intro text if provided, fallback message otherwise.
-      Text is centered on mobile and left-aligned on desktop with a max width for readability.
-    {% endcomment %}
-    <div class="text-center md:text-left md:max-w-[360px]">
-      {% if profile_user.intro %}
-        <p class="text-gray-500 font-semibold">
-          {{ profile_user.intro }}
+  
+      {% comment %} Left side: profile picture and nickname {% endcomment %}
+      <div class="flex items-center gap-2">
+        {% if profile_user.profile_pic %}
+          <img src="{{ profile_user.profile_pic.url }}" alt="Profile picture"
+            class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
+        {% else %}
+          <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="Default profile picture"
+            class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
+        {% endif %}
+        <div class="text-[20px] font-bold">
+          {{ profile_user.nickname }}
+        </div>
+      </div>
+  
+      {% comment %}
+        Center: intro text if provided, fallback message otherwise.
+        Text is centered on mobile and left-aligned on desktop with a max width for readability.
+      {% endcomment %}
+      <div class="text-center md:text-left md:max-w-[360px]">
+        {% if profile_user.intro %}
+          <p class="text-gray-500 font-semibold">
+            {{ profile_user.intro }}
+          </p>
+        {% else %}
+          <p class="text-gray-500 font-semibold">
+            No introduction.
+          </p>
+        {% endif %}
+      </div>
+      
+      {% comment %}
+        Seller rating block (desktop only):
+        Same stars as the mobile version, but positioned inline in the header row.
+      {% endcomment %}
+      <div class="hidden md:block">
+        <p class="flex items-center">
+          {% for _ in profile_user.seller_rating|filled_stars %}
+            <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
+          {% endfor %}
+          {% for _ in profile_user.seller_rating|empty_stars %}
+            <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
+          {% endfor %}
         </p>
-      {% else %}
-        <p class="text-gray-500 font-semibold">
-          No introduction.
-        </p>
-      {% endif %}
+      </div>
+  
+      {% comment %} Right side: location split into city and state via template filters {% endcomment %}
+      <ul class="podo-links justify-center md:justify-start">
+        <li>{{ profile_user.city|get_city }}</li>
+        <li class="divider"></li>
+        <li>{{ profile_user.city|get_state }}</li>
+      </ul>
     </div>
-    
-    {% comment %}
-      Seller rating block (desktop only):
-      Same stars as the mobile version, but positioned inline in the header row.
-    {% endcomment %}
-    <div class="hidden md:block">
-      <p class="flex items-center">
-        {% for _ in profile_user.seller_rating|filled_stars %}
-          <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
-        {% endfor %}
-        {% for _ in profile_user.seller_rating|empty_stars %}
-          <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
-        {% endfor %}
-      </p>
-    </div>
-
-    {% comment %} Right side: location split into city and state via template filters {% endcomment %}
-    <ul class="podo-links justify-center md:justify-start">
-      <li>{{ profile_user.city|get_city }}</li>
-      <li class="divider"></li>
-      <li>{{ profile_user.city|get_state }}</li>
-    </ul>
   </div>
 
   {% comment %} Action buttons shown only to the profile owner (edit profile & change password) {% endcomment %}
@@ -180,9 +182,9 @@
       {% empty %}
         {% comment %}
           Fallback message shown when this user has no listings.
-          Spans 2 columns on mobile and 4 columns on desktop.
+          Spans full width on mobile and all 4 columns on desktop.  
         {% endcomment %}
-        <p class="col-span-2 md:col-span-4 text-center text-[20px] font-bold my-[120px]">
+        <p class="col-span-1 md:col-span-4 text-center text-[20px] font-bold my-[120px]">
           There are no items for sale.
         </p>
       {% endfor %}
