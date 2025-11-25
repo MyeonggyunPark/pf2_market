@@ -10,47 +10,76 @@
 {% comment %} Main content {% endcomment %}
 {% block content %}
 
-  {% comment %} Profile header card: avatar, nickname, intro, rating and location {% endcomment %}
-  <div class="podo-card flex items-center justify-around w-full max-w-[1060px] mx-auto px-5 py-[25px] 
-      {% if user == profile_user %} mt-15 {% else %} my-15 {% endif %}">
-    
+  {% comment %}
+    Profile header card: avatar, nickname, intro, rating and location.
+    Uses a column layout on mobile and a row layout on desktop.
+  {% endcomment %}
+  <div class="podo-card flex flex-col md:flex-row items-center md:justify-around gap-4 md:gap-0 
+        w-full max-w-[1060px] mx-auto px-4 md:px-5 py-[25px]
+      {% if user == profile_user %} mt-15 {% else %} my-15 {% endif %}"> 
+
+    {% comment %}
+      Seller rating block (mobile only):
+      Stars are shown above the main row on small screens for better stacking.
+    {% endcomment %}
+    <div class="md:hidden">
+      <p class="flex items-center">
+        {% for _ in profile_user.seller_rating|filled_stars %}
+          <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
+        {% endfor %}
+        {% for _ in profile_user.seller_rating|empty_stars %}
+          <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
+        {% endfor %}
+      </p>
+    </div>
+
     {% comment %} Left side: profile picture and nickname {% endcomment %}
     <div class="flex items-center gap-2">
       {% if profile_user.profile_pic %}
         <img src="{{ profile_user.profile_pic.url }}" alt="Profile picture"
-            class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0"></img>    
+          class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
       {% else %}
         <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="Default profile picture"
-            class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0"></img>
+          class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
       {% endif %}
       <div class="text-[20px] font-bold">
         {{ profile_user.nickname }}
       </div>
     </div>
 
-    {% comment %} Center: intro text if provided, fallback message otherwise {% endcomment %}
-    {% if profile_user.intro %}
-      <p class="text-gray-500 font-semibold">
-        {{ profile_user.intro }}
+    {% comment %}
+      Center: intro text if provided, fallback message otherwise.
+      Text is centered on mobile and left-aligned on desktop with a max width for readability.
+    {% endcomment %}
+    <div class="text-center md:text-left md:max-w-[360px]">
+      {% if profile_user.intro %}
+        <p class="text-gray-500 font-semibold">
+          {{ profile_user.intro }}
+        </p>
+      {% else %}
+        <p class="text-gray-500 font-semibold">
+          No introduction.
+        </p>
+      {% endif %}
+    </div>
+    
+    {% comment %}
+      Seller rating block (desktop only):
+      Same stars as the mobile version, but positioned inline in the header row.
+    {% endcomment %}
+    <div class="hidden md:block">
+      <p class="flex items-center">
+        {% for _ in profile_user.seller_rating|filled_stars %}
+          <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
+        {% endfor %}
+        {% for _ in profile_user.seller_rating|empty_stars %}
+          <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
+        {% endfor %}
       </p>
-    {% else %}
-      <p class="text-gray-500 font-semibold">
-        No introduction.
-      </p>    
-    {% endif %}
-
-    {% comment %} Seller rating block: filled and empty stars based on seller_rating {% endcomment %}
-    <p class="flex items-center">
-      {% for _ in profile_user.seller_rating|filled_stars %}
-      <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
-      {% endfor %}
-      {% for _ in profile_user.seller_rating|empty_stars %}
-      <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
-      {% endfor %}
-    </p>
+    </div>
 
     {% comment %} Right side: location split into city and state via template filters {% endcomment %}
-    <ul class="podo-links">
+    <ul class="podo-links justify-center md:justify-start">
       <li>{{ profile_user.city|get_city }}</li>
       <li class="divider"></li>
       <li>{{ profile_user.city|get_state }}</li>
@@ -59,7 +88,7 @@
 
   {% comment %} Action buttons shown only to the profile owner (edit profile & change password) {% endcomment %}
   {% if user == profile_user %}
-  <div class="flex justify-end w-full max-w-[1060px] mx-auto mt-5 mb-15 px-5">
+  <div class="flex justify-center md:justify-end w-full max-w-[1060px] mx-auto mt-5 mb-15 px-4 md:px-5">
     <div class="buttons space-x-3">
       <a class="podo-button small secondary" href="{% url 'profile-update' %}">
         Edit Profile
@@ -72,30 +101,41 @@
   {% endif %}
 
   {% comment %} Latest listings section: heading and optional "View All Listings" link {% endcomment %}
-  <div class="w-full max-w-[1060px] mx-auto mb-[200px]">
-    <div class="flex justify-between items-center mb-15 px-5">
+  <div class="w-full max-w-[1060px] mx-auto mb-[100px] md:mb-[200px]">
+    <div class="flex justify-between items-center mb-10 md:mb-15 px-5">
       <h2 class="text-[24px] font-semibold">
         Latest Listings
       </h2>
 
-      {% comment %} Show "View All Listings" link only if there are items for this user {% endcomment %}
+      {% comment %}
+        "View All Listings" link:
+        - On mobile: compact label ("View All")
+        - On desktop: full label ("View All Listings")
+      {% endcomment %}
       {% if user_postitems %}
-      <a class="flex items-center text-[20px] font-semibold hover:text-link transition-colors" 
-          href="{% url 'user-item-list' profile_user.id %}">
-        <span>View All Listings</span>
-        <img class="w-[15px] h-[15px] ml-1.5" src="{% static 'market/icons/ic-triangle.svg' %}" alt="triangle icon">
+      <a href="{% url 'user-item-list' profile_user.id %}"
+        class="flex items-center text-[20px] font-semibold hover:text-link transition-colors">
+        <span>View All </span>
+        <span class="hidden md:block md:ml-2">Listings</span>
+        <img class="size-5 ml-1"
+          src="{% static 'market/icons/ic-triangle.svg' %}" alt="triangle icon">
       </a>
       {% endif %}
     </div>
 
-    {% comment %} Grid of item cards for the user's latest PostItem objects {% endcomment %}  
-    <div class="grid grid-cols-4 gap-x-5 gap-y-[30px]">
+    {% comment %}
+      Grid of item cards for the user's latest PostItem objects.
+      - Mobile: single-column list
+      - Desktop: 4-column grid
+    {% endcomment %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 md:gap-x-5 gap-y-6 md:gap-y-[30px]">
 
       {% for postitem in user_postitems %}
       <div class="podo-card flex flex-col p-3.5 bg-gray-100">
-
+        
         {% comment %} Thumbnail image for the item {% endcomment %}
-        <img class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]" src="{{ postitem.item_image1.url }}" alt="thumbnail">
+        <img src="{{ postitem.item_image1.url }}" alt="thumbnail"
+          class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]">
 
         {% comment %} Content area: title, price, meta info, and details button {% endcomment %}
         <div class="flex flex-col grow mx-[11px]">
@@ -105,12 +145,15 @@
             {{ postitem.item_title }}
           </h2>
 
-          {% comment %} Price section with sold styling and a SOLD badge when the item is marked as sold {% endcomment %}
-          <div class="flex justify-between items-center h-[30px] my-[19px]">
+          {% comment %}
+            Price section with sold styling and a SOLD badge when the item is marked as sold.
+            Price text is struck through and tinted when is_sold is True.
+          {% endcomment %}
+          <div class="flex items-center h-[30px] my-[19px] gap-3">
             <span class="text-[20px] font-bold truncate {% if postitem.is_sold %} line-through text-post-sold {% endif %}">
               &euro;&nbsp;{{ postitem.item_price|intcomma }}
             </span>
-            
+
             {% if postitem.is_sold %}
             <span class="rounded-full px-3 py-1 bg-post-sold text-white font-semibold">
               SOLD
@@ -120,24 +163,31 @@
 
           {% comment %} Meta information: seller city and creation date {% endcomment %}
           <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
-            {{ postitem.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ postitem.dt_created|date:"d.m.Y" }} 
+            {{ postitem.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ postitem.dt_created|date:"d.m.Y" }}
           </div>
 
-          {% comment %} Button to view item details (uses sold-specific styling and no-after effect when the item is sold) {% endcomment %}
-          <a href="{% url 'item-detail' postitem.id %}" class="podo-button primary block mt-[22px] mb-4 {%if postitem.is_sold %} bg-post-sold no-after{% endif %}">
+          {% comment %}
+            Button to view item details.
+            When the item is sold, the button uses sold-specific styling and disables the after effect.
+          {% endcomment %}
+          <a href="{% url 'item-detail' postitem.id %}"
+            class="podo-button primary block mt-[22px] mb-4 {% if postitem.is_sold %} bg-post-sold no-after{% endif %}">
             View Details
           </a>
-
         </div>
       </div>
 
-      {% comment %} Fallback message shown when this user has no listings {% endcomment %}
       {% empty %}
-        <p class="col-span-4 text-center text-[20px] font-bold my-[120px]">
+        {% comment %}
+          Fallback message shown when this user has no listings.
+          Spans 2 columns on mobile and 4 columns on desktop.
+        {% endcomment %}
+        <p class="col-span-2 md:col-span-4 text-center text-[20px] font-bold my-[120px]">
           There are no items for sale.
         </p>
       {% endfor %}
 
     </div>
+  </div>
 
 {% endblock content %}

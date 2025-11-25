@@ -13,87 +13,106 @@
 {% comment %} Main content {% endcomment %}
 {% block content %}
 
-{% comment %} Centered container for the profile setup form {% endcomment %}
-<div class="w-full max-w-[654px] mx-auto my-[145px]">
+  {% comment %}
+  Centered container for the profile setup form,
+  with responsive horizontal padding and vertical spacing for mobile and desktop
+  {% endcomment %}
+  <div class="w-full max-w-[654px] mx-auto px-4 md:px-0 mt-10 md:mt-[145px] mb-16 md:mb-[145px]">
 
-  {% comment %} Page heading: welcome text + profile prompt {% endcomment %}
-  <h1 class="mb-[37px] text-[24px] leading-[38px] text-center font-normal tracking-[-0.36px]">
-    Welcome!<br>
-    Please complete your <strong>Profile</strong>
-  </h1>
+    {% comment %} Page heading: welcome text + profile prompt {% endcomment %}
+    <h1 class="mb-6 md:mb-[37px] text-[20px] md:text-[24px] leading-8 md:leading-[38px] text-center font-normal tracking-[-0.36px]">
+      Welcome!<br>
+      Please complete your <strong>Profile</strong>
+    </h1>
 
-  {% comment %} Profile form: POST with file upload and server-side validation only {% endcomment %}
-  <form method="post" autocomplete="off" enctype="multipart/form-data" novalidate 
-      class="podo-box px-8 py-10 md:px-[107px] md:pt-[54px] md:pb-[76px]">
+    {% comment %} Profile form: POST with file upload and server-side validation only {% endcomment %}
+    <form method="post" autocomplete="off" enctype="multipart/form-data" novalidate
+      class="podo-box px-6 py-8 md:px-[107px] md:pt-[54px] md:pb-[76px]">
 
-    {% csrf_token %}
+      {% csrf_token %}
 
-    {% comment %} Profile picture row: current avatar preview + upload control {% endcomment %}
-    <div class="flex items-center justify-center mb-[35px]">
+      {% comment %} Profile picture row: current avatar preview + upload control {% endcomment %}
+      <div class="flex items-center md:justify-center gap-4 md:gap-0 mb-8 md:mb-[35px]">
 
-      {% comment %} Current profile picture preview (falls back to default image) {% endcomment %}
-      {% if user.profile_pic %}
-        <img src="{{ user.profile_pic.url }}" alt="Profile picture"
-            class="size-20 mr-[21px] rounded-full bg-profile-pic-placeholder bg-cover bg-center object-cover"></img>    
-      {% else %}
-        <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="Default profile picture"
-            class="size-20 mr-[21px] rounded-full bg-profile-pic-placeholder bg-cover bg-center object-cover"></img>
-      {% endif %}
-      <div class="flex-1 leading-loose overflow-hidden text-ellipsis whitespace-nowrap">
-        {{ form.profile_pic }}
+        {% comment %} Current profile picture preview (falls back to default image) {% endcomment %}
+        <div class="flex justify-center md:justify-start">
+          {% if user.profile_pic %}
+            <img src="{{ user.profile_pic.url }}" alt="Profile picture"
+              class="w-[72px] h-[72px] md:w-[79px] md:h-[79px] md:mr-[21px] rounded-full bg-profile-pic-placeholder bg-cover bg-center object-cover">
+          {% else %}
+            <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="Default profile picture"
+              class="w-[72px] h-[72px] md:w-[79px] md:h-[79px] md:mr-[21px] rounded-full bg-profile-pic-placeholder bg-cover bg-center object-cover">
+          {% endif %}
+        </div>
 
-        <label for="{{ form.profile_pic.id_for_label }}"
-          class="podo-input flex flex-col items-center justify-center cursor-pointer">
-          
-          {% comment %} Dynamic filename label updated by main.js when a file is chosen {% endcomment %}
-          <img class="size-6" src="{% static 'market/icons/upload.svg' %}" alt="Upload profile image">
-          <span id="profile-file-name"
+        <div class="w-full md:flex-1 leading-loose overflow-hidden text-ellipsis whitespace-nowrap mt-2 md:mt-0">
+          {{ form.profile_pic }}
+
+          <label for="{{ form.profile_pic.id_for_label }}"
+              class="podo-input flex flex-col items-center justify-center cursor-pointer">
+            {% comment %} Dynamic filename label updated by main.js when a file is chosen {% endcomment %}
+            <img class="size-6" src="{% static 'market/icons/upload.svg' %}" alt="Upload profile image">
+            <span id="profile-file-name"
               class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 hidden"></span>
-        </label>
+          </label>
 
-        {% comment %} Validation errors for profile picture {% endcomment %}
-        {% for error in form.profile_pic.errors %}
-          <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
+          {% comment %} Validation errors for profile picture (slightly smaller on mobile) {% endcomment %}
+          {% for error in form.profile_pic.errors %}
+            <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] mt-1 pr-3 md:pr-4">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% comment %} Nickname field with validation error messages {% endcomment %}
+      <div class="mb-5 md:mb-[25px]">
+        {{ form.nickname|add_class:"podo-input"|attr:"placeholder:Nickname"|add_error_class:"error" }}
+        {% for error in form.nickname.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] pr-3 md:pr-4">
             {{ error }}
           </div>
         {% endfor %}
       </div>
-    </div>
 
-    {% comment %} Nickname field with validation error messages {% endcomment %}
-    <div class="mb-[25px]">
-      {{ form.nickname|add_class:"podo-input"|attr:"placeholder:Nickname"|add_error_class:"error" }}
-      {% for error in form.nickname.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">{{ error }}</div>
-      {% endfor %}
-    </div>
+      {% comment %} Address field with validation error messages {% endcomment %}
+      <div class="mb-5 md:mb-[25px]">
+        {{ form.address|add_class:"podo-input"|attr:"placeholder:Address"|add_error_class:"error" }}
+        {% for error in form.address.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] pr-3 md:pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
 
-    {% comment %} Address field with validation error messages {% endcomment %}
-    <div class="mb-[25px]">
-      {{ form.address|add_class:"podo-input"|attr:"placeholder:Address"|add_error_class:"error" }}
-      {% for error in form.address.errors %}
-      <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">{{ error }}</div>
-      {% endfor %}
-    </div>
+      {% comment %} City + state field with validation error messages {% endcomment %}
+      <div class="mb-5 md:mb-[25px]">
+        {{ form.city|add_class:"podo-input"|attr:"placeholder:City and State (ex. Essen, NRW)"|add_error_class:"error" }}
+        {% for error in form.city.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] pr-3 md:pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
 
-    {% comment %} City + state field with validation error messages {% endcomment %}
-    <div class="mb-[25px]">
-      {{ form.city|add_class:"podo-input"|attr:"placeholder:City and State (ex. Essen, NRW)"|add_error_class:"error" }}
-      {% for error in form.city.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">{{ error }}</div>
-      {% endfor %}
-    </div>
+      {% comment %} Short self-introduction field with validation error messages {% endcomment %}
+      <div class="mb-6 md:mb-[25px]">
+        {{ form.intro|add_class:"podo-input"|attr:"placeholder:Introduction"|add_error_class:"error" }}
+        {% for error in form.intro.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] pr-3 md:pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
 
-    {% comment %} Short self-introduction field with validation error messages {% endcomment %}
-    <div class="mb-[25px]">
-      {{ form.intro|add_class:"podo-input"|attr:"placeholder:Introduction"|add_error_class:"error" }}
-      {% for error in form.intro.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">{{ error }}</div>
-      {% endfor %}
-    </div>
+      {% comment %} Submit button: save profile and redirect according to adapter logic {% endcomment %}
+      <button type="submit"
+        class="podo-button large primary block w-full max-w-xs md:max-w-60 mx-auto mt-4 md:mt-2.5">
+        Save
+      </button>
+      
+    </form>
 
-    {% comment %} Submit button: save profile and redirect according to adapter logic {% endcomment %}
-    <button class="podo-button large primary block w-full max-w-60 mx-auto mt-2.5" type="submit">Save</button>
-  </form>
-</div>
+  </div>
+
 {% endblock content %}

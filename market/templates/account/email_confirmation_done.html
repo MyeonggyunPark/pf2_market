@@ -1,23 +1,37 @@
 {% extends "market_base/base_with_header.html" %}
 {% comment %} Email verification success page {% endcomment %}
 
-
 {% comment %} Main content {% endcomment %}
 {% block content %}
 
-{% comment %} Centered notification box with message and action button {% endcomment %}
-<div class="flex items-center justify-between w-full max-w-[750px] mx-auto my-[38px] text-[20px] leading-[34px] rounded-[60px]
-          bg-noti-purple-bg text-noti-purple-fg px-12 py-[30px]">
+  {% comment %} Responsive horizontal padding wrapper for different screen sizes {% endcomment %}
+  <div class="w-full px-2 md:px-0">
+    <div class="flex flex-col md:flex-row items-center md:items-center justify-between
+              w-full max-w-[750px] mx-auto my-10 md:my-[38px] rounded-[30px] md:rounded-[60px]
+              text-[18px] leading-[26px] md:text-[20px] md:leading-[34px] bg-noti-purple-bg text-noti-purple-fg px-4 py-5 md:px-12 md:py-[30px] gap-4 md:gap-0">
 
-  {% comment %} Success message {% endcomment %}
-  <p>Your email has been successfully verified. Thank you.</p>
+      {% comment %} Success message text, centered on mobile and left-aligned on desktop {% endcomment %}
+      <p class="text-center md:text-left">
+        Your email has been successfully verified.
+        <br class="md:hidden">
+        Thank you.
+      </p>
 
-  {% comment %} Redirect based on auth state: home for logged-in users, login otherwise {% endcomment %}
-  {% if user.is_authenticated %}
-    <a class="podo-button darkpurple ml-[25px] whitespace-nowrap hover:bg-button-hover-bg" href="{% url 'home' %}">Go to Home</a>
-  {% else %}
-    <a class="podo-button darkpurple ml-[25px] whitespace-nowrap hover:bg-button-hover-bg" href="{% url 'account_login' %}">Log in</a>
-  {% endif %}
-</div>
+      {% comment %} Redirect based on auth state: home for logged-in users, login otherwise {% endcomment %}
+      {% if user.is_authenticated %}
+        <a href="{% url 'home' %}"
+          class="podo-button darkpurple whitespace-nowrap hover:bg-button-hover-bg md:w-auto
+                text-center mt-1 md:mt-0 md:ml-[25px]">
+          Go to Home
+        </a>
+      {% else %}
+        <a href="{% url 'account_login' %}"
+          class="podo-button darkpurple whitespace-nowrap hover:bg-button-hover-bg md:w-auto
+                text-center mt-1 md:mt-0 md:ml-[25px]">
+          Log in
+        </a>
+      {% endif %}
+    </div>
+  </div>
 
 {% endblock content %}

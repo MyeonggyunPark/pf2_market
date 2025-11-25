@@ -5,263 +5,280 @@
 {% load widget_tweaks %}
 {% load market_extras %}
 
-+{% comment %} Page title: show item title on edit, or "Create" on new item {% endcomment %}
+{% comment %} Page title: show item title on edit, or "Create" on new item {% endcomment %}
 {% block title %}
   {% if postitem %}
-    {{ postitem.item_title }}  
+    {{ postitem.item_title }}
   {% else %}
-    Create 
+    Create
   {% endif %} | Podo-Market
 {% endblock title %}
 
-{% comment %} Main content {% endcomment %}
+{% comment %} Main content: create / edit item form {% endcomment %}
 {% block content %}
 
-{% comment %} Item create/update form: POST with file upload and server-side validation only (novalidate) {% endcomment %}
-<form method="post" autocomplete="off" enctype="multipart/form-data" novalidate
-      class="grid grid-cols-2 w-full max-w-[880px] mx-auto mt-[90px] mb-[250px] gap-x-[43px] gap-y-[27px]">
+  {% comment %}
+    Item create/update form:
+    - POST with file upload, no HTML5 validation (novalidate)
+    - Responsive grid: single column on mobile, two columns on desktop
+    - Outer container is centered with responsive padding and vertical spacing
+  {% endcomment %}
+  <form method="post" autocomplete="off" enctype="multipart/form-data" novalidate
+    class="grid grid-cols-1 md:grid-cols-2 w-full max-w-[880px] mx-auto px-4 md:px-0 mt-10 md:mt-[90px] mb-16 md:mb-[250px] gap-y-6 md:gap-y-[27px] md:gap-x-[43px]">
 
-  {% csrf_token %}
+    {% csrf_token %}
 
-  {% comment %} Item title input row {% endcomment %}
-  <div class="col-span-2">
-
-    {% comment %} Item title field with custom styling and placeholder {% endcomment %}
-    {{ form.item_title|add_class:"podo-input"|attr:"placeholder:Item Title"|add_error_class:"error" }}
-
-    {% comment %} Validation errors for item title {% endcomment %}
-    {% for error in form.item_title.errors %}
-      <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
-        {{ error }}
-      </div>
-    {% endfor %}
-  </div>
-
-
-  {# Row containing sold toggle, price field and condition radio buttons #}
-  <div class="col-span-2">
-
-    <div class="flex items-center gap-6 w-full">
-
-      {# Optional "sold" toggle: only rendered when is_sold field exists (update form) #}
-      {% if form.is_sold %}
-        <div class="flex items-center">
-          <label class="sold-toggle-wrapper">
-
-            {% comment %} Hide the real checkbox visually; it only holds the state {% endcomment %}
-            {{ form.is_sold|add_class:"sold-toggle-input" }}
-
-            {% comment %} Colored track (green/gray) with the white capsule that slides left/right {% endcomment %}
-            <span class="sold-toggle-track">
-              <span class="sold-toggle-thumb">
-                <span class="sold-toggle-text sold-toggle-text-sale">SALE</span>
-                <span class="sold-toggle-text sold-toggle-text-sold">SOLD</span>
-              </span>
-            </span>
-
-          </label>
+    {% comment %}
+      Item title row:
+      - On mobile: title input and mobile SOLD toggle share the row
+      - On desktop: title is full width, SOLD toggle is moved to the next row
+    {% endcomment %}
+    <div class="col-span-1 md:col-span-2">
+      <div class="flex md:block items-center gap-3">
+        <div class="{% if form.is_sold %}w-3/4{% else %}w-full{% endif %} md:w-full">
+          {{ form.item_title|add_class:"podo-input"|attr:"placeholder:Item Title"|add_error_class:"error" }}
         </div>
-      {% endif %}
 
-      {# Item price input (center) #}
-      <div class="flex-1">
-        {{ form.item_price|add_class:"podo-input no-spin"|attr:"placeholder:Item Price"|add_error_class:"error" }}
+        {% comment %}
+          Mobile-only SOLD toggle:
+          - Uses a separate checkbox with data-sold-mobile="true"
+          - Visually scaled down and aligned to the right
+        {% endcomment %}
+        {% if form.is_sold %}
+          <div class="w-1/4 md:hidden flex justify-end">
+            <label class="sold-toggle-wrapper scale-75 origin-right md:scale-100">
+              <input class="sold-toggle-input" type="checkbox" data-sold-mobile="true"
+                    {% if form.is_sold.value %}checked{% endif %}>
+              <span class="sold-toggle-track">
+                <span class="sold-toggle-thumb">
+                  <span class="sold-toggle-text sold-toggle-text-sale">SALE</span>
+                  <span class="sold-toggle-text sold-toggle-text-sold">SOLD</span>
+                </span>
+              </span>
+            </label>
+          </div>
+        {% endif %}
       </div>
 
-      {# Item condition radio buttons (right side) #}
-      <div class="flex flex-nowrap justify-end items-center gap-3">
-        {% for value, label in form.item_condition.field.choices %}
-          <label class="cursor-pointer shrink-0">
-            <input
-              type="radio"
-              name="{{ form.item_condition.html_name }}"
-              value="{{ value }}"
-              class="sr-only peer"
-              {% if form.item_condition.value == value|stringformat:"s" %}checked{% endif %}>
-            <span class="podo-chip text-[15px] text-chip-border font-semibold px-3 py-1.5 leading-5
-              peer-checked:text-chip-primary-fg
-              peer-checked:bg-chip-primary-bg
-              peer-checked:border-chip-primary-border
-              {% if form.item_condition.errors %}podo-select-error{% endif %}">
-              {{ label }}
+      {% comment %} Validation errors for item title {% endcomment %}
+      {% for error in form.item_title.errors %}
+        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
+          {{ error }}
+        </div>
+      {% endfor %}
+    </div>
+
+    {% comment %}
+      Row containing:
+      - Desktop SOLD toggle (when present)
+      - Item price input
+      - Item condition selector (dropdown on mobile, pills on desktop)
+    {% endcomment %}
+    <div class="col-span-1 md:col-span-2">
+      <div class="flex items-start md:items-center gap-3 md:gap-6 w-full">
+
+        {% comment %}
+          Desktop SOLD toggle:
+          - Binds to the real is_sold field with data-sold-real="true"
+          - Synced with the mobile toggle via JavaScript
+        {% endcomment %}
+        {% if form.is_sold %}
+          <div class="hidden md:flex items-center">
+            <label class="sold-toggle-wrapper">
+              {{ form.is_sold|add_class:"sold-toggle-input"|attr:"data-sold-real:true" }}
+              <span class="sold-toggle-track">
+                <span class="sold-toggle-thumb">
+                  <span class="sold-toggle-text sold-toggle-text-sale">SALE</span>
+                  <span class="sold-toggle-text sold-toggle-text-sold">SOLD</span>
+                </span>
+              </span>
+            </label>
+          </div>
+        {% endif %}
+
+        {% comment %} Item price input {% endcomment %}
+        <div class="w-1/2 md:flex-1">
+          {{ form.item_price|add_class:"podo-input no-spin"|attr:"placeholder:Item Price"|add_error_class:"error" }}
+        </div>
+
+        {% comment %}
+          Mobile-only condition dropdown:
+          - Custom select-like UI, backed by the item_condition radio group
+          - Each option button has data-condition-option / data-value / data-label
+        {% endcomment %}
+        <div class="relative w-1/2 md:hidden" data-condition-dropdown>
+          <button type="button" data-condition-trigger
+            class="podo-input w-full flex items-center justify-between text-[17px] text-input-placeholder leading-[18px]">
+            <span data-condition-label>Condition</span>
+            <span class="text-[25px]">▾</span>
+          </button>
+
+          <div data-condition-menu
+            class="absolute right-0 mt-1 w-full rounded-2xl bg-white shadow-[0_0_14px_rgba(219,221,223,0.79)] border border-box-border z-20 hidden">
+            {% for value, label in form.item_condition.field.choices %}
+              <button type="button" data-condition-option
+                class="w-full text-center px-3 py-2 text-[17px] text-input-placeholder leading-[18px] hover:bg-box-gray-bg"
+                data-value="{{ value }}" data-label="{{ label }}">
+                {{ label }}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% comment %}
+          Desktop condition chips:
+          - Radio buttons styled as chips
+          - Uses peer classes to switch active styles
+        {% endcomment %}
+        <div class="hidden md:flex flex-nowrap justify-end items-center gap-3">
+          {% for value, label in form.item_condition.field.choices %}
+            <label class="cursor-pointer shrink-0">
+              <input type="radio" name="{{ form.item_condition.html_name }}"
+                    value="{{ value }}" class="sr-only peer"
+                  {% if form.item_condition.value == value|stringformat:"s" %}checked{% endif %}>
+              <span class="podo-chip text-[15px] text-chip-border font-semibold px-3 py-1.5 leading-5
+                      peer-checked:text-chip-primary-fg
+                      peer-checked:bg-chip-primary-bg
+                      peer-checked:border-chip-primary-border
+                      {% if form.item_condition.errors %}podo-select-error{% endif %}">
+                {{ label }}
+              </span>
+            </label>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      {% comment %} Validation errors for price (left) and condition (right), stacked on mobile {% endcomment %}
+      <div class="mt-1 grid grid-cols-1 md:grid-cols-2 gap-y-1 md:gap-x-6">
+        <div>
+          {% for error in form.item_price.errors %}
+            <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </div>
+        <div>
+          {% for error in form.item_condition.errors %}
+            <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Item detail (description) textarea row {% endcomment %}
+    <div class="col-span-1 md:col-span-2">
+      {{ form.item_detail|add_class:"podo-input"|attr:"placeholder:Item Details"|add_error_class:"error" }}
+      {% for error in form.item_detail.errors %}
+        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
+          {{ error }}
+        </div>
+      {% endfor %}
+    </div>
+
+    {% comment %}
+      Image upload section:
+      - Mobile: images in a single column
+      - Desktop: 3-column grid (main + optional second + third images)
+    {% endcomment %}
+    <div class="col-span-1 md:col-span-2">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+        {% comment %} First (main) image upload {% endcomment %}
+        <div>
+          {{ form.item_image1 }}
+          <label for="{{ form.item_image1.id_for_label }}"
+            class="podo-input flex flex-col items-center justify-center cursor-pointer {% if form.item_image1.errors %} error{% endif %}">
+            <img src="{% static 'market/icons/upload.svg' %}" alt="Upload image 1" class="w-6 h-6">
+            <span id="file-name-1"
+              class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2
+                    {% if form.instance.item_image1 %}{% else %}hidden{% endif %}">
+              {% if form.instance.item_image1 %}
+                {{ form.instance.item_image1.name|filename_filter }}
+              {% endif %}
             </span>
-          </label>
-        {% endfor %}
-      </div>
-
-    </div>
-
-    {% comment %} Validation errors for price (left) and condition (right) under the row {% endcomment %}
-    <div class="mt-1 grid grid-cols-2 gap-x-6">
-      <div>
-        {% for error in form.item_price.errors %}
-          <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
-            {{ error }}
-          </div>
-        {% endfor %}
-      </div>
-
-      <div>
-        {% for error in form.item_condition.errors %}
-          <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
-            {{ error }}
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-
-
-  {% comment %} Item detail (description) textarea row {% endcomment %}
-  <div class="col-span-2">
-
-    {% comment %} Description field with custom styling and placeholder {% endcomment %}
-    {{ form.item_detail|add_class:"podo-input"|attr:"placeholder:Item Details"|add_error_class:"error" }}
-
-    {% comment %} Validation errors for item detail {% endcomment %}
-    {% for error in form.item_detail.errors %}
-      <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
-        {{ error }}
-      </div>
-    {% endfor %}
-  </div>
-
-
-  {% comment %} Image upload section: main image + optional second and third images {% endcomment %}
-  <div class="col-span-2">
-    <div class="grid grid-cols-3 gap-3">
-
-      {% comment %} First (main) image upload {% endcomment %}
-      <div>
-
-        {% comment %} File input (hidden by widget); label below acts as the visible button {% endcomment %}
-        {{ form.item_image1 }}
-        <label for="{{ form.item_image1.id_for_label }}"
-              class="podo-input flex flex-col items-center justify-center cursor-pointer {% if form.item_image1.errors %} error{% endif %}">
-          
-          {% comment %} Upload icon for main image {% endcomment %}
-          <img src="{% static 'market/icons/upload.svg' %}"
-              alt="Upload image 1"
-              class="w-6 h-6">
-
-          {% comment %} Dynamic filename text for selected or existing main image {% endcomment %}
-          <span id="file-name-1"
-                class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 
-                {% if form.instance.item_image1 %}{% else %}hidden{% endif %}">
             {% if form.instance.item_image1 %}
-            {{ form.instance.item_image1.name|filename_filter }}
+              <img src="{{ form.instance.item_image1.url }}" alt="First-image" class="w-full h-40 object-cover rounded-lg mt-3">
             {% endif %}
-          </span>
+          </label>
+          {% for error in form.item_image1.errors %}
+            <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-3">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </div>
 
-          {% comment %} Existing main image preview (edit mode only) {% endcomment %}
-          {% if form.instance.item_image1 %}
-            <img src="{{ form.instance.item_image1.url }}" alt="First-image" class="w-full h-40 object-cover rounded-lg mt-3">
-          {% endif %}
-
-        </label>
-
-        {% comment %} Validation errors for main image {% endcomment %}
-        {% for error in form.item_image1.errors %}
-          <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-3">
-            {{ error }}
-          </div>
-        {% endfor %}
-      </div>
-
-
-      {% comment %} Second (optional) image upload {% endcomment %}
-      <div>
-
-        {% comment %} File input (hidden by widget); label below acts as the visible button {% endcomment %}
-        {{ form.item_image2 }}
-        <label for="{{ form.item_image2.id_for_label }}"
-              class="podo-input flex flex-col items-center justify-center cursor-pointer {% if form.item_image2.errors %} error{% endif %}">
-          
-          {% comment %} Upload icon for second image {% endcomment %}
-          <img src="{% static 'market/icons/upload.svg' %}"
-              alt="Upload image 2"
-              class="w-6 h-6">
-
-          {% comment %} Dynamic filename text for selected or existing second image {% endcomment %}
-          <span id="file-name-2"
-                class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 
-                {% if form.instance.item_image2 %}{% else %}hidden{% endif %}">
+        {% comment %} Second (optional) image upload {% endcomment %}
+        <div>
+          {{ form.item_image2 }}
+          <label for="{{ form.item_image2.id_for_label }}"
+            class="podo-input flex flex-col items-center justify-center cursor-pointer {% if form.item_image2.errors %} error{% endif %}">
+            <img src="{% static 'market/icons/upload.svg' %}" alt="Upload image 2" class="w-6 h-6">
+            <span id="file-name-2"
+              class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2
+                    {% if form.instance.item_image2 %}{% else %}hidden{% endif %}">
+              {% if form.instance.item_image2 %}
+                {{ form.instance.item_image2.name|filename_filter }}
+              {% endif %}
+            </span>
             {% if form.instance.item_image2 %}
-              {{ form.instance.item_image2.name|filename_filter }}
+              <img src="{{ form.instance.item_image2.url }}" alt="Second-image" class="w-full h-40 object-cover rounded-lg mt-3">
             {% endif %}
-          </span>
+          </label>
+          {% for error in form.item_image2.errors %}
+            <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </div>
 
-          {% comment %} Existing second image preview (edit mode only) {% endcomment %}
-          {% if form.instance.item_image2 %}
-            <img src="{{ form.instance.item_image2.url }}" alt="Second-image" class="w-full h-40 object-cover rounded-lg mt-3">
-          {% endif %}
-
-        </label>
-        
-        {% comment %} Validation errors for second image {% endcomment %}
-        {% for error in form.item_image2.errors %}
-          <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
-            {{ error }}
-          </div>
-        {% endfor %}
-      </div>
-
-
-      {% comment %} Third (optional) image upload {% endcomment %}
-      <div>
-
-        {% comment %} File input (hidden by widget); label below acts as the visible button {% endcomment %}
-        {{ form.item_image3 }}
-        <label for="{{ form.item_image3.id_for_label }}"
-              class="podo-input flex flex-col items-center justify-center cursor-pointer {% if form.item_image3.errors %} error{% endif %}">
-          
-          {% comment %} Upload icon for third image {% endcomment %}
-          <img src="{% static 'market/icons/upload.svg' %}"
-              alt="Upload image 3"
-              class="w-6 h-6">
-
-          {% comment %} Dynamic filename text for selected or existing third image {% endcomment %}
-          <span id="file-name-3"
-                class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2 
-                {% if form.instance.item_image3 %}{% else %}hidden{% endif %}">
+        {% comment %} Third (optional) image upload {% endcomment %}
+        <div>
+          {{ form.item_image3 }}
+          <label for="{{ form.item_image3.id_for_label }}"
+            class="podo-input flex flex-col items-center justify-center cursor-pointer {% if form.item_image3.errors %} error{% endif %}">
+            <img src="{% static 'market/icons/upload.svg' %}" alt="Upload image 3" class="w-6 h-6">
+            <span id="file-name-3"
+              class="text-input-placeholder text-[14px] truncate max-w-full text-center mt-2
+                    {% if form.instance.item_image3 %}{% else %}hidden{% endif %}">
+              {% if form.instance.item_image3 %}
+                {{ form.instance.item_image3.name|filename_filter }}
+              {% endif %}
+            </span>
             {% if form.instance.item_image3 %}
-              {{ form.instance.item_image3.name|filename_filter }}
+              <img src="{{ form.instance.item_image3.url }}" alt="Third-image" class="w-full h-40 object-cover rounded-lg mt-3">
             {% endif %}
-          </span>
+          </label>
+          {% for error in form.item_image3.errors %}
+            <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </div>
 
-          {% comment %} Existing third image preview (edit mode only) {% endcomment %}
-          {% if form.instance.item_image3 %}
-            <img src="{{ form.instance.item_image3.url }}" alt="Third-image" class="w-full h-40 object-cover rounded-lg mt-3">
-          {% endif %}
-
-        </label>
-
-        {% comment %} Validation errors for third image {% endcomment %}
-        {% for error in form.item_image3.errors %}
-          <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
-            {{ error }}
-          </div>
-        {% endfor %}
       </div>
-
     </div>
-  </div>
 
-  {% comment %} Form action buttons: Cancel (back to list) and Save (submit form) {% endcomment %}
-  <div class="col-span-2 flex w-full max-w-[600px] mx-auto mt-4">
+    {% comment %}
+      Form action buttons:
+      - Cancel: go back to item detail on edit, or home (list) on create
+      - Save: submit the form
+      - On mobile: stacked full-width buttons
+      - On desktop: aligned in a row with grow behavior
+    {% endcomment %}
+    <div class="col-span-1 md:col-span-2 w-full max-w-[600px] mx-auto mt-6 md:mt-4 flex flex-col md:flex-row gap-3 md:gap-0">
+      <a href="{% if postitem %}{% url 'item-detail' postitem.id %}{% else %}{% url 'home' %}{% endif %}"
+        class="podo-button large secondary w-full md:w-auto md:grow md:mr-[15px] text-center">
+        Cancel
+      </a>
 
-    {% comment %} Cancel button: go back to item detail on edit, or home (item list) on create {% endcomment %}
-    <a href="{% if postitem %}{% url 'item-detail' postitem.id %}{% else %}{% url 'home' %}{% endif %}" 
-      class="podo-button large secondary grow mr-[15px] text-center">
-      Cancel
-    </a>
+      <button type="submit" class="podo-button large primary w-full md:w-auto md:grow-6 text-center">
+        Save
+      </button>
+    </div>
 
-    {% comment %} Save button: submit the form and create a new item {% endcomment %}
-    <button type="submit" class="podo-button large primary grow-6 text-center">
-      Save
-    </button>
-  </div>
-
-</form>
+  </form>
 
 {% endblock content %}

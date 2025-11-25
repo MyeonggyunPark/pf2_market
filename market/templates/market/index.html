@@ -8,120 +8,127 @@
 {% comment %} Main content {% endcomment %}
 {% block content %}
 
-<div class="w-full max-w-[1060px] mx-auto mt-[90px] mb-[260px]">
+  {% comment %} Responsive container for the item list with adaptive padding and vertical spacing {% endcomment %}
+  <div class="w-full max-w-[1060px] mx-auto px-4 md:px-5 mt-10 md:mt-[90px] mb-16 md:mb-[260px]">
 
-  {% comment %} Header section: page title and "write post" button {% endcomment %}
-  <div class="flex justify-between items-center mb-15 px-5">
+    {% comment %} Header section: page title and "write post" button {% endcomment %}
+    <div class="flex items-end justify-between mb-6 md:mb-10">
 
-    {% comment %} Page title {% endcomment %}
-    <h2 class="text-[24px] font-semibold">All Sale Items</h2>
+      {% comment %} Page title {% endcomment %}
+      <h2 class="text-[20px] md:text-[24px] font-semibold">
+        All Sale Items
+      </h2>
 
-    {% comment %} Link to the "create new post" page {% endcomment %}
-    <a href="{% url 'item-create' %}"
-      class="flex items-center text-[20px] font-medium text-text-main hover:text-link transition-colors">
-      <img class="w-[29px] h-[29px] mr-1.5" src="{% static 'market/icons/ic-pen.svg' %}" alt="pen icon">
-      <span>Create</span>
-    </a>
-  </div>
-
-  {% comment %} item cards {% endcomment %}
-  <div class="grid grid-cols-4 gap-x-5 gap-y-[30px]">
-
-    {% for item in items %}
-    <div class="podo-card flex flex-col p-3.5 bg-gray-100">
-
-      {% comment %} Thumbnail image for the item {% endcomment %}
-      <img class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]" src="{{ item.item_image1.url }}" alt="thumbnail">
-
-      {% comment %} Content area: title, price, meta info, and details button {% endcomment %}
-      <div class="flex flex-col grow mx-[11px]">
-
-        {% comment %} Item title {% endcomment %}
-        <h2 class="font-normal text-[18px] leading-[22px] h-11 overflow-hidden text-ellipsis line-clamp-2">
-          {{ item.item_title }}
-        </h2>
-
-        {% comment %} Price section {% endcomment %}
-        <div class="flex items-center h-[30px] my-[19px]">
-          <span class="text-[20px] font-bold truncate">
-            &euro;&nbsp;{{ item.item_price|intcomma }}
-          </span>
-        </div>
-
-        {% comment %} Meta information: creation date and seller city {% endcomment %}
-        <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
-          {{ item.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ item.dt_created|date:"d.m.Y" }} 
-        </div>
-
-        {% comment %} Button to view item details {% endcomment %}
-        <a href="{% url 'item-detail' item.id %}" class="podo-button primary block mt-[22px] mb-4">
-          View Details
-        </a>
-
-      </div>
+      {% comment %} Link to the "create new post" page {% endcomment %}
+      <a href="{% url 'item-create' %}"
+        class="inline-flex items-center self-start md:self-auto text-[20px] font-medium text-text-main hover:text-link transition-colors">
+        <img class="size-[30px] md:size-[29px] mr-1.5"
+          src="{% static 'market/icons/ic-pen.svg' %}" alt="pen icon">
+        <span>Create</span>
+      </a>
     </div>
 
-    {% comment %} Fallback message shown when there are no items to display {% endcomment %}
-    {% empty %}
-      <p class="col-span-4 text-center text-[20px] font-bold my-[120px]">
-        There are no items for sale.
-      </p>
-    {% endfor %}
+    {% comment %} item cards {% endcomment %}
+    {% comment %} Responsive grid: 1 column on mobile, 2 on medium screens, 4 on large screens {% endcomment %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-x-5 md:gap-y-[30px]">
 
-  </div>
+      {% for item in items %}
+      <div class="podo-card flex flex-col p-3.5 bg-gray-100">
 
-  {% comment %} Pagination controls: only render if the queryset is paginated {% endcomment %}
-  {% if is_paginated %}
-  <ul class="flex justify-center items-center list-none mt-[50px] p-0">
+        {% comment %} Thumbnail image for the item {% endcomment %}
+        <img src="{{ item.item_image1.url }}" alt="thumbnail"
+          class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]">
 
-    {% comment %} "First" and "Previous" links when there is a previous page {% endcomment %}
-    {% if page_obj.has_previous %}
-      <li class="mr-5">
-        <a href="?page=1"
-          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg"
-          aria-label="Go to first page">
-          «
-        </a>
-      </li>
-      <li class="mr-5">
-        <a href="?page={{ page_obj.previous_page_number }}"
-          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg"
-          aria-label="Go to previous page">
-          ‹
-        </a>
-      </li>
-    {% endif %}
-    
-    {% comment %} Page number links: show current page and a small range around it {% endcomment %}
-    {% for num in page_obj.paginator.page_range %}
-      {% if page_obj.number == num %}
-        <li class="mr-5 px-[15px] py-[9px] rounded-full font-bold text-post-list-pagination bg-post-list-pagination-bg">
-          {{ num }}
+        {% comment %} Content area: title, price, meta info, and details button {% endcomment %}
+        <div class="flex flex-col grow mx-[11px]">
+
+          {% comment %} Item title {% endcomment %}
+          <h2 class="font-normal text-[16px] md:text-[18px] leading-[22px] h-11 overflow-hidden text-ellipsis line-clamp-2">
+            {{ item.item_title }}
+          </h2>
+
+          {% comment %} Price section {% endcomment %}
+          <div class="flex items-center h-[30px] my-4 md:my-[19px]">
+            <span class="text-[18px] md:text-[20px] font-bold truncate">
+              &euro;&nbsp;{{ item.item_price|intcomma }}
+            </span>
+          </div>
+
+          {% comment %} Meta information: creation date and seller city {% endcomment %}
+          <div class="text-[14px] md:text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
+            {{ item.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ item.dt_created|date:"d.m.Y" }} 
+          </div>
+
+          {% comment %} Button to view item details {% endcomment %}
+          <a href="{% url 'item-detail' item.id %}"
+            class="podo-button primary block mt-[18px] md:mt-[22px] mb-3 md:mb-4">
+            View Details
+          </a>
+
+        </div>
+      </div>
+
+      {% comment %} Fallback message shown when there are no items to display {% endcomment %}
+      {% empty %}
+        <p class="col-span-full text-center text-[18px] md:text-[20px] font-bold my-20 md:my-[120px]">
+          There are no items for sale.
+        </p>
+      {% endfor %}
+
+    </div>
+
+    {% comment %} Pagination controls: only render if the queryset is paginated {% endcomment %}
+    {% if is_paginated %}
+    <ul class="flex justify-center items-center list-none mt-8 md:mt-[50px] p-0">
+
+      {% comment %} "First" and "Previous" links when there is a previous page {% endcomment %}
+      {% if page_obj.has_previous %}
+        <li class="mr-3 md:mr-5">
+          <a href="?page=1" aria-label="Go to first page"
+            class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-2xl md:text-3xl text-gray-400 font-semibold pb-2 md:pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg">
+            «
+          </a>
         </li>
-      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-        <li class="mr-5">
-          <a href="?page={{ num }}" class="hover:underline">{{ num }}</a>
+        <li class="mr-3 md:mr-5">
+          <a href="?page={{ page_obj.previous_page_number }}" aria-label="Go to previous page"
+            class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-2xl md:text-3xl text-gray-400 font-semibold pb-2 md:pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg">
+            ‹
+          </a>
         </li>
       {% endif %}
-    {% endfor %}
-    
-    {% comment %} "Next" and "Last" links when there is a next page {% endcomment %}
-    {% if page_obj.has_next %}
-      <li class="mr-5">
-        <a href="?page={{ page_obj.next_page_number }}"
-          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg" aria-label="Go to next page">
-          ›
-        </a>
-      </li>
-      <li>
-        <a href="?page={{ page_obj.paginator.num_pages }}"
-          class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-3xl text-gray-400 font-semibold pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg" aria-label="Go to last page">
-          »
-        </a>
-      </li>
+      
+      {% comment %} Page number links: show current page and a small range around it {% endcomment %}
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="mr-3 md:mr-5 px-3 md:px-[15px] py-[7px] md:py-[9px] rounded-full font-bold text-post-list-pagination bg-post-list-pagination-bg">
+            {{ num }}
+          </li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="mr-3 md:mr-5">
+            <a href="?page={{ num }}" class="text-[15px] md:text-base hover:underline">
+              {{ num }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      
+      {% comment %} "Next" and "Last" links when there is a next page {% endcomment %}
+      {% if page_obj.has_next %}
+        <li class="mr-3 md:mr-5">
+          <a href="?page={{ page_obj.next_page_number }}" aria-label="Go to next page"
+            class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-2xl md:text-3xl text-gray-400 font-semibold pb-2 md:pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg">
+            ›
+          </a>
+        </li>
+        <li>
+          <a href="?page={{ page_obj.paginator.num_pages }}" aria-label="Go to last page"
+            class="podo-chip rounded-full w-9 h-9 flex items-center justify-center border-2 text-2xl md:text-3xl text-gray-400 font-semibold pb-2 md:pb-3 hover:border-button-darkpurple-bg hover:text-button-darkpurple-bg">
+            »
+          </a>
+        </li>
+      {% endif %}
+    </ul>
     {% endif %}
-  </ul>
-  {% endif %}
 
-</div>
+  </div>
 {% endblock content %}

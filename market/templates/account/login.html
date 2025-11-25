@@ -15,126 +15,154 @@
 {% comment %} Main content {% endcomment %}
 {% block content %}
 
-<div class="w-full max-w-[440px] mx-auto my-[196px]">
-  
-  {% comment %} Login form (email/username + password) {% endcomment %}
-  <form method="post" novalidate>
-    <a href="{% url 'home' %}">
-      <img class="block w-[164px] h-[90px] mx-auto mb-[47px]" src="{% static 'market/assets/logo.svg' %}" alt="podomarket">
-    </a>
+  {# Responsive container for the login content: width, padding, and vertical spacing for mobile/desktop #}
+  <div class="w-full max-w-[440px] mx-auto px-4 md:px-0 mt-10 mb-12 md:my-[196px]">
+    
+    {% comment %} Login form (email/username + password) {% endcomment %}
+    <form method="post" novalidate>
 
-    {% csrf_token %}
+      {% comment %} Logo linking back to home, with responsive sizing for mobile and desktop {% endcomment %}
+      <a href="{% url 'home' %}">
+        <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket"
+          class="block w-[140px] h-auto md:w-[164px] md:h-[90px] mx-auto mb-8 md:mb-[47px]">
+      </a>
 
-    {% comment %} Login identifier field {% endcomment %}
-    <div class="mb-[15px]">
-      {{ form.login|add_class:"podo-input"|attr:"placeholder:E-mail"|add_error_class:"error" }}
-      {% for error in form.login.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
-          {{ error }}
-        </div>
-      {% endfor %}
+      {% csrf_token %}
+
+      {% comment %} Login identifier field {% endcomment %}
+      <div class="mb-[15px]">
+        {{ form.login|add_class:"podo-input"|attr:"placeholder:E-mail"|add_error_class:"error" }}
+
+        {% comment %} Login field error text, slightly smaller on mobile and right-aligned {% endcomment %}
+        {% for error in form.login.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% comment %} Password field {% endcomment %}
+      <div>
+        {{ form.password|add_class:"podo-input"|attr:"placeholder:Password"|add_error_class:"error" }}
+
+        {% comment %} Password field error text, slightly smaller on mobile and right-aligned {% endcomment %}
+        {% for error in form.password.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% comment %} Non-field errors shown below the inputs {% endcomment %}
+      <div class="mt-[15px] text-[13px] md:text-[14px] leading-[1.7] text-center">
+        {% for error in form.non_field_errors %}
+          <div class="text-input-error-fg">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      {% comment %} Submit button for logging in {% endcomment %}
+      <button type="submit" class="podo-button large primary block w-full max-w-60 mx-auto mt-6">
+        Log In
+      </button>
+    </form>
+
+    {% comment %} Links for password reset and signup below the login form {% endcomment %}
+    <ul class="podo-links flex justify-center text-[16px] md:text-[17px] leading-[25px] mt-6">
+      <li>
+        <a href="{% url 'account_reset_password' %}" class="hover:border-b-2 hover:border-links-divider">
+          Forgot Password
+        </a>
+      </li>
+      <li class="h-[15px] mx-[21px] w-px border-r border-links-divider"></li>
+      <li>
+        <a href="{% url 'account_signup' %}" class="hover:border-b-2 hover:border-links-divider">
+          Sign Up
+        </a>
+      </li>
+    </ul>
+
+    {% comment %} Divider text between email login and social login options {% endcomment %}
+    <div class="mt-10 md:mt-10 text-center text-[15px] md:text-[16px] text-post-list-meta border-t border-post-list-meta py-7 md:py-6">
+      Or log in with a social account
     </div>
 
-    {% comment %} Password field {% endcomment %}
-    <div>
-      {{ form.password|add_class:"podo-input"|attr:"placeholder:Password"|add_error_class:"error" }}
-      {% for error in form.password.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
-          {{ error }}
-        </div>
-      {% endfor %}
+    {% comment %} === MOBILE: icon-only horizontal social login === {% endcomment %}
+    {% comment %} Compact circular social buttons row, only visible on mobile {% endcomment %}
+    <div class="flex items-center justify-between md:hidden">
+      
+      {# Google #}
+      <a href="{% provider_login_url 'google' %}"
+        class="flex items-center justify-center size-16 rounded-full bg-white border border-border-light active:scale-95 transition">
+        <img src="{% static 'market/icons/google-logo.svg' %}"
+          alt="Google" class="size-9">
+      </a>
+
+      {# GitHub #}
+      <a href="{% provider_login_url 'github' %}"
+        class="flex items-center justify-center size-16 rounded-full bg-[#181717] active:scale-95 transition">
+        <img src="{% static 'market/icons/github-logo.svg' %}"
+          alt="GitHub" class="size-9">
+      </a>
+
+      {# Kakao #}
+      <a href="{% provider_login_url 'kakao' %}" 
+        class="flex items-center justify-center size-16 rounded-full bg-[#FEE500] active:scale-95 transition">
+        <img src="{% static 'market/icons/kakao-logo.svg' %}"
+          alt="Kakaotalk" class="size-9 rounded-lg">
+      </a>
+
+      {# Naver #}
+      <a href="{% provider_login_url 'naver' %}"
+        class="flex items-center justify-center size-16 rounded-full bg-[#03C75A] active:scale-95 transition">
+        <img src="{% static 'market/icons/naver-logo.svg' %}"
+          alt="Naver" class="size-9 rounded-lg">
+      </a>
     </div>
 
-    {% comment %} Non-field errors shown below the inputs {% endcomment %}
-    <div class="mt-[15px] text-[14px] leading-[1.7] text-center">
-      {% for error in form.non_field_errors %}
-      <div class="text-input-error-fg">{{ error }}</div>
-      {% endfor %}
+    {% comment %} === DESKTOP: original full-width buttons with hover text === {% endcomment %}
+    {% comment %} Full-width social login buttons stack, only visible on desktop {% endcomment %}
+    <div class="hidden md:block md:space-y-5">
+
+      {% comment %} Google social login {% endcomment %}
+      <a href="{% provider_login_url 'google' %}"
+        class="group podo-button medium w-full bg-white text-[#3c4043] border-2 border-border-light relative">
+        <span class="block w-full text-center text-[15px] md:text-[17px]">
+          Continue with <span class="hidden group-hover:inline-block">Google</span>
+        </span>
+        <img src="{% static 'market/icons/google-logo.svg' %}" alt="google logo"
+          class="absolute right-6 top-1/2 -translate-y-1/2 size-7">
+      </a>
+
+      {% comment %} GitHub social login {% endcomment %}
+      <a href="{% provider_login_url 'github' %}"
+        class="group podo-button medium w-full bg-[#181717] text-white border-2 border-[#181717] relative">
+        <span class="block w-full text-center text-[15px] md:text-[17px]">
+          Continue with <span class="hidden group-hover:inline-block">GitHub</span>
+        </span>
+        <img src="{% static 'market/icons/github-logo.svg' %}" alt="GitHub logo"
+          class="absolute right-6 top-1/2 -translate-y-1/2 size-[25px]">
+      </a>
+
+      {% comment %} Kakaotalk social login {% endcomment %}
+      <a href="{% provider_login_url 'kakao' %}"
+        class="group podo-button medium w-full bg-[#FEE500] text-black relative">
+        <span class="block w-full text-center text-[15px] md:text-[17px]">
+          Continue with <span class="hidden group-hover:inline-block">Kakaotalk</span>
+        </span>
+        <img src="{% static 'market/icons/kakao-logo.svg' %}" alt="Kakaotalk logo"
+          class="absolute right-6 top-1/2 -translate-y-1/2 size-[26px] rounded-sm">
+      </a>
+
+      {% comment %} Naver social login {% endcomment %}
+      <a href="{% provider_login_url 'naver' %}"
+        class="group podo-button medium w-full bg-[#03C75A] text-black relative">
+        <span class="block w-full text-center text-[15px] md:text-[17px]">
+          Continue with <span class="hidden group-hover:inline-block">Naver</span>
+        </span>
+        <img src="{% static 'market/icons/naver-logo.svg' %}" alt="Naver logo"
+          class="absolute right-6 top-1/2 -translate-y-1/2 size-7 rounded-lg">
+      </a>
     </div>
-
-    {% comment %} Submit button for logging in {% endcomment %}
-    <button class="podo-button large primary block w-full max-w-60 mx-auto mt-6" type="submit">Log In</button>
-  </form>
-
-  {% comment %} Links for password reset and signup below the login form {% endcomment %}
-  <ul class="podo-links flex justify-center text-[17px] leading-[25px] mt-6">
-    <li>
-      <a href="{% url 'account_reset_password' %}" class="hover:border-b-2 hover:border-links-divider">Forgot Password</a>
-    </li>
-    <li class="h-[15px] mx-[21px] w-px border-r border-links-divider"></li>
-    <li>
-      <a href="{% url 'account_signup' %}" class="hover:border-b-2 hover:border-links-divider">Sign Up</a>
-    </li>
-  </ul>
-
-  {% comment %} Divider text between email login and social login options {% endcomment %}
-  <div class="mt-8 mb-4 text-center text-[16px] text-post-list-meta border-t border-post-list-meta py-6">
-    Or log in with a social account
   </div>
-
-  {% comment %} Social login buttons using django-allauth providers (same UI as signup page) {% endcomment %}
-  <div class="space-y-5">
-
-    {% comment %} Google social login {% endcomment %}
-    <a
-      href="{% provider_login_url 'google' %}"
-      class="group podo-button medium w-full bg-white text-[#3c4043] border-2 border-border-light hover:border-2"
-    >
-      <span class="block w-full text-center">
-        Continue with <span class="hidden group-hover:inline-block">Google</span>
-      </span>
-      <img
-        src="{% static 'market/icons/google-logo.svg' %}"
-        alt=""
-        class="absolute right-6 top-1/2 -translate-y-1/2 size-7"
-      >
-    </a>
-
-    {% comment %} GitHub social login {% endcomment %}
-    <a
-      href="{% provider_login_url 'github' %}"
-      class="group podo-button medium w-full bg-[#181717] text-white border-2 border-[#181717]"
-    >
-      <span class="block w-full text-center">
-        Continue with <span class="hidden group-hover:inline-block">GitHub</span>
-      </span>
-      <img
-        src="{% static 'market/icons/github-logo.svg' %}"
-        alt=""
-        class="absolute right-6 top-1/2 -translate-y-1/2 size-[25px]"
-      >
-    </a>
-
-    {% comment %} Kakaotalk social login {% endcomment %}
-    <a
-      href="{% provider_login_url 'kakao' %}"
-      class="group podo-button medium w-full bg-[#FEE500] text-black"
-    >
-      <span class="block w-full text-center">
-        Continue with <span class="hidden group-hover:inline-block">Kakaotalk</span>
-      </span>
-      <img
-        src="{% static 'market/icons/kakao-logo.svg' %}"
-        alt=""
-        class="absolute right-6 top-1/2 -translate-y-1/2 size-[26px] rounded-sm"
-      >
-    </a>
-
-    {% comment %} Naver social login {% endcomment %}
-    <a
-      href="{% provider_login_url 'naver' %}"
-      class="group podo-button medium w-full bg-[#03C75A] text-white"
-    >
-      <span class="block w-full text-center">
-        Continue with <span class="hidden group-hover:inline-block">Naver</span>
-      </span>
-      <img
-        src="{% static 'market/icons/naver-logo.svg' %}"
-        alt=""
-        class="absolute right-6 top-1/2 -translate-y-1/2 size-7 rounded-lg"
-      >
-    </a>
-  </div>
-</div>
 
 {% endblock content %}

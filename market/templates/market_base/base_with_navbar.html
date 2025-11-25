@@ -9,42 +9,66 @@
 {% comment %} header area {% endcomment %}
 {% block header %}
 
-<header class="flex flex-col items-center pt-[22px] pb-[26px] border-b border-b-site-header-border-bottom bg-site-header-bg">
-  <a class="" href="{% url 'home' %}">
-    <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket" class="w-[104px] h-[57px] mx-auto">
-  </a>
+  {% comment %}
+    Site header with brand logo and user navigation.
+    Background and bottom border match the site header theme.
+  {% endcomment %}
+  <header class="bg-site-header-bg border-b border-b-site-header-border-bottom">
 
-  {% comment %} Show logout when the user is authenticated, otherwise show login/signup buttons {% endcomment %}
-  <nav>
-    <ul class="flex justify-center list-none mt-[26px] m-0 p-0">
-      {% if user.is_authenticated %}
-        <li class="mr-[54px] last:mr-0 leading-[25px]">
-          <a href="{% url 'profile' user.id %}" 
-            class="user-menu-dot hover:font-bold hover:text-site-header-user-menu-hover hover:no-underline relative">
-            Profile
-          </a>
-        </li>
-        <li class="mr-[54px] last:mr-0 leading-[25px]">
-          <a href="{% url 'account_logout' %}" 
-            class="user-menu-dot hover:font-bold hover:text-site-header-user-menu-hover hover:no-underline relative">
-            Logout
-          </a>
-        </li>
-      {% else %}
-        <li class="mr-[18px] last:mr-0">
-          <a class="podo-chip hover:border-button-darkpurple-bg" href="{% url 'account_login' %}">
-            Login
-          </a>
-        </li>
-        <li class="mr-[18px] last:mr-0">
-          <a class="podo-chip hover:border-button-darkpurple-bg" href="{% url 'account_signup'%}">
-            Signup
-          </a>
-        </li>
-      {% endif %}
-    </ul>
-  </nav>
-</header>
+    {% comment %}
+      Header inner container:
+      - Centers content with max width
+      - Adds horizontal/vertical padding on mobile
+      - Restores original spacing on desktop
+    {% endcomment %}
+    <div class="w-full max-w-[1060px] mx-auto px-4 py-4 md:px-0 md:pt-[22px] md:pb-[26px] flex flex-col items-center">
+
+      {% comment %}
+        Clickable logo linking back to the home page.
+        Logo size is slightly smaller on mobile and uses fixed size on desktop.
+      {% endcomment %}
+      <a href="{% url 'home' %}">
+        <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket"
+          class="w-[90px] h-auto md:w-[104px] md:h-[57px] mx-auto">
+      </a>
+
+      {% comment %}
+        User navigation:
+        - When authenticated: show profile/logout links
+        - When not authenticated: show login/signup chips
+        The list can wrap on smaller screens to avoid horizontal overflow.
+      {% endcomment %}
+      <nav class="w-full">
+        <ul class="flex flex-wrap justify-center list-none mt-4 md:mt-[26px] m-0 p-0 gap-x-6 gap-y-2">
+          {% if user.is_authenticated %}
+            <li class="leading-[25px]">
+              <a href="{% url 'profile' user.id %}"
+                class="user-menu-dot hover:font-bold hover:text-site-header-user-menu-hover hover:no-underline relative text-xl">
+                Profile
+              </a>
+            </li>
+            <li class="leading-[25px]">
+              <a href="{% url 'account_logout' %}"
+                class="user-menu-dot hover:font-bold hover:text-site-header-user-menu-hover hover:no-underline relative text-xl">
+                Logout
+              </a>
+            </li>
+          {% else %}
+            <li>
+              <a class="podo-chip hover:border-button-darkpurple-bg" href="{% url 'account_login' %}">
+                Login
+              </a>
+            </li>
+            <li>
+              <a class="podo-chip hover:border-button-darkpurple-bg" href="{% url 'account_signup' %}">
+                Signup
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
 
 {% endblock header %}
 
@@ -52,11 +76,14 @@
 {% comment %} footer area {% endcomment %}
 {% block footer %}
 
-<footer class="py-[26px] bg-site-footer-bg">
-  {% comment %} Simple footer with brand text aligned to the right {% endcomment %}
-  <div class="max-w-[1060px] min-h-6 mx-auto font-bold text-right text-site-footer-text">
-    <span>PODOMARKET</span>
-  </div>
-</footer>
+  {% comment %}
+    Simple footer with brand text.
+    Text is centered on mobile and right-aligned on desktop.
+  {% endcomment %}
+  <footer class="bg-site-footer-bg py-4 md:py-[26px]">
+    <div class="max-w-[1060px] min-h-6 mx-auto px-4 md:px-0 font-bold text-center md:text-right text-site-footer-text">
+      <span>PODOMARKET</span>
+    </div>
+  </footer>
 
 {% endblock footer %}

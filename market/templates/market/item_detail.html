@@ -11,127 +11,136 @@
 {% comment %} Main content {% endcomment %}
 {% block content %}
 
-<div class="w-full max-w-[880px] mx-auto mt-[67px] mb-[120px]">
+  <div class="w-full max-w-[880px] mx-auto px-4 md:px-0 mt-10 md:mt-[67px] mb-16 md:mb-[120px]">
 
-  {% comment %} Top bar: back link and (optional) Edit/Delete actions {% endcomment %}
-  <div class="flex justify-between items-center text-[20px] mb-[23px] mx-[7px]">
+    {% comment %} Top bar: back link and (optional) Edit/Delete actions {% endcomment %}
+    <div class="flex justify-between items-center text-[18px] md:text-[20px] mb-4 md:mb-[23px] mx-0 md:mx-[7px]">
 
-    {% comment %} Link to navigate back to the item list (home page) {% endcomment %}
-    <a href="{% url 'home' %}" class="hover:text-link font-semibold">
-      <span class="text-[28px]">«</span> 
-      Go to List
-    </a>
+      {% comment %} Link to navigate back to the item list (home page) {% endcomment %}
+      <a href="{% url 'home' %}" class="hover:text-link font-semibold flex items-center">
+        <span class="text-[30px] mr-1 mb-1.5 md:mb-1">«</span>
+        <span>Go to List</span>
+      </a>
 
-    {% comment %} Show Edit/Delete buttons only when the logged-in user is the author {% endcomment %}
-    {% if postitem.item_author == user %}
-    <div class="flex space-x-2">
-      <a class="podo-button small negative" href="{% url 'item-delete' postitem.id %}">Delete</a>
-      <a class="podo-button small secondary" href="{% url 'item-update' postitem.id %}">Edit</a>
-    </div>
-    {% endif %}
-  </div>
-
-  {% comment %} Main item image (first image is required) {% endcomment %}
-  <img class="w-full h-auto max-h-[645px] object-cover rounded-[11px]" 
-      src="{{ postitem.item_image1.url }}" alt="item-image-1">
-
-  {% comment %} Optional second image: only render if item_image2 exists {% endcomment %}
-  {% if postitem.item_image2 %}
-  <img class="w-full h-auto max-h-[645px] object-cover rounded-[11px] mt-[15px]"
-      src="{{ postitem.item_image2.url }}" alt="item-image-2">
-  {% endif %}
-
-  {% comment %} Optional third image: only render if item_image3 exists {% endcomment %}
-  {% if postitem.item_image3 %}
-  <img class="w-full h-auto max-h-[645px] object-cover rounded-[11px] mt-[15px]"
-      src="{{ postitem.item_image3.url }}" alt="item-image-3">
-  {% endif %}
-
-  {% comment %} Item header section: title, price, condition, and creation date {% endcomment %}
-  <div class="mt-[30px] mb-[42px] mx-[15px]">
-
-    {% comment %} Item title {% endcomment %}
-    <h1 class="text-[22px] font-normal mb-[15px] truncate">
-      {{ postitem.item_title }}
-    </h1>
-
-    {% comment %} Price, condition, and creation date {% endcomment %}
-    <div class="flex items-center">
-
-      {% comment %} Item price {% endcomment %}
-      <span class="text-[25px] font-bold mr-[15px] 
-          {% if postitem.is_sold %}line-through text-post-sold{% endif %}">
-        &euro;&nbsp;{{ postitem.item_price|intcomma }}
-      </span>
-
-      {% comment %} Sold status badge shown next to the price when the item is marked as sold {% endcomment %}
-      {% if postitem.is_sold %}
-        <span class="rounded-full px-[18px] py-[5px] text-[17px] leading-[25px] text-white font-semibold bg-post-sold mr-2">
-          SOLD
-        </span>
+      {% comment %} Show Edit/Delete buttons only when the logged-in user is the author {% endcomment %}
+      {% if postitem.item_author == user %}
+      <div class="flex space-x-2">
+        <a class="podo-button small negative text-[14px] md:text-[15px]"
+          href="{% url 'item-delete' postitem.id %}">
+          Delete
+        </a>
+        <a class="podo-button small secondary text-[14px] md:text-[15px]"
+          href="{% url 'item-update' postitem.id %}">
+          Edit
+        </a>
+      </div>
       {% endif %}
-
-      {% comment %} Item condition {% endcomment %}
-      <span class="podo-chip font-bold text-chip-primary-fg bg-chip-primary-bg border-chip-primary-border">
-        {{ postitem.get_item_condition_display }}
-      </span>
-
-      {% comment %} Creation date of the item {% endcomment %}
-      <span class="ml-auto text-[15px] text-post-detail-date">
-        {{ postitem.dt_created|date:"d.m.Y" }}
-      </span>
-
     </div>
-    
-  </div>
 
-  {% comment %} Seller information box: profile image, nickname, rating, and location {% endcomment %}
-  <a href="{% url "profile" postitem.item_author.id %}" class="no-underline">
-    <div class="podo-box gray-background flex justify-center items-center px-5 mx-[15px] py-[25px] rounded-[27px]">
+    {% comment %} Main item image (first image is required) {% endcomment %}
+    <img src="{{ postitem.item_image1.url }}" alt="item-image-1"
+      class="w-full h-auto max-h-[645px] object-cover rounded-[11px]">
 
-      <div class="flex justify-around w-full">
+    {% comment %} Optional second image: only render if item_image2 exists {% endcomment %}
+    {% if postitem.item_image2 %}
+      <img src="{{ postitem.item_image2.url }}" alt="item-image-2"
+        class="w-full h-auto max-h-[645px] object-cover rounded-[11px] mt-[15px]">
+    {% endif %}
 
-        {% comment %} Seller profile image {% endcomment %}
-        <div class="flex">
-          <img class="w-[79px] h-[79px] mr-[23px] rounded-full bg-profile-pic-placeholder bg-cover bg-center "
-            src="{{ postitem.item_author.profile_pic.url|default:'' }}">
-          </img>
-    
-          {% comment %} Seller nickname {% endcomment %}      
-          <div class="text-[20px] font-bold flex items-center">
-            {{ postitem.item_author.nickname }}
-          </div>
-        </div>
+    {% comment %} Optional third image: only render if item_image3 exists {% endcomment %}
+    {% if postitem.item_image3 %}
+      <img src="{{ postitem.item_image3.url }}" alt="item-image-3"
+        class="w-full h-auto max-h-[645px] object-cover rounded-[11px] mt-[15px]">
+    {% endif %}
 
-        {% comment %}
-          Seller rating: render a number of filled and empty stars based on
-          the author's seller_rating value using the filled_stars/empty_stars filters
-        {% endcomment %}
-        <p class="flex items-center">
-          {% for _ in postitem.item_author.seller_rating|filled_stars %}
-          <i class="fa-solid fa-star text-xl text-button-darkpurple-bg"></i>
-          {% endfor %}
-          {% for _ in postitem.item_author.seller_rating|empty_stars %}
-          <i class="fa-solid fa-star text-xl text-site-footer-text"></i>
-          {% endfor %}
-        </p>
-        
-        {% comment %} Seller location: city and state {% endcomment %}
-        <ul class="podo-links">
-          <li>{{ postitem.item_author.city|get_city }}</li>
-          <li class="divider"></li>
-          <li>{{ postitem.item_author.city|get_state }}</li>
-        </ul>
+    {% comment %} Item header section: title, price, condition, and creation date {% endcomment %}
+    <div class="mt-6 md:mt-[30px] mb-6 md:mb-[42px] mx-1 md:mx-[15px]">
+
+      {% comment %} Item title {% endcomment %}
+      <h1 class="text-[20px] md:text-[24px] font-normal mb-[15px] truncate">
+        {{ postitem.item_title }}
+      </h1>
+
+      {% comment %} Price, condition, and creation date {% endcomment %}
+      <div class="flex flex-wrap items-center gap-y-2">
+
+        {% comment %} Item price {% endcomment %}
+        <span class="text-[22px] md:text-[25px] font-bold mr-[15px]
+            {% if postitem.is_sold %}line-through text-post-sold{% endif %}">
+          &euro;&nbsp;{{ postitem.item_price|intcomma }}
+        </span>
+
+        {% comment %} Sold status badge shown next to the price when the item is marked as sold {% endcomment %}
+        {% if postitem.is_sold %}
+          <span class="rounded-full px-[18px] py-[5px] text-[14px] md:text-[17px] leading-[25px] text-white font-semibold bg-post-sold mr-2">
+            SOLD
+          </span>
+        {% endif %}
+
+        {% comment %} Item condition {% endcomment %}
+        <span class="podo-chip text-[14px] md:text-[15px] font-bold text-chip-primary-fg bg-chip-primary-bg border-chip-primary-border">
+          {{ postitem.get_item_condition_display }}
+        </span>
+
+        {% comment %} Creation date of the item {% endcomment %}
+        <span class="ml-auto text-[15px] md:text-[20px] text-post-detail-date mt-1 md:mt-0">
+          {{ postitem.dt_created|date:"d.m.Y" }}
+        </span>
 
       </div>
+      
     </div>
-  </a>
 
-  {% comment %} Item description {% endcomment %}
-  <p class="text-[17px] leading-[30px] mx-[15px] mt-9 px-9 mb-[300px]">
-    {{ postitem.item_detail|linebreaksbr }}
-  </p>
+    {% comment %} Seller information box: profile image, nickname, rating, and location {% endcomment %}
+    <a href="{% url "profile" postitem.item_author.id %}" class="no-underline">
+      <div class="podo-box gray-background px-4 md:px-5 md:mx-[15px] py-4 md:py-[25px] rounded-[27px]">
+        <div class="w-full flex justify-around items-center gap-5">
 
-</div>
+          {% comment %} Seller profile image (with fallback to default image when none is set) {% endcomment %}
+          <div class="flex flex-col items-center md:flex-row md:justify-center">
+            {% if postitem.item_author.profile_pic %}
+              <img src="{{ postitem.item_author.profile_pic.url }}" alt="seller-profile"
+                class="size-16 md:size-[79px] md:mr-[23px] rounded-full bg-profile-pic-placeholder bg-cover bg-center">
+            {% else %}
+              <img 
+                src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="default-profile"
+                class="size-16 md:size-[79px] md:mr-[23px] rounded-full bg-profile-pic-placeholder bg-cover bg-center">
+            {% endif %}
+            {% comment %} Seller nickname {% endcomment %}
+            <div class="text-[20px] md:text-[24px] font-bold md:flex md:items-center">
+              {{ postitem.item_author.nickname }}
+            </div>
+          </div>
+
+          {% comment %}
+            Seller rating: render a number of filled and empty stars based on
+            the author's seller_rating value using the filled_stars/empty_stars filters
+          {% endcomment %}
+          <p class="flex items-center">
+            {% for _ in postitem.item_author.seller_rating|filled_stars %}
+            <i class="fa-solid fa-star text-lg md:text-xl text-button-darkpurple-bg"></i>
+            {% endfor %}
+            {% for _ in postitem.item_author.seller_rating|empty_stars %}
+            <i class="fa-solid fa-star text-lg md:text-xl text-site-footer-text"></i>
+            {% endfor %}
+          </p>
+          
+          {% comment %} Seller location: city and state {% endcomment %}
+          <ul class="podo-links mt-1 text-[15px] md:text-[20px] md:mt-0">
+            <li>{{ postitem.item_author.city|get_city }}</li>
+            <li class="divider"></li>
+            <li>{{ postitem.item_author.city|get_state }}</li>
+          </ul>
+
+        </div>
+      </div>
+    </a>
+
+    {% comment %} Item description {% endcomment %}
+    <p class="text-[17px] md:text-[20px] leading-[26px] md:leading-[30px] mx-4 md:mx-[15px] mt-6 md:mt-9 px-0 md:px-9 mb-20 md:mb-[300px]">
+      {{ postitem.item_detail|linebreaksbr }}
+    </p>
+
+  </div>
 
 {% endblock content %}

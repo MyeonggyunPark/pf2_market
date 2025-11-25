@@ -15,167 +15,193 @@
 {% comment %} Main content {% endcomment %}
 {% block content %}
 
-<div class="w-full max-w-[440px] mx-auto my-[196px]">
-  
-  {% comment %} Signup form (email, nickname, address, city, password fields) {% endcomment %}
-  <form method="post" novalidate>
-    <a href="{% url 'home' %}">
-      <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket" class="block w-[164px] h-[90px] mx-auto mb-[47px]">
-    </a>
-
-    {% csrf_token %}
+  {% comment %} Responsive container for signup content with mobile padding and vertical spacing {% endcomment %}
+  <div class="w-full max-w-[440px] mx-auto px-4 md:px-0 mt-10 mb-12 md:my-[196px]">
     
-    {% comment %} Email field with validation error messages {% endcomment %}
-    <div class="mb-5">
-      {{ form.email|add_class:"podo-input"|attr:"placeholder:E-mail"|add_error_class:"error" }}
-      {% for error in form.email.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
-          {{ error }}
-        </div>
-      {% endfor %}
+    {% comment %} Signup form (email, nickname, address, city, password fields) {% endcomment %}
+    <form method="post" novalidate>
+
+      {% comment %} Logo linking back to home, with responsive sizing for mobile and desktop {% endcomment %}
+      <a href="{% url 'home' %}">
+        <img src="{% static 'market/assets/logo.svg' %}" alt="podomarket"
+          class="block w-[140px] h-auto md:w-[164px] md:h-[90px] mx-auto mb-8 md:mb-[47px]">
+      </a>
+
+      {% csrf_token %}
+      
+      {% comment %} Email field with validation error messages {% endcomment %}
+      <div class="mb-5">
+        {{ form.email|add_class:"podo-input"|attr:"placeholder:E-mail"|add_error_class:"error" }}
+
+        {% comment %} Email field error text, slightly smaller on mobile {% endcomment %}
+        {% for error in form.email.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% comment %}
+        Nickname field (previously collected on signup).
+        Now handled on the profile setup page, so this block is kept
+        only for reference and is not rendered.
+      
+      <div class="mb-5">
+        {{ form.nickname|add_class:"podo-input"|attr:"placeholder:Nickname"|add_error_class:"error" }}
+        {% for error in form.nickname.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>  
+      {% endcomment %}
+
+      {% comment %}
+        Address field (previously collected on signup).
+        Now handled on the profile setup page.
+
+      <div class="mb-5">
+        {{ form.address|add_class:"podo-input"|attr:"placeholder:Address"|add_error_class:"error" }}
+        {% for error in form.address.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div> 
+      {% endcomment %}
+      
+      {% comment %}
+        City field (previously collected on signup).
+        Now handled on the profile setup page.
+
+      <div class="mb-5">
+        {{ form.city|add_class:"podo-input"|attr:"placeholder:City"|add_error_class:"error" }}
+        {% for error in form.city.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div> 
+      {% endcomment %}
+
+      {% comment %} Password field with validation error messages {% endcomment %}
+      <div class="mb-5">
+        {{ form.password1|add_class:"podo-input"|attr:"placeholder:Password"|add_error_class:"error" }}
+
+        {% comment %} Password field error text, slightly smaller on mobile {% endcomment %}
+        {% for error in form.password1.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% comment %} Password confirmation field with validation error messages {% endcomment %}
+      <div class="mb-5">
+        {{ form.password2|add_class:"podo-input"|attr:"placeholder:Confirm Password"|add_error_class:"error" }}
+
+        {% comment %} Password confirmation error text, slightly smaller on mobile {% endcomment %}
+        {% for error in form.password2.errors %}
+          <div class="text-input-error-fg block w-full text-right text-[13px] md:text-[14px] leading-[1.7] pr-4">
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% comment %} Submit button for standard email-based signup {% endcomment %}
+      <button type="submit"
+        class="podo-button large primary block w-full max-w-60 mx-auto mt-6">
+        Sign Up
+      </button>
+    </form>
+
+    {% comment %} Divider text between email signup and social signup options {% endcomment %}
+    <div class="mt-12 md:mt-10 text-center text-[15px] md:text-[16px] text-post-list-meta border-t border-post-list-meta py-7 md:py-6">
+      Or sign up with a social account
     </div>
 
-    {% comment %}
-      Nickname field (previously collected on signup).
-      Now handled on the profile setup page, so this block is kept
-      only for reference and is not rendered.
-    
-    <div class="mb-5">
-      {{ form.nickname|add_class:"podo-input"|attr:"placeholder:Nickname"|add_error_class:"error" }}
-      {% for error in form.nickname.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
-          {{ error }}
-        </div>
-      {% endfor %}
-    </div>  
-    {% endcomment %}
+    {% comment %} === MOBILE: icon-only horizontal social login === {% endcomment %}
+    {% comment %} Compact circular social signup buttons row, only visible on mobile {% endcomment %}
+    <div class="flex items-center justify-between md:hidden">
 
-    {% comment %}
-      Address field (previously collected on signup).
-      Now handled on the profile setup page.
+      {# Google #}
+      <a href="{% provider_login_url 'google' %}"
+        class="flex items-center justify-center size-16 rounded-full bg-white border border-border-light active:scale-95 transition">
+        <img src="{% static 'market/icons/google-logo.svg' %}" alt="Google" class="size-9">
+      </a>
 
-    <div class="mb-5">
-      {{ form.address|add_class:"podo-input"|attr:"placeholder:Address"|add_error_class:"error" }}
-      {% for error in form.address.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
-          {{ error }}
-        </div>
-      {% endfor %}
-    </div> 
-    {% endcomment %}
-    
-    {% comment %}
-      City field (previously collected on signup).
-      Now handled on the profile setup page.
+      {# GitHub #}
+      <a href="{% provider_login_url 'github' %}"
+        class="flex items-center justify-center size-16 rounded-full bg-[#181717] active:scale-95 transition">
+        <img src="{% static 'market/icons/github-logo.svg' %}" alt="GitHub"class="size-9">
+      </a>
 
-    <div class="mb-5">
-      {{ form.city|add_class:"podo-input"|attr:"placeholder:City"|add_error_class:"error" }}
-      {% for error in form.city.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
-          {{ error }}
-        </div>
-      {% endfor %}
-    </div> 
-    {% endcomment %}
+      {# Kakao #}
+      <a href="{% provider_login_url 'kakao' %}" 
+        class="flex items-center justify-center size-16 rounded-full bg-[#FEE500] active:scale-95 transition">
+        <img src="{% static 'market/icons/kakao-logo.svg' %}" alt="Kakaotalk" class="size-9 rounded-lg">
+      </a>
 
-    {% comment %} Password field with validation error messages {% endcomment %}
-    <div class="mb-5">
-      {{ form.password1|add_class:"podo-input"|attr:"placeholder:Password"|add_error_class:"error" }}
-      {% for error in form.password1.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
-          {{ error }}
-        </div>
-      {% endfor %}
+      {# Naver #}
+      <a href="{% provider_login_url 'naver' %}"
+        class="flex items-center justify-center size-16 rounded-full bg-[#03C75A] active:scale-95 transition">
+        <img src="{% static 'market/icons/naver-logo.svg' %}" alt="Naver" class="size-9 rounded-lg">
+      </a>
     </div>
 
-    {% comment %} Password confirmation field with validation error messages {% endcomment %}
-    <div class="mb-5">
-      {{ form.password2|add_class:"podo-input"|attr:"placeholder:Confirm Password"|add_error_class:"error" }}
-      {% for error in form.password2.errors %}
-        <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] pr-4">
-          {{ error }}
-        </div>
-      {% endfor %}
+    {% comment %} === DESKTOP: original full-width buttons with hover text === {% endcomment %}
+    {% comment %} Full-width social signup buttons stack, only visible on desktop {% endcomment %}
+    <div class="hidden md:block md:space-y-5">
+
+      {% comment %} Google social login {% endcomment %}
+      <a href="{% provider_login_url 'google' %}"
+        class="group podo-button medium w-full bg-white text-[#3c4043] border-2 border-border-light relative">
+        <span class="block w-full text-center text-[15px] md:text-[17px]">
+          Continue with <span class="hidden group-hover:inline-block">Google</span>
+        </span>
+        <img src="{% static 'market/icons/google-logo.svg' %}" alt="google logo"
+          class="absolute right-6 top-1/2 -translate-y-1/2 size-7">
+      </a>
+
+      {% comment %} GitHub social login {% endcomment %}
+      <a href="{% provider_login_url 'github' %}"
+        class="group podo-button medium w-full bg-[#181717] text-white border-2 border-[#181717] relative">
+        <span class="block w-full text-center text-[15px] md:text-[17px]">
+          Continue with <span class="hidden group-hover:inline-block">GitHub</span>
+        </span>
+        <img src="{% static 'market/icons/github-logo.svg' %}" alt="GitHub logo"
+          class="absolute right-6 top-1/2 -translate-y-1/2 size-[25px]">
+      </a>
+
+      {% comment %} Kakaotalk social login {% endcomment %}
+      <a href="{% provider_login_url 'kakao' %}"
+        class="group podo-button medium w-full bg-[#FEE500] text-black relative">
+        <span class="block w-full text-center text-[15px] md:text-[17px]">
+          Continue with <span class="hidden group-hover:inline-block">Kakaotalk</span>
+        </span>
+        <img src="{% static 'market/icons/kakao-logo.svg' %}" alt="Kakaotalk logo"
+          class="absolute right-6 top-1/2 -translate-y-1/2 size-[26px] rounded-sm">
+      </a>
+
+      {% comment %} Naver social login {% endcomment %}
+      <a href="{% provider_login_url 'naver' %}"
+        class="group podo-button medium w-full bg-[#03C75A] text-black relative">
+        <span class="block w-full text-center text-[15px] md:text-[17px]">
+          Continue with <span class="hidden group-hover:inline-block">Naver</span>
+        </span>
+        <img src="{% static 'market/icons/naver-logo.svg' %}" alt="Naver logo"
+          class="absolute right-6 top-1/2 -translate-y-1/2 size-7 rounded-lg">
+      </a>
     </div>
 
-    {% comment %} Submit button for standard email-based signup {% endcomment %}
-    <button class="podo-button large primary block w-full max-w-60 mx-auto mt-6" type="submit">Sign Up</button>
-  </form>
-
-  {% comment %} Divider text between email signup and social signup options {% endcomment %}
-  <div class="mt-8 mb-4 text-center text-[16px] text-post-list-meta border-t border-post-list-meta py-6">
-    Or sign up with a social account
+    {% comment %} Link to the login page for users who already have an account {% endcomment %}
+    <div class="text-center mt-18 md:mt-10 text-[15px] md:text-[16px] font-semibold">
+      Already have an account?
+      <a href="{% url 'account_login' %}" 
+        class="text-lg md:text-xl text-link font-bold ml-2 md:ml-4 hover:border-b-3 hover:border-link">
+        Log In
+      </a>
+    </div>
   </div>
-
-  {% comment %} Social login buttons using django-allauth providers {% endcomment %}
-  <div class="space-y-5">
-
-    {% comment %} Google social login {% endcomment %}
-    <a
-      href="{% provider_login_url 'google' %}"
-      class="group podo-button medium w-full bg-white text-[#3c4043] border-2 border-border-light hover:border-2"
-    >
-      <span class="block w-full text-center">
-        Continue with <span class="hidden group-hover:inline-block">Google</span>
-      </span>
-      <img
-        src="{% static 'market/icons/google-logo.svg' %}"
-        alt=""
-        class="absolute right-6 top-1/2 -translate-y-1/2 size-7"
-      >
-    </a>
-
-    {% comment %} GitHub social login {% endcomment %}
-    <a
-      href="{% provider_login_url 'github' %}"
-      class="group podo-button medium w-full bg-[#181717] text-white border-2 border-[#181717]"
-    >
-      <span class="block w-full text-center">
-        Continue with <span class="hidden group-hover:inline-block">GitHub</span>
-      </span>
-      <img
-        src="{% static 'market/icons/github-logo.svg' %}"
-        alt=""
-        class="absolute right-6 top-1/2 -translate-y-1/2 size-[25px]"
-      >
-    </a>
-
-    {% comment %} Kakaotalk social login {% endcomment %}
-    <a
-      href="{% provider_login_url 'kakao' %}"
-      class="group podo-button medium w-full bg-[#FEE500] text-black"
-    >
-      <span class="block w-full text-center">
-        Continue with <span class="hidden group-hover:inline-block">Kakakotalk</span>
-      </span>
-      <img
-        src="{% static 'market/icons/kakao-logo.svg' %}"
-        alt=""
-        class="absolute right-6 top-1/2 -translate-y-1/2 size-[26px] rounded-sm"
-      >
-    </a>
-
-    {% comment %} Naver social login {% endcomment %}
-    <a
-      href="{% provider_login_url 'naver' %}"
-      class="group podo-button medium w-full bg-[#03C75A] text-white"
-    >
-      <span class="block w-full text-center">
-        Continue with <span class="hidden group-hover:inline-block">Naver</span>
-      </span>
-      <img
-        src="{% static 'market/icons/naver-logo.svg' %}"
-        alt=""
-        class="absolute right-6 top-1/2 -translate-y-1/2 size-7 rounded-lg"
-      >
-    </a>
-  </div>
-
-  {% comment %} Link to the login page for users who already have an account {% endcomment %}
-  <div class="text-center mt-6">
-    Already have an account?
-    <a class="text-xl text-link font-bold ml-4 hover:border-b-3 hover:border-link" href="{% url 'account_login' %}">Log In</a>
-  </div>
-</div>
 
 {% endblock content %}
