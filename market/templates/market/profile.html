@@ -88,16 +88,22 @@
     </div>
   </div>
 
-  {% comment %} Action buttons shown only to the profile owner (edit profile & change password) {% endcomment %}
+  {% comment %}
+  Action buttons for the profile owner:
+  - "Edit Profile" is shown to the profile owner
+  - "Change Password" is shown only if the user has a usable local password (non-social login)
+  {% endcomment %}
   {% if user == profile_user %}
   <div class="flex justify-center md:justify-end w-full max-w-[1060px] mx-auto mt-5 mb-15 px-4 md:px-5">
-    <div class="buttons space-x-3">
+    <div class="space-x-3">
       <a class="podo-button small secondary" href="{% url 'profile-update' %}">
         Edit Profile
       </a>
+      {% if user.has_usable_password %}
       <a class="podo-button small secondary" href="{% url 'account_change_password' %}">
         Change Password
       </a>
+      {% endif %}
     </div>
   </div>
   {% endif %}
