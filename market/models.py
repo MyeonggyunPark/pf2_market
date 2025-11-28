@@ -123,7 +123,7 @@ class PostItem(models.Model):
 
     # Whether this item has been sold (used to display sold status / styling)
     is_sold = models.BooleanField(default=False)
-    
+
     # Main image for the item (required).
     item_image1 = models.ImageField(
         upload_to=item_image_upload_to,
@@ -190,3 +190,33 @@ class PostItem(models.Model):
     # Use the item title as the string representation in admin and shell.
     def __str__(self):
         return self.item_title
+
+
+class Comment(models.Model):
+    """
+    Represents a comment left by a user on a specific item listing.
+
+    Links a User (author) to a PostItem and stores the comment content
+    along with creation and update timestamps.
+    """
+
+    # The main text content of the comment.
+    # verbose_name is set to "Comment" for better readability in forms/admin.
+    content = models.TextField(max_length=500, verbose_name="Comment")
+
+    # Timestamps
+    dt_created = models.DateTimeField(auto_now_add=True)
+    dt_updated = models.DateTimeField(auto_now=True)
+
+    # The user who wrote the comment.
+    # Deleting the user will cascade and delete their comments.
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+
+    # The item listing that this comment belongs to.
+    # Deleting the post will cascade and delete its comments.
+    post_item = models.ForeignKey(PostItem, on_delete=models.CASCADE, related_name="comments")
+
+    # String representation for debugging and admin display.
+    # Formatted as: [Comment-Nickname]/[Item-ID]
+    def __str__(self):
+        return f"[Comment-{self.author.nickname}]/[Item-{self.post_item.id}]"

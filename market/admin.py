@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # Import the custom User and PostItem models from the current app
-from .models import User, PostItem
+from .models import User, PostItem, Comment
 
 
 # Register the custom User model in the admin site
@@ -89,3 +89,22 @@ class PostItemAdmin(admin.ModelAdmin):
 
     # Default ordering in the list view (newest first)
     ordering = ("-dt_created",)
+
+
+# Register the Comment model to manage comments via the admin interface
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for the Comment model.
+    Displays a custom string representation along with timestamps.
+    """
+
+    # Columns shown in the list view.
+    # 'comment_info' is a custom method defined below.
+    list_display = ("comment_info", "dt_created", "dt_updated")
+
+    # Custom method to display the model's __str__ representation in the list view.
+    # The 'description' argument sets the column header name in the admin UI.
+    @admin.display(description="Comment Info")
+    def comment_info(self, obj):
+        return str(obj)
