@@ -161,4 +161,36 @@
       mobileSold.checked = realSold.checked;
     });
   }
+
+  // Expose functions to the global window object for HTML event handlers
+  
+  // Toggle between view mode and edit mode for a specific comment
+  window.toggleCommentEdit = function(commentId) {
+    const viewMode = document.getElementById(`comment-view-${commentId}`);
+    const editMode = document.getElementById(`comment-edit-${commentId}`);
+    
+    if (viewMode && editMode) {
+      viewMode.classList.toggle("hidden");
+      editMode.classList.toggle("hidden");
+    }
+  };
+
+  // Open the delete modal and dynamically set the form action URL
+  window.openDeleteModal = function(deleteUrl) {
+    const modal = document.getElementById('delete-modal');
+    const form = document.getElementById('delete-form');
+    
+    // Set the action URL for the form to the specific comment's delete URL
+    form.action = deleteUrl;
+    
+    // Show the modal
+    modal.classList.remove('hidden');
+  };
+
+  // Close the delete modal and hide the overlay
+  window.closeDeleteModal = function() {
+    const modal = document.getElementById('delete-modal');
+    modal.classList.add('hidden');
+  };
+
 })();

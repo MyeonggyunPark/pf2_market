@@ -80,3 +80,19 @@ def get_state(value):
 
     state = parts[1].strip()
     return state
+
+
+@register.filter
+def user_liked(obj, user):
+    """
+    Custom filter to check if the given user has liked the specific object.
+
+    - Usage: {% if postitem|user_liked:user %}
+    - Returns False if the user is not authenticated.
+    - Uses the GenericRelation 'likes' to query for the user's like.
+    """
+
+    if not user.is_authenticated:
+        return False
+
+    return obj.likes.filter(author=user).exists()

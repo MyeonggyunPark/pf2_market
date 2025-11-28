@@ -4,6 +4,7 @@
 {% load static %}
 {% load humanize %}
 {% load market_extras %}
+{% load widget_tweaks %}
 
 {% comment %} Page title: show item title followed by site name {% endcomment %}
 {% block title %}{{ postitem.item_title }} | Podo-Market{% endblock title %}
@@ -137,9 +138,259 @@
     </a>
 
     {% comment %} Item description {% endcomment %}
-    <p class="text-[17px] md:text-[20px] leading-[26px] md:leading-[30px] mx-4 md:mx-[15px] mt-6 md:mt-9 px-0 md:px-9 mb-20 md:mb-[300px]">
+    <p class="text-[17px] md:text-[20px] leading-[26px] md:leading-[30px] mx-4 md:mx-[15px] mt-6 md:mt-9 px-0 md:px-9 mb-20">
       {{ postitem.item_detail|linebreaksbr }}
     </p>
+
+    {% comment %}
+      Stats Header: Total Likes & Comments
+
+      - Displays the aggregated count of likes and comments for the current item.
+      - Uses GenericRelation (postitem.likes) for the like count.
+      - Uses reverse ForeignKey relation (postitem.comments) for the comment count.
+    {% endcomment %}
+    <div class="flex justify-end items-center gap-x-3.5 mb-[25px]">
+      
+      {% comment %} Item Post Like Button {% endcomment %}
+      <button class="flex items-center px-4 py-1.5 rounded-[20px] border-3 border-box-border bg-white hover:bg-[#f3f3f3] transition-colors cursor-pointer" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
+            class="size-6 mr-1 transition-colors duration-200 
+                    {% if postitem|user_liked:user %} text-button-bg fill-current {% else %} fill-none stroke-current stroke-2 {% endif %}">
+          <path stroke-linecap="round" stroke-linejoin="round" 
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z">
+        </svg>
+        <span class="{% if postitem.likes.count > 0 %} font-semibold {% else %} font-normal text-box-border {% endif %}">
+          {{ postitem.likes.count }}
+        </span>
+      </button>
+
+      {% comment %} Comment Count Badge {% endcomment %}
+      <div class="flex items-center px-4 py-1.5 rounded-[20px] border-3 border-box-border text-[17px] text-text-main">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
+            class="size-6 mr-1
+                  {% if postitem|user_liked:user %} text-button-decoration fill-current {% else %} fill-none stroke-current stroke-2 {% endif %}">
+          <path stroke-linecap="round" stroke-linejoin="round" 
+                d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
+        </svg>
+        <span class="{% if postitem.comments.count > 0 %} font-semibold {% else %} font-normal text-box-border {% endif %}">
+          {{ postitem.comments.count }}
+        </span>
+      </div>
+    </div>
+
+    {% comment %}
+      Comment Creation Form (New Comment)
+
+      - Handled by ItemDetailView (via FormMixin).
+      - Renders the comment content field with custom Tailwind styling.
+      - Displays server-side validation errors directly below the input field.
+      - Shows different UI states for logged-in vs guest users.
+    {% endcomment %}
+    <form method="post" action="{% url 'item-detail' postitem.id %}" novalidate class="flex justify-between items-center mb-[30px]">
+      {% csrf_token %}
+      
+      {% if user.is_authenticated %}
+        {% comment %} Logged-in User: Active Input & Button {% endcomment %}
+        <div class="w-full">
+          {{ form.content|attr:"placeholder:Leave a comment..."|add_class:"podo-input h-[120px]"|add_error_class:"error" }}
+          
+          {% for error in form.content.errors %}
+            <div class="text-input-error-fg block w-full text-right text-[14px] leading-[1.7] mt-1 pr-4">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </div>
+
+        <button class="podo-button medium primary w-[89px] h-[50px] ml-[30px] shrink-0" type="submit">
+          Save
+        </button>
+
+      {% else %}
+        {% comment %} Guest User: Disabled Input with Login Link {% endcomment %}
+        <div class="w-full">
+          <a href="{% url 'account_login' %}?next={% url 'item-detail' postitem.id %}" class="block w-full">
+            {{ form.content|attr:"placeholder:Log in to leave a comment."|add_class:"podo-input h-[120px] cursor-not-allowed"|attr:"disabled" }}      
+          </a>
+        </div>
+
+        <button class="podo-button medium secondary w-[89px] h-[50px] ml-[30px] shrink-0 cursor-not-allowed" type="submit" disabled>
+          Save
+        </button>
+      {% endif %}
+    </form>
+
+    {% comment %}
+      Comment List (With In-Place Edit Support)
+
+      - Iterates through all comments associated with this post.
+      - Supports "In-Place Editing" by rendering both view-mode and edit-mode (hidden) for each comment.
+      - Uses JavaScript to toggle between view and edit modes without page reload.
+    {% endcomment %}
+    {% for comment in postitem.comments.all %}
+      <div class="p-5 md:px-[25px] border border-box-border rounded-[19px] mb-[15px] bg-white">
+        
+        {% comment %} ================= [View Mode] Standard Display ================= {% endcomment %}
+        <div id="comment-view-{{ comment.id }}">
+          
+          {% comment %} Comment Header: Author & Date {% endcomment %}
+          <div class="flex justify-between items-center mb-2.5">
+            <a href="{% url 'profile' comment.author.id %}" class="no-underline hover:underline">
+              <div class="flex items-center font-bold text-text-main">
+                {% if comment.author.profile_pic %}
+                  <img src="{{ comment.author.profile_pic.url }}" alt="profile pic" class="w-[30px] h-[30px] mr-2.5 rounded-full bg-cover bg-center bg-[#f3f3f3]">
+                {% else %}
+                  <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="profile pic" class="w-[30px] h-[30px] mr-2.5 rounded-full bg-cover bg-center bg-[#f3f3f3]">
+                {% endif %}
+                <span>{{ comment.author.nickname }}</span>
+              </div>
+            </a>
+            <div class="text-[13px] tracking-[-0.23px] text-[#706e6c]">
+              {{ comment.dt_created|date:"d.m.Y" }}
+            </div>
+          </div>
+
+          {% comment %} Comment Content {% endcomment %}
+          <div class="text-[15px] leading-[1.67] mb-3 text-text-main wrap-break-word whitespace-pre-wrap">
+            {{ comment.content|linebreaksbr }}
+          </div>
+
+          {% comment %} Comment Footer: Likes & Actions {% endcomment %}
+          <div class="flex justify-between items-center">
+            
+            {% comment %} 
+              Comment Like Button 
+              - Uses 'user_liked' filter to highlight if the current user liked this comment.
+            {% endcomment %}
+            <button class="flex items-center text-[14px] text-text-main bg-transparent border-none cursor-pointer hover:opacity-70" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
+                  class="size-5 mr-1 transition-colors duration-200 
+                          {% if comment|user_liked:user %} text-button-bg fill-current {% else %} fill-none stroke-current stroke-2 {% endif %}">
+                <path stroke-linecap="round" stroke-linejoin="round" 
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+              </svg>
+              <span class="{% if comment.likes.count > 0 %} font-semibold {% else %} font-normal text-box-border {% endif %}">
+                {{ comment.likes.count }}
+              </span>
+            </button>
+
+          {% comment %} 
+            Action Buttons (Edit/Delete)
+            - Only visible to the comment author.
+            - 'Edit' button toggles the hidden form.
+            - 'Delete' button opens the confirmation modal.
+          {% endcomment %}
+          {% if user == comment.author %}
+            <div class="flex space-x-2">
+              
+              {% comment %} 
+                Delete Button Trigger
+                - Opens the delete modal via JS (openDeleteModal).
+                - The <form> wrapper here is technically not needed for the JS trigger but kept as per original code.
+              {% endcomment %}
+              <button type="button" 
+                      onclick="openDeleteModal('{% url 'comment-delete' comment.id %}')"
+                      class="podo-button small negative text-[14px]">
+                Delete
+              </button>
+              
+              {% comment %} Edit Button Trigger (JS Toggle) {% endcomment %}
+              <button type="button" 
+                      onclick="toggleCommentEdit('{{ comment.id }}')"
+                      class="podo-button small secondary text-[14px]">
+                Edit
+              </button>
+            </div>
+          {% endif %}
+          </div>
+        </div>
+
+        {% comment %} 
+          ================= [Edit Mode] Hidden Form ================= 
+          - Hidden by default (class="hidden").
+          - Shown when 'Edit' is clicked in the View Mode.
+          - Submits to 'comment-update' view but creates a seamless UX.
+        {% endcomment %}
+        {% if user == comment.author %}
+          <form id="comment-edit-{{ comment.id }}" class="hidden flex flex-col gap-3" method="post" action="{% url 'comment-update' comment.id %}">
+            {% csrf_token %}
+
+            <div class="w-full">
+              {% comment %} Textarea pre-filled with existing content {% endcomment %}
+              <textarea name="content" class="podo-input h-[120px]" required>{{ comment.content }}</textarea>
+            </div>
+            <div class="flex justify-end gap-2">
+              <button type="button" onclick="toggleCommentEdit('{{ comment.id }}')" class="podo-button small secondary cursor-pointer">
+                Cancel
+              </button>
+              <button type="submit" class="podo-button small primary cursor-pointer">
+                Save
+              </button>
+            </div>
+          </form>
+        {% endif %}
+
+      </div>
+
+    {% empty %}
+      {% comment %} Empty State {% endcomment %}
+      <p class="text-center text-[#706e6c] py-10">No comments yet.</p>
+    {% endfor %}
+    
+    {% comment %} 
+      ================= [Delete Confirmation Modal] ================= 
+      - Styled to match 'item_confirm_delete.html' (podo-noti style).
+      - Centered on screen with a semi-transparent backdrop.
+    {% endcomment %}
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      
+      {% comment %} Backdrop (Semi-transparent black overlay) {% endcomment %}
+      <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeDeleteModal()"></div>
+
+      {% comment %} Modal Panel (Centered) {% endcomment %}
+      <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          
+          {% comment %} 
+            Modal Content 
+            - Reusing the design from 'item_confirm_delete.html'
+            - Tailwind classes converted from original CSS variables
+          {% endcomment %}
+          <div class="relative w-full max-w-[540px] transform overflow-hidden rounded-[30px] bg-noti-bg shadow-xl transition-all p-6 md:p-[30px]">
+            
+            <div class="flex flex-col items-center justify-between gap-6">
+              
+              {% comment %} Warning Text {% endcomment %}
+              <div class="text-center md:text-left md:ml-6">
+                <p class="text-[20px] leading-[26px] md:leading-[34px] font-normal text-text-main">
+                  Are you sure you want to delete this comment?
+                </p>
+              </div>
+
+              {% comment %} Action Buttons {% endcomment %}
+              <div class="grid grid-cols-2 gap-[15px] w-full md:flex md:w-auto">
+                
+                {% comment %} Actual Delete Form {% endcomment %}
+                <form id="delete-form" method="post" action="" class="w-full md:w-auto">
+                  {% csrf_token %}
+                  <button type="submit"
+                    class="w-full md:w-auto rounded-full bg-[#d62f50] text-white font-medium px-[31px] py-[13px] text-[17px] leading-[17px] hover:text-button-negative-hover-fg transition-colors">
+                    Delete
+                  </button>
+                </form>
+                
+                {% comment %} Cancel Button {% endcomment %}
+                <button type="button" onclick="closeDeleteModal()"
+                  class="w-full md:w-auto rounded-full bg-[#b9b7ba] text-white font-medium px-[31px] py-[13px] text-[17px] leading-[17px] hover:text-button-secondary-hover-fg transition-colors">
+                  Cancel
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
 
   </div>
 

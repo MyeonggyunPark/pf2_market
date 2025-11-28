@@ -1,7 +1,7 @@
 from django import forms
 from allauth.account.forms import SignupForm, LoginForm, ResetPasswordForm, ResetPasswordKeyForm, ChangePasswordForm
 
-from .models import User, PostItem  
+from .models import User, PostItem, Comment
 
 
 class CustomSignupForm(SignupForm):
@@ -326,3 +326,29 @@ class PostItemUpdateForm(BasePostItemForm):
             "item_detail",
             "is_sold",
         ]
+
+
+class CommentForm(forms.ModelForm):
+    """
+    Form used for creating new comments on a post item.
+
+    - Validates the 'content' field.
+    - Renders 'content' as a Textarea widget for multiline input.
+    - Removes HTML5 `required` attribute to rely on Django's server-side validation.
+    """
+    class Meta:
+        model = Comment
+        fields = ["content",]
+        widgets = {"content": forms.Textarea,}
+
+    def __init__(self, *args, **kwargs):
+        """
+        Customize the default form behavior after initialization.
+
+        - Remove the HTML5 'required' attribute from the content field
+            to prevent browser-side validation popups.
+        """
+        super().__init__(*args, **kwargs)
+
+        # Remove HTML5 required attribute to match the project's validation style
+        self.fields["content"].widget.attrs.pop("required", None)

@@ -1,13 +1,14 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from allauth.account.views import PasswordChangeView
 from allauth.account.models import EmailAddress
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from braces.views import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic.edit import FormMixin
 
-from market.models import PostItem, User
-from market.forms import PostItemCreateForm, PostItemUpdateForm , ProfileForm
+from market.models import PostItem, User, Comment
+from market.forms import PostItemCreateForm, PostItemUpdateForm , ProfileForm, CommentForm
 from market.utils import confirmation_required_redirect
 
 
@@ -64,7 +65,7 @@ class IndexView(ListView):
         return PostItem.objects.filter(is_sold=False)
 
 
-class ItemDetailView(LoginRequiredMixin, DetailView):
+class ItemDetailView(LoginRequiredMixin, FormMixin, DetailView):
     """
     Class-based detail view for a single PostItem.
 
@@ -72,6 +73,11 @@ class ItemDetailView(LoginRequiredMixin, DetailView):
     - Uses PostItem as the underlying model.
     - Renders the 'market/item_detail.html' template.
     - Retrieves a single item based on the 'id' parameter from the URL.
+
+    Form Handling (Comment):
+    - Integrates FormMixin to handle the comment submission form on the same page.
+    - Uses CommentForm to validate and save new comments.
+    - Handles POST requests to save comments and re-render the page on errors.
     """
 
     # The model that this detail view will retrieve a single instance of
@@ -82,6 +88,58 @@ class ItemDetailView(LoginRequiredMixin, DetailView):
 
     # Name of the URL keyword argument used to look up the object (e.g. path('item/<int:id>/'))
     pk_url_kwarg = "id"
+
+    # The form class to use for comment submission (processed by FormMixin)
+    form_class = CommentForm 
+
+    def get_context_data(self, **kwargs):
+        """
+        Extend the default context with the comment form.
+
+        - Adds 'form' to the context so it can be rendered in the template.
+        - Uses self.get_form() to ensure the form is correctly instantiated
+            (with data on POST, empty on GET).
+        """
+        context =  super().get_context_data(**kwargs)
+        context["form"] = self.get_form()
+        return context
+
+    def get_success_url(self):
+        """
+        Return the URL to redirect to after a successful comment submission.
+
+        - Redirects back to the current item's detail page.
+        """
+        return reverse("item-detail", kwargs={"id": self.object.id})
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests (comment submission).
+
+        - Sets self.object to the current PostItem (required for context/form).
+        - Validates the form and delegates to form_valid() or form_invalid().
+        """
+        self.object = self.get_object()
+        form = self.get_form()
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        """
+        Save the comment when the form is valid.
+
+        - Creates a Comment instance but doesn't save to DB yet (commit=False).
+        - Assigns the current PostItem and User to the comment.
+        - Saves the comment to the database.
+        """
+        comment = form.save(commit=False)
+        comment.post_item = self.object  
+        comment.author = self.request.user 
+        comment.save() 
+        return super().form_valid(form)
 
 
 class ItemCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -405,3 +463,76 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         - Redirects to the 'profile' detail page of the current user.
         """
         return reverse("profile", kwargs=(({"id": self.request.user.id})))
+
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    View for updating an existing comment.
+
+    - Uses CommentForm via POST requests (intended for in-place editing).
+    - Redirects GET requests to the parent item detail page to prevent standalone access.
+    - Requires login and author verification.
+    """
+
+    model = Comment
+    form_class = CommentForm
+    pk_url_kwarg = "comment_id" 
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests by redirecting to the item detail page.
+
+        - Since comment editing happens via a hidden form on the detail page,
+            direct access to the edit URL is unnecessary and blocked.
+        """
+        return redirect("item-detail", id=self.get_object().post_item.id)
+
+    def get_success_url(self):
+        """
+        Return the URL to redirect to after successful comment update.
+
+        - Redirects back to the related PostItem detail page.
+        """
+        return reverse("item-detail", kwargs={"id": self.object.post_item.id})
+
+    def test_func(self, user):
+        """
+        Permission check: Only the author of the comment can update it.
+        """
+        return self.get_object().author == user
+
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    View for deleting an existing comment.
+
+    - Handles deletion via POST requests (triggered by a JS modal).
+    - Redirects GET requests to the parent item detail page.
+    - Requires login and author verification.
+    """
+
+    model = Comment
+    pk_url_kwarg = "comment_id"
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests by redirecting to the item detail page.
+
+        - Deletion should be performed via POST for security.
+        - Direct access to this URL via GET is blocked.
+        """
+        return redirect("item-detail", id=self.get_object().post_item.id)
+
+    def get_success_url(self):
+        """
+        Return the URL to redirect to after successful deletion.
+
+        - Redirects back to the related PostItem detail page.
+        """
+        return reverse("item-detail", kwargs={"id": self.object.post_item.id})
+
+    def test_func(self, user):
+        """
+        Permission check: Only the author of the comment can delete it.
+        """
+        return self.get_object().author == user

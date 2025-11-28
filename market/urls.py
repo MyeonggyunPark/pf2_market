@@ -37,4 +37,13 @@ urlpatterns = [
     
     # Profile update page: allows the currently logged-in user to update their existing profile using ProfileUpdateView
     path("update-profile/", views.ProfileUpdateView.as_view(), name="profile-update"),
+    
+
+    # ========== Urls about Comment ==========
+    
+    # Comment update: handles updating an existing comment using CommentUpdateView
+    path("comment/<int:comment_id>/edit/", views.CommentUpdateView.as_view(), name="comment-update"),
+
+    # Comment delete: handles deleting an existing comment using CommentDeleteView
+    path("comment/<int:comment_id>/delete/", views.CommentDeleteView.as_view(), name="comment-delete"),
 ]
