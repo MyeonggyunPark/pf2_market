@@ -3,8 +3,8 @@ from django.contrib import admin
 # Preconfigured admin class for user management (base class for User-like models)
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-# Import the custom User and PostItem models from the current app
-from .models import User, PostItem, Comment
+# Import all Models from the current app
+from .models import User, PostItem, Comment, Like
 
 
 # Register the custom User model in the admin site
@@ -107,4 +107,21 @@ class CommentAdmin(admin.ModelAdmin):
     # The 'description' argument sets the column header name in the admin UI.
     @admin.display(description="Comment Info")
     def comment_info(self, obj):
+        return str(obj)
+
+
+# Register the Like model to view who liked what
+@admin.register(Like)
+class LikeAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for the Like model.
+    Shows the user and the string representation of the liked object.
+    """
+
+    # Columns shown in the list view
+    list_display = ("like_info", "dt_created")
+
+    # Custom method to display a summary of the like instance
+    @admin.display(description="Like Info")
+    def like_info(self, obj):
         return str(obj)

@@ -2,6 +2,8 @@ from django.db import models
 
 # Reusable base class for a fully featured User model
 from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 # Import the field-level validator from validators.py
 from market.validators import validate_no_special_characters, validate_image_mime_type
@@ -220,3 +222,32 @@ class Comment(models.Model):
     # Formatted as: [Comment-Nickname]/[Item-ID]
     def __str__(self):
         return f"[Comment-{self.author.nickname}]/[Item-{self.post_item.id}]"
+
+
+class Like(models.Model):
+    """
+    Represents a 'Like' reaction from a user on any content object.
+
+    Uses Django's ContentTypes framework (GenericForeignKey) to allow
+    users to like different types of objects (e.g., PostItem, Comment)
+    without creating separate Like models for each.
+    """
+
+    # Timestamp when the like was created
+    dt_created = models.DateTimeField(auto_now_add=True)
+
+    # The user who performed the like action
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="likes")
+
+    # Part 1 of GenericForeignKey: Points to the model class
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+
+    # Part 2 of GenericForeignKey: Stores the primary key (ID) of the specific object
+    object_id = models.PositiveIntegerField()
+
+    # Part 3 of GenericForeignKey: The actual object being liked
+    # This field does not create a database column but combines content_type and object_id
+    liked_object = GenericForeignKey("content_type", "object_id")
+
+    def __str__(self):
+        return f"{self.author.nickname}-[LIKE]-{self.liked_object}"
