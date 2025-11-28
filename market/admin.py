@@ -2,9 +2,60 @@ from django.contrib import admin
 
 # Preconfigured admin class for user management (base class for User-like models)
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.contenttypes.admin import GenericTabularInline
 
 # Import all Models from the current app
 from .models import User, PostItem, Comment, Like
+
+
+class CommentInline(admin.TabularInline):
+    """
+    Inline admin for comments.
+
+    - Displays comments related to the parent object.
+    - Used in PostItemAdmin to show comments received on a post.
+    - Used in UserAdmin to show comments written by the user (via 'author' FK).
+    """
+    model = Comment
+
+    # Removes empty input rows to keep the UI clean
+    extra = 0 
+
+    # Prevent editing creation timestamps
+    readonly_fields = ("dt_created",) 
+
+
+class LikeUserInline(admin.TabularInline):
+    """
+    Inline admin for likes *given* by a user.
+
+    - Used in UserAdmin.
+    - Connects via the 'author' ForeignKey in the Like model.
+    - Shows a list of items/comments the user has liked.
+    """
+    model = Like
+
+    # Explicitly specifies the ForeignKey to User
+    fk_name = "author"  
+    extra = 0
+    verbose_name = "Given Like"
+    verbose_name_plural = "Given Likes"
+
+
+class LikePostInline(GenericTabularInline):
+    """
+    Inline admin for likes *received* by an object (e.g., PostItem).
+
+    - Used in PostItemAdmin.
+    - Must use GenericTabularInline because Like is connected via GenericForeignKey
+        (content_type + object_id), not a direct ForeignKey to PostItem.
+    """
+    model = Like
+    ct_field = "content_type" 
+    fk_field = "object_id"
+    extra = 0
+    verbose_name = "Received Like"
+    verbose_name_plural = "Received Likes"
 
 
 # Register the custom User model in the admin site
@@ -55,6 +106,11 @@ class CustomUserAdmin(BaseUserAdmin):
         "is_staff",
     )
 
+    # Inlines to show related data
+    # CommentInline: Shows comments authored by this user (based on Comment.author)
+    # LikeUserInline: Shows likes clicked by this user (based on Like.author)
+    inlines = (CommentInline, LikeUserInline )
+
 
 # Register the PostItem model with a basic ModelAdmin configuration
 @admin.register(PostItem)
@@ -90,6 +146,10 @@ class PostItemAdmin(admin.ModelAdmin):
     # Default ordering in the list view (newest first)
     ordering = ("-dt_created",)
 
+    # Inlines to show interaction data
+    # CommentInline: Shows comments attached to this post (based on Comment.post_item)
+    # LikePostInline: Shows likes received by this post (via GenericForeignKey)
+    inlines = (CommentInline, LikePostInline)
 
 # Register the Comment model to manage comments via the admin interface
 @admin.register(Comment)

@@ -3,7 +3,7 @@ from django.db import models
 # Reusable base class for a fully featured User model
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 # Import the field-level validator from validators.py
 from market.validators import validate_no_special_characters, validate_image_mime_type
@@ -72,6 +72,8 @@ class PostItem(models.Model):
     Each PostItem instance corresponds to one listing created by a user and
     includes basic information such as title, price, condition, description,
     images and author, along with timestamps.
+
+    Supports 'Like' functionality via GenericRelation.
     """
 
     # Short title displayed in item listings and on the detail page
@@ -189,6 +191,11 @@ class PostItem(models.Model):
     dt_created = models.DateTimeField(auto_now_add=True)
     dt_updated = models.DateTimeField(auto_now=True)
 
+    # Reverse relationship to the Like model.
+    # - Allows accessing likes via 'post.likes.all()'.
+    # - Enables cascading delete: if this post is deleted, associated likes are also deleted.
+    likes = GenericRelation("Like", related_query_name="post_items")
+
     # Use the item title as the string representation in admin and shell.
     def __str__(self):
         return self.item_title
@@ -210,6 +217,8 @@ class Comment(models.Model):
 
     Links a User (author) to a PostItem and stores the comment content
     along with creation and update timestamps.
+
+    Supports 'Like' functionality via GenericRelation.
     """
 
     # The main text content of the comment.
@@ -227,6 +236,11 @@ class Comment(models.Model):
     # The item listing that this comment belongs to.
     # Deleting the post will cascade and delete its comments.
     post_item = models.ForeignKey(PostItem, on_delete=models.CASCADE, related_name="comments")
+
+    # Reverse relationship to the Like model.
+    # - Allows accessing likes via 'comment.likes.all()'.
+    # - Enables cascading delete: if this comment is deleted, associated likes are also deleted.
+    likes = GenericRelation("Like", related_query_name="comments")
 
     # String representation for debugging and admin display.
     # Formatted as: [Comment-Nickname]/[Item-ID]
