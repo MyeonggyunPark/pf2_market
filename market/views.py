@@ -38,7 +38,7 @@ class IndexView(ListView):
     - Exposes the object list in the template as 'items'.
     - Paginates the list, showing 8 items per page.
     - Shows only items that are not marked as sold (is_sold=False).
-    - Orders items by creation date in descending order (newest first).
+    - Ordering is handled implicitly by PostItem.Meta (newest first).
     """
 
     # The model providing the queryset for this list view
@@ -58,10 +58,10 @@ class IndexView(ListView):
         Return the queryset for the index page.
 
         - Filters out items that are already sold (is_sold=True).
-        - Orders remaining items by creation date in descending order.
+        - Default ordering (-dt_created) is applied by the model.
         """
-        
-        return PostItem.objects.filter(is_sold=False).order_by("-dt_created")
+
+        return PostItem.objects.filter(is_sold=False)
 
 
 class ItemDetailView(LoginRequiredMixin, DetailView):
@@ -264,6 +264,7 @@ class ProfileView(DetailView):
 
         - Adds 'user_postitems' containing the 4 most recently created posts
             authored by the profile user.
+        - Relies on PostItem's default ordering (newest first).
         """
         # Start with the default context provided by DetailView
         context = super().get_context_data(**kwargs)
@@ -272,7 +273,7 @@ class ProfileView(DetailView):
         profile_user = self.object
 
         # Latest 4 items posted by this user, ordered by creation date (newest first)
-        context["user_postitems"] = profile_user.posts.order_by("-dt_created")[:4]
+        context["user_postitems"] = profile_user.posts.all()[:4]
 
         return context
 
@@ -286,6 +287,7 @@ class UserPostItemListView(ListView):
     - Paginates the result set, showing 8 items per page.
     - Additionally exposes the profile owner as 'profile_user' in the template context
         so the template can render user-specific information (nickname, avatar, etc.).
+    - Results are ordered by PostItem.Meta default (newest first).
     """
 
     # Model that this list view will query
@@ -313,7 +315,7 @@ class UserPostItemListView(ListView):
         self.profile_user = get_object_or_404(User, pk=self.kwargs.get("id"))
 
         # Return all posts authored by this user, newest first
-        return self.profile_user.posts.order_by("-dt_created")
+        return self.profile_user.posts.all()
 
     def get_context_data(self, **kwargs):
         """

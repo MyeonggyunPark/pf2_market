@@ -193,6 +193,16 @@ class PostItem(models.Model):
     def __str__(self):
         return self.item_title
 
+    # Default ordering configuration
+    class Meta:
+        """
+        Meta options for PostItem.
+
+        - ordering: Default ordering for all queries is newest first (-dt_created).
+            This removes the need to manually call .order_by() in views.
+        """
+        ordering = ["-dt_created"]
+
 
 class Comment(models.Model):
     """
@@ -223,6 +233,15 @@ class Comment(models.Model):
     def __str__(self):
         return f"[Comment-{self.author.nickname}]/[Item-{self.post_item.id}]"
 
+    # Default ordering configuration
+    class Meta:
+        """
+        Meta options for Comment.
+
+        - ordering: Comments are displayed newest first by default.
+        """
+        ordering = ["-dt_created"]
+
 
 class Like(models.Model):
     """
@@ -251,3 +270,12 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.author.nickname}-[LIKE]-{self.liked_object}"
+
+    class Meta:
+        # Ensures that a user can like a specific object only once.
+        # This creates a unique index on (author, content_type, object_id).
+        constraints = [
+            models.UniqueConstraint(
+                fields=["author", "content_type", "object_id"], name="unique_user_like"
+            )
+        ]
