@@ -3,11 +3,14 @@ from django.urls import reverse
 
 from allauth.account.views import PasswordChangeView
 from allauth.account.models import EmailAddress
+from django.views import View
+from django.http import JsonResponse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from braces.views import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic.edit import FormMixin
+from django.contrib.contenttypes.models import ContentType
 
-from market.models import PostItem, User, Comment
+from market.models import PostItem, User, Comment, Like
 from market.forms import PostItemCreateForm, PostItemUpdateForm , ProfileForm, CommentForm
 from market.utils import confirmation_required_redirect
 
@@ -102,6 +105,8 @@ class ItemDetailView(LoginRequiredMixin, FormMixin, DetailView):
         """
         context =  super().get_context_data(**kwargs)
         context["form"] = self.get_form()
+        context['postitem_ctype_id'] = ContentType.objects.get(model='postitem').id
+        context['comment_ctype_id'] = ContentType.objects.get(model='comment').id
         return context
 
     def get_success_url(self):
@@ -536,3 +541,55 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         Permission check: Only the author of the comment can delete it.
         """
         return self.get_object().author == user
+
+
+class ProcessLikeView(LoginRequiredMixin, View):
+    """
+    Class-based view for handling 'Like' toggles via AJAX POST requests.
+
+    - Requires the user to be logged in (via LoginRequiredMixin).
+    - Only accepts POST requests (http_method_name = ["post"]).
+    - Toggles the like status: creates a Like if it doesn't exist, deletes it if it does.
+    - Returns a JsonResponse with the new like status and total count,
+        allowing the frontend to update the UI without a page reload.
+    """
+
+    http_method_name = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle the POST request to toggle a like.
+
+        - Retrieves the content type and object ID from the URL kwargs.
+        - Uses get_or_create to either find an existing like or create a new one.
+        - If the like already existed (not created), it is deleted (unlike).
+        - Calculates the new total like count for the object.
+        - Returns JSON data containing:
+            - 'liked': Boolean indicating if the user currently likes the item.
+            - 'like_count': The updated total number of likes.
+        """
+        content_type_id = self.kwargs.get("content_type_id")
+        object_id = self.kwargs.get("object_id")
+
+        like, created = Like.objects.get_or_create(
+            author=self.request.user,
+            content_type_id=self.kwargs.get("content_type_id"),
+            object_id=self.kwargs.get("object_id"),
+        )
+
+        if not created:
+            like.delete()
+            liked = False
+        else:
+            liked = True
+
+        like_count = Like.objects.filter(
+            content_type_id=content_type_id, object_id=object_id
+        ).count()
+
+        return JsonResponse(
+            {
+                "liked": liked,
+                "like_count": like_count,
+            }
+        )

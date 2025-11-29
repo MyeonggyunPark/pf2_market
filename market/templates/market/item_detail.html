@@ -151,15 +151,28 @@
     {% endcomment %}
     <div class="flex justify-end items-center gap-x-3.5 mb-[25px]">
       
-      {% comment %} Item Post Like Button {% endcomment %}
-      <button class="flex items-center px-4 py-1.5 rounded-[20px] border-3 border-box-border bg-white hover:bg-[#f3f3f3] transition-colors cursor-pointer" type="button">
+      {% comment %} Item Post Like Button (AJAX Trigger) {% endcomment %}
+      <button type="button" 
+              data-url="{% url 'process-like' postitem_ctype_id postitem.id %}"
+              class="like-btn flex items-center px-4 py-1.5 rounded-[20px] border-3 border-box-border bg-white hover:bg-[#f3f3f3] transition-colors cursor-pointer">
+        
+        {% comment %} 
+          Icon Logic: 
+          - Uses 'user_liked' filter to determine initial state (filled vs outline).
+        {% endcomment %}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
-            class="size-6 mr-1 transition-colors duration-200 
-                    {% if postitem|user_liked:user %} text-button-bg fill-current {% else %} fill-none stroke-current stroke-2 {% endif %}">
+            class="like-icon size-6 mr-1 transition-colors duration-200 text-button-bg stroke-current stroke-2
+                    {% if postitem|user_liked:user %} fill-current {% else %} fill-none {% endif %}">
           <path stroke-linecap="round" stroke-linejoin="round" 
-                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z">
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
         </svg>
-        <span class="{% if postitem.likes.count > 0 %} font-semibold {% else %} font-normal text-box-border {% endif %}">
+        
+        {% comment %} 
+          Text Logic: 
+          - Shows bold purple text if count > 0, otherwise normal gray text.
+        {% endcomment %}
+        <span class="like-count font-semibold inline-block min-w-2.5 text-center
+              {% if postitem.likes.count > 0 %} text-button-bg {% else %} text-box-border {% endif %}">
           {{ postitem.likes.count }}
         </span>
       </button>
@@ -167,12 +180,13 @@
       {% comment %} Comment Count Badge {% endcomment %}
       <div class="flex items-center px-4 py-1.5 rounded-[20px] border-3 border-box-border text-[17px] text-text-main">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
-            class="size-6 mr-1
-                  {% if postitem|user_liked:user %} text-button-decoration fill-current {% else %} fill-none stroke-current stroke-2 {% endif %}">
+            class="size-6 mr-1 text-button-decoration stroke-current stroke-2
+            {% if postitem|user_commented:user %} fill-current {% else %} fill-none {% endif %}">
           <path stroke-linecap="round" stroke-linejoin="round" 
                 d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
         </svg>
-        <span class="{% if postitem.comments.count > 0 %} font-semibold {% else %} font-normal text-box-border {% endif %}">
+        <span class="font-semibold inline-block min-w-2.5 text-center 
+              {% if postitem.comments.count > 0  %} text-button-decoration {% else %} text-box-border {% endif %}">
           {{ postitem.comments.count }}
         </span>
       </div>
@@ -258,42 +272,40 @@
           <div class="flex justify-between items-center">
             
             {% comment %} 
-              Comment Like Button 
+              Comment Like Button (AJAX)
               - Uses 'user_liked' filter to highlight if the current user liked this comment.
             {% endcomment %}
-            <button class="flex items-center text-[14px] text-text-main bg-transparent border-none cursor-pointer hover:opacity-70" type="button">
+            <button type="button" data-url="{% url 'process-like' comment_ctype_id comment.id %}"
+                  class="like-btn flex items-center text-[14px] text-text-main bg-transparent border-none cursor-pointer hover:opacity-70">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
-                  class="size-5 mr-1 transition-colors duration-200 
-                          {% if comment|user_liked:user %} text-button-bg fill-current {% else %} fill-none stroke-current stroke-2 {% endif %}">
+                  class="like-icon size-5 mr-1 transition-colors duration-200 text-button-bg stroke-current stroke-2
+                          {% if comment|user_liked:user %} fill-current {% else %} fill-none {% endif %}">
                 <path stroke-linecap="round" stroke-linejoin="round" 
                       d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
               </svg>
-              <span class="{% if comment.likes.count > 0 %} font-semibold {% else %} font-normal text-box-border {% endif %}">
+              <span class="like-count font-semibold
+                    {% if comment.likes.count > 0 %} text-button-bg {% else %} text-box-border {% endif %}">
                 {{ comment.likes.count }}
               </span>
             </button>
 
           {% comment %} 
-            Action Buttons (Edit/Delete)
-            - Only visible to the comment author.
-            - 'Edit' button toggles the hidden form.
-            - 'Delete' button opens the confirmation modal.
-          {% endcomment %}
+              Action Buttons (Edit/Delete)
+              - Only visible to the comment author.
+              - 'Edit' button toggles the hidden form.
+              - 'Delete' button opens the confirmation modal via JS.
+            {% endcomment %}
           {% if user == comment.author %}
             <div class="flex space-x-2">
               
-              {% comment %} 
-                Delete Button Trigger
-                - Opens the delete modal via JS (openDeleteModal).
-                - The <form> wrapper here is technically not needed for the JS trigger but kept as per original code.
-              {% endcomment %}
+              {% comment %} Delete Button Trigger (Opens Modal) {% endcomment %}
               <button type="button" 
                       onclick="openDeleteModal('{% url 'comment-delete' comment.id %}')"
                       class="podo-button small negative text-[14px]">
                 Delete
               </button>
               
-              {% comment %} Edit Button Trigger (JS Toggle) {% endcomment %}
+              {% comment %} Edit Button Trigger (Toggles Edit Mode) {% endcomment %}
               <button type="button" 
                       onclick="toggleCommentEdit('{{ comment.id }}')"
                       class="podo-button small secondary text-[14px]">
@@ -340,6 +352,7 @@
       ================= [Delete Confirmation Modal] ================= 
       - Styled to match 'item_confirm_delete.html' (podo-noti style).
       - Centered on screen with a semi-transparent backdrop.
+      - Toggled via JavaScript (openDeleteModal / closeDeleteModal).
     {% endcomment %}
     <div id="delete-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       

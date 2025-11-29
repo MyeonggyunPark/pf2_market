@@ -46,4 +46,10 @@ urlpatterns = [
 
     # Comment delete: handles deleting an existing comment using CommentDeleteView
     path("comment/<int:comment_id>/delete/", views.CommentDeleteView.as_view(), name="comment-delete"),
+    
+    
+    # ========== Urls about Like ==========
+    
+    # Process like: handles toggling a like via AJAX POST request using ProcessLikeView
+    path("like/<int:content_type_id>/<int:object_id>/", views.ProcessLikeView.as_view(), name="process-like"),
 ]

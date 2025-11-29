@@ -96,3 +96,18 @@ def user_liked(obj, user):
         return False
 
     return obj.likes.filter(author=user).exists()
+
+
+@register.filter
+def user_commented(obj, user):
+    """
+    Custom filter to check if the given user has commented on the specific object.
+
+    - Usage: {% if postitem|user_commented:user %}
+    - Returns False if the user is not authenticated.
+    - Uses the reverse ForeignKey 'comments' to query.
+    """
+    if not user.is_authenticated:
+        return False
+
+    return obj.comments.filter(author=user).exists()

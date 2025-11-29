@@ -12,6 +12,9 @@
 
     // Keep "sold" toggle in sync between desktop and mobile inputs
     initSoldToggleSync();
+
+    // Initialize AJAX behavior for like buttons
+    initLikeButtons();
   });
 
   // Set up logic for displaying selected file names next to file inputs
@@ -162,35 +165,122 @@
     });
   }
 
-  // Expose functions to the global window object for HTML event handlers
-  
-  // Toggle between view mode and edit mode for a specific comment
-  window.toggleCommentEdit = function(commentId) {
-    const viewMode = document.getElementById(`comment-view-${commentId}`);
-    const editMode = document.getElementById(`comment-edit-${commentId}`);
-    
-    if (viewMode && editMode) {
-      viewMode.classList.toggle("hidden");
-      editMode.classList.toggle("hidden");
+  // Set up AJAX behavior for like buttons (posts & comments)
+  // Handles click events to toggle likes without page reload
+  // and updates the heart icon and count text based on the server response.
+  function initLikeButtons() {
+
+    // Find all like buttons on the page
+    const likeButtons = document.querySelectorAll(".like-btn");
+
+    likeButtons.forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+
+        // Prevent default button behavior
+        e.preventDefault();
+
+        const url = btn.dataset.url;
+        const icon = btn.querySelector(".like-icon");
+        const countSpan = btn.querySelector(".like-count");
+
+        try {
+          // Send POST request to toggle like status
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              // Include CSRF token for security
+              "X-CSRFToken": getCookie("csrftoken"),
+              "Content-Type": "application/json",
+            },
+          });
+
+          // Handle unauthorized access (e.g., user not logged in)
+          if (response.status === 403) {
+            window.location.href = "/login/";
+            return;
+          }
+
+          if (response.ok) {
+            const data = await response.json();
+
+            // Logic 1. Heart Icon Style (Based on 'user_liked' status)
+            // - Liked: add 'text-button-bg', 'fill-current'
+            // - Unliked: add 'text-text-main', 'fill-none'
+            if (data.liked) {
+              icon.classList.remove("text-text-main", "fill-none");
+              icon.classList.add("text-button-bg", "fill-current");
+            } else {
+              icon.classList.remove("text-button-bg", "fill-current");
+              icon.classList.add("text-text-main", "fill-none");
+            }
+
+            // Logic 2. Count Text Style (Based on 'likes.count')
+            // - Count > 0: bold, colored (text-button-bg)
+            // - Count == 0: normal, gray border color (text-box-border)
+
+            // Update the count number first
+            countSpan.textContent = data.like_count;
+
+            if (data.like_count > 0) {
+              countSpan.classList.remove("font-normal", "text-box-border");
+              countSpan.classList.add("font-semibold", "text-button-bg");
+            } else {
+              countSpan.classList.remove("font-semibold", "text-button-bg");
+              countSpan.classList.add("font-normal", "text-box-border");
+            }
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      });
+    });
+  }
+
+  // Helper function to retrieve the CSRF token from cookies
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
     }
-  };
-
-  // Open the delete modal and dynamically set the form action URL
-  window.openDeleteModal = function(deleteUrl) {
-    const modal = document.getElementById('delete-modal');
-    const form = document.getElementById('delete-form');
-    
-    // Set the action URL for the form to the specific comment's delete URL
-    form.action = deleteUrl;
-    
-    // Show the modal
-    modal.classList.remove('hidden');
-  };
-
-  // Close the delete modal and hide the overlay
-  window.closeDeleteModal = function() {
-    const modal = document.getElementById('delete-modal');
-    modal.classList.add('hidden');
-  };
-
+    return cookieValue;
+  }
 })();
+
+// [GLOBAL Functions] Expose functions to the global window object for inline HTML event handlers
+
+// Toggle visibility between view mode and edit form for a specific comment
+window.toggleCommentEdit = function (commentId) {
+  const viewMode = document.getElementById(`comment-view-${commentId}`);
+  const editMode = document.getElementById(`comment-edit-${commentId}`);
+
+  if (viewMode && editMode) {
+    viewMode.classList.toggle("hidden");
+    editMode.classList.toggle("hidden");
+  }
+};
+
+// Open the delete confirmation modal and set the form action URL dynamically
+window.openDeleteModal = function (deleteUrl) {
+  const modal = document.getElementById("delete-modal");
+  const form = document.getElementById("delete-form");
+
+  // Set the action URL so the form submits to the correct endpoint
+  if (form) form.action = deleteUrl;
+
+  // Display the modal
+  if (modal) modal.classList.remove("hidden");
+};
+
+// Close the delete confirmation modal
+window.closeDeleteModal = function () {
+  const modal = document.getElementById("delete-modal");
+  if (modal) modal.classList.add("hidden");
+};
