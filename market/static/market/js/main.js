@@ -28,10 +28,8 @@
       { input: "id_profile_pic", output: "profile-file-name" },
     ];
 
-    // For each file input → output span pair
+    // For each file input -> output span pair
     files.forEach(({ input, output }) => {
-
-      // Get the input element and the span where the file name will be shown
       const inputEl = document.getElementById(input);
       const outputEl = document.getElementById(output);
 
@@ -71,16 +69,9 @@
     if (!radios.length) return;
 
     dropdownRoots.forEach((root) => {
-      // Trigger button that opens/closes the dropdown
       const trigger = root.querySelector("[data-condition-trigger]");
-
-      // Span displaying the currently selected condition label
       const labelSpan = root.querySelector("[data-condition-label]");
-
-      // Dropdown menu container
       const menu = root.querySelector("[data-condition-menu]");
-
-      // Individual options inside the dropdown menu
       const options = root.querySelectorAll("[data-condition-option]");
 
       // Abort if essential elements are missing
@@ -144,7 +135,7 @@
 
     // Actual form input that is submitted
     const realSold = document.querySelector('input[data-sold-real="true"]');
-    
+
     // Separate input used in mobile UI
     const mobileSold = document.querySelector('input[data-sold-mobile="true"]');
 
@@ -175,9 +166,7 @@
 
     likeButtons.forEach((btn) => {
       btn.addEventListener("click", async (e) => {
-
-        // Prevent default button behavior
-        e.preventDefault();
+        e.preventDefault(); // Prevent default button behavior
 
         const url = btn.dataset.url;
         const icon = btn.querySelector(".like-icon");
@@ -188,45 +177,40 @@
           const response = await fetch(url, {
             method: "POST",
             headers: {
-              // Include CSRF token for security
-              "X-CSRFToken": getCookie("csrftoken"),
+              "X-CSRFToken": getCookie("csrftoken"), // Include CSRF token for security
               "Content-Type": "application/json",
             },
           });
 
           // Handle unauthorized access (e.g., user not logged in)
           if (response.status === 403) {
-            window.location.href = "/login/";
+            window.location.href = "/accounts/login/";
             return;
           }
 
           if (response.ok) {
             const data = await response.json();
 
-            // Logic 1. Heart Icon Style (Based on 'user_liked' status)
-            // - Liked: add 'text-button-bg', 'fill-current'
-            // - Unliked: add 'text-text-main', 'fill-none'
+            // Logic 1. Heart Icon Style
+            // Toggles the 'fill' class to show filled or empty heart state.
             if (data.liked) {
-              icon.classList.remove("text-text-main", "fill-none");
-              icon.classList.add("text-button-bg", "fill-current");
+              icon.classList.remove("fill-none");
+              icon.classList.add("fill-current");
             } else {
-              icon.classList.remove("text-button-bg", "fill-current");
-              icon.classList.add("text-text-main", "fill-none");
+              icon.classList.remove("fill-current");
+              icon.classList.add("fill-none");
             }
 
-            // Logic 2. Count Text Style (Based on 'likes.count')
-            // - Count > 0: bold, colored (text-button-bg)
-            // - Count == 0: normal, gray border color (text-box-border)
-
-            // Update the count number first
+            // Logic 2. Count Text Style
+            // Updates the count number and toggles text color/weight based on count value.
             countSpan.textContent = data.like_count;
 
             if (data.like_count > 0) {
-              countSpan.classList.remove("font-normal", "text-box-border");
-              countSpan.classList.add("font-semibold", "text-button-bg");
+              countSpan.classList.remove("text-box-border");
+              countSpan.classList.add("text-button-bg");
             } else {
-              countSpan.classList.remove("font-semibold", "text-button-bg");
-              countSpan.classList.add("font-normal", "text-box-border");
+              countSpan.classList.remove("text-button-bg");
+              countSpan.classList.add("text-box-border");
             }
           }
         } catch (error) {
@@ -234,6 +218,112 @@
         }
       });
     });
+  }
+
+  // Tab switching logic for Profile page
+  // - Toggles visibility of content sections (Listings/Likes/Comments)
+  // - Updates tab button styles (border, text color, icon color)
+  function switchTab(tabName) {
+    // 1. Hide all content sections
+    document
+      .querySelectorAll(".tab-content")
+      .forEach((el) => el.classList.add("hidden"));
+
+    // 2. Show the selected content
+    const targetContent = document.getElementById(`content-${tabName}`);
+    if (targetContent) targetContent.classList.remove("hidden");
+
+    // 3. Reset all tab buttons to inactive style
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      // Remove active classes
+      btn.classList.remove("border-button-bg", "text-text-main");
+
+      // Add inactive classes
+      btn.classList.add(
+        "border-transparent",
+        "text-site-footer-text",
+        "hover:text-button-bg"
+      );
+
+      // Reset SVG colors to inactive (Gray with Hover Purple)
+      const paths = btn.querySelectorAll(".js-icon-fill");
+      const strokes = btn.querySelectorAll(".js-icon-stroke");
+
+      paths.forEach((p) => {
+        p.classList.remove("fill-button-bg");
+        p.classList.add("fill-site-footer-text", "group-hover:fill-button-bg");
+      });
+
+      strokes.forEach((s) => {
+        s.classList.remove("stroke-button-bg");
+        s.classList.add(
+          "stroke-site-footer-text",
+          "group-hover:stroke-button-bg"
+        );
+      });
+    });
+
+    // 4. Set active style for clicked button
+    const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+    if (activeBtn) {
+      // Active: Remove inactive & hover classes (Disable hover effect)
+      activeBtn.classList.remove(
+        "border-transparent",
+        "text-site-footer-text",
+        "hover:text-button-bg"
+      );
+      // Add active classes
+      activeBtn.classList.add("border-button-bg", "text-text-main");
+
+      // Set SVG colors to active (Purple) & Remove group-hover classes
+      const activePaths = activeBtn.querySelectorAll(".js-icon-fill");
+      const activeStrokes = activeBtn.querySelectorAll(".js-icon-stroke");
+
+      activePaths.forEach((p) => {
+        p.classList.remove(
+          "fill-site-footer-text",
+          "group-hover:fill-button-bg"
+        );
+        p.classList.add("fill-button-bg");
+      });
+
+      activeStrokes.forEach((s) => {
+        s.classList.remove(
+          "stroke-site-footer-text",
+          "group-hover:stroke-button-bg"
+        );
+        s.classList.add("stroke-button-bg");
+      });
+    }
+  }
+
+  // Toggle visibility between view mode and edit form for a comment
+  function toggleCommentEdit(commentId) {
+    const viewMode = document.getElementById(`comment-view-${commentId}`);
+    const editMode = document.getElementById(`comment-edit-${commentId}`);
+
+    if (viewMode && editMode) {
+      viewMode.classList.toggle("hidden");
+      editMode.classList.toggle("hidden");
+    }
+  }
+
+  // Open the delete confirmation modal and set the form action URL dynamically
+  function openDeleteModal(deleteUrl) {
+    const modal = document.getElementById("delete-modal");
+    const form = document.getElementById("delete-form");
+
+    // Set the action URL so the form submits to the correct endpoint
+    if (form) form.action = deleteUrl;
+
+    // Display the modal
+    if (modal) modal.classList.remove("hidden");
+  }
+
+  // Close the delete confirmation modal
+  function closeDeleteModal() {
+    const modal = document.getElementById("delete-modal");
+    if (modal) modal.classList.add("hidden");
   }
 
   // Helper function to retrieve the CSRF token from cookies
@@ -252,35 +342,12 @@
     }
     return cookieValue;
   }
+
+  // [GLOBAL EXPOSURE]
+  // Explicitly expose functions to the global 'window' object
+  // so they can be called from HTML event handlers (onclick="...")
+  window.switchTab = switchTab;
+  window.toggleCommentEdit = toggleCommentEdit;
+  window.openDeleteModal = openDeleteModal;
+  window.closeDeleteModal = closeDeleteModal;
 })();
-
-// [GLOBAL Functions] Expose functions to the global window object for inline HTML event handlers
-
-// Toggle visibility between view mode and edit form for a specific comment
-window.toggleCommentEdit = function (commentId) {
-  const viewMode = document.getElementById(`comment-view-${commentId}`);
-  const editMode = document.getElementById(`comment-edit-${commentId}`);
-
-  if (viewMode && editMode) {
-    viewMode.classList.toggle("hidden");
-    editMode.classList.toggle("hidden");
-  }
-};
-
-// Open the delete confirmation modal and set the form action URL dynamically
-window.openDeleteModal = function (deleteUrl) {
-  const modal = document.getElementById("delete-modal");
-  const form = document.getElementById("delete-form");
-
-  // Set the action URL so the form submits to the correct endpoint
-  if (form) form.action = deleteUrl;
-
-  // Display the modal
-  if (modal) modal.classList.remove("hidden");
-};
-
-// Close the delete confirmation modal
-window.closeDeleteModal = function () {
-  const modal = document.getElementById("delete-modal");
-  if (modal) modal.classList.add("hidden");
-};

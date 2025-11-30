@@ -4,25 +4,21 @@
 {% load humanize %}
 {% load market_extras %}
 
-{% comment %} Page title: show profile nickname followed by site name {% endcomment %}
 {% block title %}{{ profile_user.nickname }} | Podo-Market{% endblock title %}
 
-{% comment %} Main content {% endcomment %}
 {% block content %}
 
-  {% comment %}
-    Profile header card: avatar, nickname, intro, rating and location.
-    Uses a column layout on mobile and a row layout on desktop.
+  {% comment %} 
+    =================================================================
+    1. Profile Header Card (User Info)
+    =================================================================
   {% endcomment %}
   <div class="w-full px-2 md:px-0">
     <div class="podo-card flex flex-col md:flex-row items-center md:justify-around gap-4 md:gap-0 
           w-full max-w-[1060px] mx-auto md:px-5 py-[25px]
-        {% if user == profile_user %} mt-15 {% else %} my-15 {% endif %}"> 
-  
-      {% comment %}
-        Seller rating block (mobile only):
-        Stars are shown above the main row on small screens for better stacking.
-      {% endcomment %}
+          {% if user == profile_user %} mt-15 {% else %} my-15 {% endif %}"> 
+      
+      {% comment %} Mobile Rating {% endcomment %}
       <div class="md:hidden">
         <p class="flex items-center">
           {% for _ in profile_user.seller_rating|filled_stars %}
@@ -34,29 +30,22 @@
         </p>
       </div>
   
-      {% comment %} Left side: profile picture and nickname {% endcomment %}
+      {% comment %} Avatar & Nickname {% endcomment %}
       <div class="flex items-center gap-2">
         {% if profile_user.profile_pic %}
-          <img src="{{ profile_user.profile_pic.url }}" alt="Profile picture"
-            class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
+          <img src="{{ profile_user.profile_pic.url }}" alt="Profile" 
+              class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
         {% else %}
-          <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="Default profile picture"
-            class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
+          <img src="{% static 'market/assets/default_profile_pic.jpg' %}" alt="Default" 
+              class="w-[79px] h-[79px] mr-[23px] rounded-full object-cover shrink-0">
         {% endif %}
-        <div class="text-[20px] font-bold">
-          {{ profile_user.nickname }}
-        </div>
+        <div class="text-[20px] font-bold">{{ profile_user.nickname }}</div>
       </div>
   
-      {% comment %}
-        Center: intro text if provided, fallback message otherwise.
-        Text is centered on mobile and left-aligned on desktop with a max width for readability.
-      {% endcomment %}
+      {% comment %} Intro Text {% endcomment %}
       <div class="text-center md:text-left md:max-w-[360px]">
         {% if profile_user.intro %}
-          <p class="text-gray-500 font-semibold">
-            {{ profile_user.intro }}
-          </p>
+          <p class="text-gray-500 font-semibold">{{ profile_user.intro }}</p>
         {% else %}
           <p class="text-gray-500 font-semibold">
             No introduction.
@@ -64,10 +53,7 @@
         {% endif %}
       </div>
       
-      {% comment %}
-        Seller rating block (desktop only):
-        Same stars as the mobile version, but positioned inline in the header row.
-      {% endcomment %}
+      {% comment %} Desktop Rating {% endcomment %}
       <div class="hidden md:block">
         <p class="flex items-center">
           {% for _ in profile_user.seller_rating|filled_stars %}
@@ -79,7 +65,7 @@
         </p>
       </div>
   
-      {% comment %} Right side: location split into city and state via template filters {% endcomment %}
+      {% comment %} Location {% endcomment %}
       <ul class="podo-links justify-center md:justify-start">
         <li>{{ profile_user.city|get_city }}</li>
         <li class="divider"></li>
@@ -88,13 +74,9 @@
     </div>
   </div>
 
-  {% comment %}
-  Action buttons for the profile owner:
-  - "Edit Profile" is shown to the profile owner
-  - "Change Password" is shown only if the user has a usable local password (non-social login)
-  {% endcomment %}
+  {% comment %} Edit/Change Password Buttons (Owner Only) {% endcomment %}
   {% if user == profile_user %}
-  <div class="flex justify-center md:justify-end w-full max-w-[1060px] mx-auto mt-5 mb-15 px-4 md:px-5">
+  <div class="flex justify-center md:justify-end w-full max-w-[1060px] mx-auto mt-5 mb-10 px-4 md:px-5">
     <div class="space-x-3">
       <a class="podo-button small secondary" href="{% url 'profile-update' %}">
         Edit Profile
@@ -108,93 +90,214 @@
   </div>
   {% endif %}
 
-  {% comment %} Latest listings section: heading and optional "View All Listings" link {% endcomment %}
-  <div class="w-full max-w-[1060px] mx-auto mb-[100px] md:mb-[200px]">
-    <div class="flex justify-between items-center mb-10 md:mb-15 px-5">
-      <h2 class="text-[24px] font-semibold">
-        Latest Listings
-      </h2>
 
-      {% comment %}
-        "View All Listings" link:
-        - On mobile: compact label ("View All")
-        - On desktop: full label ("View All Listings")
+  {% comment %} 
+    =================================================================
+    2. Content Tabs (Listings / Likes / Comments)
+    - Centered layout with Icons + Text labels.
+    =================================================================
+  {% endcomment %}
+  <div class="w-full max-w-[1060px] mx-auto mb-[100px] md:mb-[200px]">
+    
+    {% comment %} Tab Navigation Bar (Centered) {% endcomment %}
+    <div class="flex items-center border-b border-[#e3e1dc] mb-6 md:mb-10 px-5 gap-8 md:gap-16">
+    
+      {% comment %} 
+        Tab 1: Listings (Default Active)
+        - Active Style: border-button-bg text-text-main (No hover)
+        - Icons: fill-button-bg / stroke-button-bg (No group-hover)
       {% endcomment %}
-      {% if user_postitems %}
-      <a href="{% url 'user-item-list' profile_user.id %}"
-        class="flex items-center text-[20px] font-semibold hover:text-link transition-colors">
-        <span>View All </span>
-        <span class="hidden md:block md:ml-2">Listings</span>
-        <img class="size-5 ml-1"
-          src="{% static 'market/icons/ic-triangle.svg' %}" alt="triangle icon">
-      </a>
+      <button type="button" onclick="switchTab('listings')" id="tab-btn-listings"
+        class="tab-btn pb-2 px-1 border-b-[3px] border-button-bg text-text-main transition-colors group 
+          {% if user == profile_user %} cursor-pointer {% endif %}"
+        title="Latest Listings">
+        <div class="flex items-center gap-2">
+          <svg width="24" height="24" viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" class="fill-current">
+              <g transform="translate(2.16 2.16)" fill="none" fill-rule="evenodd">
+                  {% comment %} ACTIVE: No group-hover class {% endcomment %}
+                  <g transform="translate(2.16 1.08)" class="fill-button-bg transition-colors js-icon-fill">
+                      <rect width="9.72" height="8.64" rx="1"/>
+                      <rect y="10.8" width="9.72" height="8.64" rx="1"/>
+                      <rect x="11.88" width="9.72" height="8.64" rx="1"/>
+                      <rect x="11.88" y="10.8" width="9.72" height="8.64" rx="1"/>
+                  <g>
+                  <g class="stroke-button-bg transition-colors js-icon-stroke">
+                      <rect width="9.72" height="8.64" rx="1"/>
+                      <rect y="10.8" width="9.72" height="8.64" rx="1"/>
+                      <rect x="11.88" width="9.72" height="8.64" rx="1"/>
+                      <rect x="11.88" y="10.8" width="9.72" height="8.64" rx="1"/>
+                  </g>
+              </g>
+          </svg>
+          <span class="text-[18px] font-semibold">Listings</span>
+        </div>
+      </button>
+
+      {% comment %} 
+        Tab 2: Likes 
+        - Inactive Style: text-site-footer-text hover:text-button-bg
+        - Icons: fill/stroke-site-footer-text + group-hover:fill/stroke-button-bg
+      {% endcomment %}
+      {% if user == profile_user %}
+        <button type="button" onclick="switchTab('likes')" id="tab-btn-likes"
+          class="tab-btn pb-2 px-1 border-b-[3px] border-transparent text-site-footer-text hover:text-button-bg transition-colors group cursor-pointer"
+          title="Liked Items">
+          <div class="flex items-center gap-2">
+            <svg width="24" height="24" viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" class="fill-current">
+                <g fill="none" fill-rule="evenodd">
+                    <path d="M10.936 3.645c-3.377 0-4.898 2.117-5.565 3.31-3.661 7.799 6.923 14.965 9.764 16.746.411.259.929.259 1.34 0 2.842-1.78 13.425-8.947 9.764-16.745-.667-1.194-2.189-3.311-5.565-3.311-3.775.144-4.81 2.684-4.87 2.846-.058-.162-1.093-2.702-4.868-2.846" 
+                          class="fill-site-footer-text group-hover:fill-button-bg transition-colors js-icon-fill">
+                </g>
+            </svg>
+            <span class="text-[18px] font-semibold">Likes</span>
+          </div>
+        </button>
+
+        {% comment %} Tab 3: Comments {% endcomment %}
+        <button type="button" onclick="switchTab('comments')" id="tab-btn-comments"
+          class="tab-btn pb-2 px-1 border-b-[3px] border-transparent text-site-footer-text hover:text-button-bg transition-colors group cursor-pointer"
+          title="Commented Items">
+          <div class="flex items-center gap-2">
+            <svg width="24" height="24" viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" class="fill-current">
+                <path d="M13.5 22.5c-1.667 0-3.23-.382-4.585-1.06l-4.165 2.06 1.125-3.938C4.48 18.07 3.375 15.89 3.375 13.5c0-5.523 4.533-10 10.125-10S23.625 7.977 23.625 13.5s-4.533 10-10.125 10z"
+                      class="fill-site-footer-text group-hover:fill-button-bg transition-colors js-icon-fill"
+                      fill-rule="evenodd">
+            </svg>
+            <span class="text-[18px] font-semibold">Comments</span>
+          </div>
+        </button>
       {% endif %}
     </div>
 
-    {% comment %}
-      Grid of item cards for the user's latest PostItem objects.
-      - Mobile: single-column list
-      - Desktop: 4-column grid
+
+    {% comment %} 
+      =================================================================
+      3. Content Sections
+      =================================================================
     {% endcomment %}
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 md:gap-x-5 gap-y-6 md:gap-y-[30px]">
 
-      {% for postitem in user_postitems %}
-      <div class="podo-card flex flex-col p-3.5 bg-gray-100">
-        
-        {% comment %} Thumbnail image for the item {% endcomment %}
-        <img src="{{ postitem.item_image1.url }}" alt="thumbnail"
-          class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]">
-
-        {% comment %} Content area: title, price, meta info, and details button {% endcomment %}
-        <div class="flex flex-col grow mx-[11px]">
-
-          {% comment %} Item title {% endcomment %}
-          <h2 class="font-normal text-[18px] leading-[22px] h-11 overflow-hidden text-ellipsis line-clamp-2">
-            {{ postitem.item_title }}
-          </h2>
-
-          {% comment %}
-            Price section with sold styling and a SOLD badge when the item is marked as sold.
-            Price text is struck through and tinted when is_sold is True.
-          {% endcomment %}
-          <div class="flex items-center h-[30px] my-[19px] gap-3">
-            <span class="text-[20px] font-bold truncate {% if postitem.is_sold %} line-through text-post-sold {% endif %}">
-              &euro;&nbsp;{{ postitem.item_price|intcomma }}
-            </span>
-
-            {% if postitem.is_sold %}
-            <span class="rounded-full px-3 py-1 bg-post-sold text-white font-semibold">
-              SOLD
-            </span>
-            {% endif %}
+    {% comment %} CONTENT 1: My Listings (Default Visible) {% endcomment %}
+    <div id="content-listings" class="tab-content">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 md:gap-x-5 gap-y-6 md:gap-y-[30px]">
+        {% for postitem in user_postitems %}
+          <div class="podo-card flex flex-col p-3.5 bg-gray-100">
+            <img src="{{ postitem.item_image1.url }}" alt="thumbnail" class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]">
+            <div class="flex flex-col grow mx-[11px]">
+              <h2 class="font-normal text-[18px] leading-[22px] h-11 overflow-hidden text-ellipsis line-clamp-2">{{ postitem.item_title }}</h2>
+              <div class="flex items-center h-[30px] my-[19px] gap-3">
+                <span class="text-[20px] font-bold truncate 
+                      {% if postitem.is_sold %} line-through text-post-sold {% endif %}">
+                  &euro;&nbsp;{{ postitem.item_price|intcomma }}
+                </span>
+                {% if postitem.is_sold %}
+                  <span class="rounded-full px-3 py-1 bg-post-sold text-white font-semibold">
+                    SOLD
+                  </span>
+                {% endif %}
+              </div>
+              <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
+                {{ postitem.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ postitem.dt_created|date:"d.m.Y" }}
+              </div>
+              <a href="{% url 'item-detail' postitem.id %}" 
+                  class="podo-button primary block mt-[22px] mb-4 
+                  {% if postitem.is_sold %} bg-post-sold no-after{% endif %}">
+                View Details
+              </a>
+            </div>
           </div>
-
-          {% comment %} Meta information: seller city and creation date {% endcomment %}
-          <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
-            {{ postitem.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ postitem.dt_created|date:"d.m.Y" }}
-          </div>
-
-          {% comment %}
-            Button to view item details.
-            When the item is sold, the button uses sold-specific styling and disables the after effect.
-          {% endcomment %}
-          <a href="{% url 'item-detail' postitem.id %}"
-            class="podo-button primary block mt-[22px] mb-4 {% if postitem.is_sold %} bg-post-sold no-after{% endif %}">
-            View Details
-          </a>
-        </div>
+        {% empty %}
+          <p class="col-span-1 md:col-span-4 text-center text-[18px] font-medium my-[60px] text-site-footer-text">
+            There are no items for sale.
+          </p>
+        {% endfor %}
       </div>
+      
+      {% comment %} 'View All' Link for Listings {% endcomment %}
+      {% if user_postitems %}
+      <div class="mt-8 flex justify-end">
+        <a href="{% url 'user-item-list' profile_user.id %}" 
+          class="flex items-center text-[18px] font-semibold hover:text-link transition-colors text-[#706e6c]">
+          <span>View All Listings</span>
+          <img class="size-4 ml-1" src="{% static 'market/icons/ic-triangle.svg' %}" alt="arrow">
+        </a>
+      </div>
+      {% endif %}
+    </div>
 
-      {% empty %}
-        {% comment %}
-          Fallback message shown when this user has no listings.
-          Spans full width on mobile and all 4 columns on desktop.  
-        {% endcomment %}
-        <p class="col-span-1 md:col-span-4 text-center text-[20px] font-bold my-[120px]">
-          There are no items for sale.
-        </p>
-      {% endfor %}
+    {% comment %} CONTENT 2: Liked Items (Hidden by default) {% endcomment %}
+    <div id="content-likes" class="tab-content hidden">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 md:gap-x-5 gap-y-6 md:gap-y-[30px]">
+        {% for postitem in liked_postitems %}
+          <div class="podo-card flex flex-col p-3.5 bg-gray-100">
+            <img src="{{ postitem.item_image1.url }}" alt="thumbnail" class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]">
+            <div class="flex flex-col grow mx-[11px]">
+              <h2 class="font-normal text-[18px] leading-[22px] h-11 overflow-hidden text-ellipsis line-clamp-2">
+                {{ postitem.item_title }}
+              </h2>
+              <div class="flex items-center h-[30px] my-[19px] gap-3">
+                <span class="text-[20px] font-bold truncate {% if postitem.is_sold %} line-through text-post-sold {% endif %}">
+                  &euro;&nbsp;{{ postitem.item_price|intcomma }}
+                </span>
+                {% if postitem.is_sold %}
+                  <span class="rounded-full px-3 py-1 bg-post-sold text-white font-semibold">
+                    SOLD
+                  </span>
+                {% endif %}
+              </div>
+              <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
+                {{ postitem.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ postitem.dt_created|date:"d.m.Y" }}
+              </div>
+              <a href="{% url 'item-detail' postitem.id %}" 
+                class="podo-button primary block mt-[22px] mb-4 
+                {% if postitem.is_sold %} bg-post-sold no-after{% endif %}">
+                View Details
+              </a>
+            </div>
+          </div>
+        {% empty %}
+          <p class="col-span-1 md:col-span-4 text-center text-[18px] font-medium my-[60px] text-site-footer-text">
+            No liked items yet.
+          </p>
+        {% endfor %}
+      </div>
+    </div>
 
+    {% comment %} CONTENT 3: Commented Items (Hidden by default) {% endcomment %}
+    <div id="content-comments" class="tab-content hidden">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 md:gap-x-5 gap-y-6 md:gap-y-[30px]">
+        {% for postitem in commented_postitems %}
+          <div class="podo-card flex flex-col p-3.5 bg-gray-100">
+            <img src="{{ postitem.item_image1.url }}" alt="thumbnail" class="w-full h-[188px] rounded-[11px] object-cover mb-[19px]">
+            <div class="flex flex-col grow mx-[11px]">
+              <h2 class="font-normal text-[18px] leading-[22px] h-11 overflow-hidden text-ellipsis line-clamp-2">
+                {{ postitem.item_title }}
+              </h2>
+              <div class="flex items-center h-[30px] my-[19px] gap-3">
+                <span class="text-[20px] font-bold truncate 
+                    {% if postitem.is_sold %} line-through text-post-sold {% endif %}">
+                  &euro;&nbsp;{{ postitem.item_price|intcomma }}
+                </span>
+                {% if postitem.is_sold %}
+                  <span class="rounded-full px-3 py-1 bg-post-sold text-white font-semibold">
+                    SOLD
+                  </span>
+                {% endif %}
+              </div>
+              <div class="text-[15px] text-post-list-meta overflow-hidden whitespace-nowrap text-ellipsis">
+                {{ postitem.item_author.city|get_city }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ postitem.dt_created|date:"d.m.Y" }}
+              </div>
+              <a href="{% url 'item-detail' postitem.id %}" 
+                class="podo-button primary block mt-[22px] mb-4 {% if postitem.is_sold %} bg-post-sold no-after{% endif %}">
+                View Details
+              </a>
+            </div>
+          </div>
+        {% empty %}
+          <p class="col-span-1 md:col-span-4 text-center text-[18px] font-medium my-[60px] text-site-footer-text">
+            No commented items yet.
+          </p>
+        {% endfor %}
+      </div>
     </div>
   </div>
 

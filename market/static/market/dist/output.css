@@ -355,8 +355,8 @@
   .my-\[38px\] {
     margin-block: 38px;
   }
-  .my-\[120px\] {
-    margin-block: 120px;
+  .my-\[60px\] {
+    margin-block: 60px;
   }
   .mt-1 {
     margin-top: calc(var(--spacing) * 1);
@@ -457,9 +457,6 @@
   .mb-12 {
     margin-bottom: calc(var(--spacing) * 12);
   }
-  .mb-15 {
-    margin-bottom: calc(var(--spacing) * 15);
-  }
   .mb-16 {
     margin-bottom: calc(var(--spacing) * 16);
   }
@@ -528,6 +525,10 @@
   }
   .table {
     display: table;
+  }
+  .size-4 {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
   }
   .size-5 {
     width: calc(var(--spacing) * 5);
@@ -708,12 +709,6 @@
   .min-w-2\.5 {
     min-width: calc(var(--spacing) * 2.5);
   }
-  .min-w-\[10px\] {
-    min-width: 10px;
-  }
-  .min-w-\[11px\] {
-    min-width: 11px;
-  }
   .flex-1 {
     flex: 1;
   }
@@ -756,11 +751,20 @@
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
   }
+  .cursor-alias {
+    cursor: alias;
+  }
+  .cursor-auto {
+    cursor: auto;
+  }
   .cursor-not-allowed {
     cursor: not-allowed;
   }
   .cursor-pointer {
     cursor: pointer;
+  }
+  .cursor-zoom-in {
+    cursor: zoom-in;
   }
   .resize {
     resize: both;
@@ -807,6 +811,9 @@
   .justify-end {
     justify-content: flex-end;
   }
+  .justify-start {
+    justify-content: flex-start;
+  }
   .gap-2 {
     gap: calc(var(--spacing) * 2);
   }
@@ -821,6 +828,9 @@
   }
   .gap-6 {
     gap: calc(var(--spacing) * 6);
+  }
+  .gap-8 {
+    gap: calc(var(--spacing) * 8);
   }
   .gap-\[15px\] {
     gap: 15px;
@@ -952,18 +962,31 @@
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
   }
+  .border-b-\[3px\] {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 3px;
+  }
   .border-none {
     --tw-border-style: none;
     border-style: none;
   }
+  .border-\[\#7644c3\] {
+    border-color: #7644c3;
+  }
   .border-\[\#181717\] {
     border-color: #181717;
+  }
+  .border-\[\#e3e1dc\] {
+    border-color: #e3e1dc;
   }
   .border-border-light {
     border-color: var(--color-border-light);
   }
   .border-box-border {
     border-color: var(--color-box-border);
+  }
+  .border-button-bg {
+    border-color: var(--color-button-bg);
   }
   .border-button-darkpurple-bg {
     border-color: var(--color-button-darkpurple-bg);
@@ -977,11 +1000,17 @@
   .border-input-placeholder {
     border-color: var(--color-input-placeholder);
   }
+  .border-link {
+    border-color: var(--color-link);
+  }
   .border-links-divider {
     border-color: var(--color-links-divider);
   }
   .border-post-list-meta {
     border-color: var(--color-post-list-meta);
+  }
+  .border-transparent {
+    border-color: transparent;
   }
   .border-t-site-body-border-top {
     border-top-color: var(--color-site-body-border-top);
@@ -1070,14 +1099,44 @@
   .bg-center {
     background-position: center;
   }
+  .fill-\[\#7644c3\] {
+    fill: #7644c3;
+  }
+  .fill-\[\#adaab0\] {
+    fill: #adaab0;
+  }
+  .fill-button-bg {
+    fill: var(--color-button-bg);
+  }
   .fill-current {
     fill: currentcolor;
+  }
+  .fill-link {
+    fill: var(--color-link);
   }
   .fill-none {
     fill: none;
   }
+  .fill-site-footer-text {
+    fill: var(--color-site-footer-text);
+  }
+  .stroke-\[\#7644c3\] {
+    stroke: #7644c3;
+  }
+  .stroke-\[\#adaab0\] {
+    stroke: #adaab0;
+  }
+  .stroke-button-bg {
+    stroke: var(--color-button-bg);
+  }
   .stroke-current {
     stroke: currentcolor;
+  }
+  .stroke-link {
+    stroke: var(--color-link);
+  }
+  .stroke-site-footer-text {
+    stroke: var(--color-site-footer-text);
   }
   .stroke-2 {
     stroke-width: 2;
@@ -1196,6 +1255,12 @@
   .pb-3 {
     padding-bottom: calc(var(--spacing) * 3);
   }
+  .pb-4 {
+    padding-bottom: calc(var(--spacing) * 4);
+  }
+  .pb-5 {
+    padding-bottom: calc(var(--spacing) * 5);
+  }
   .text-center {
     text-align: center;
   }
@@ -1244,9 +1309,6 @@
   }
   .text-\[22px\] {
     font-size: 22px;
-  }
-  .text-\[24px\] {
-    font-size: 24px;
   }
   .text-\[25px\] {
     font-size: 25px;
@@ -1357,8 +1419,8 @@
   .text-\[\#706e6c\] {
     color: #706e6c;
   }
-  .text-\[\#7644c3\] {
-    color: #7644c3;
+  .text-\[\#adaab0\] {
+    color: #adaab0;
   }
   .text-black {
     color: var(--color-black);
@@ -1484,6 +1546,48 @@
       }
     }
   }
+  .group-hover\:fill-\[\#7644c3\] {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        fill: #7644c3;
+      }
+    }
+  }
+  .group-hover\:fill-button-bg {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        fill: var(--color-button-bg);
+      }
+    }
+  }
+  .group-hover\:fill-link {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        fill: var(--color-link);
+      }
+    }
+  }
+  .group-hover\:stroke-\[\#7644c3\] {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        stroke: #7644c3;
+      }
+    }
+  }
+  .group-hover\:stroke-button-bg {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        stroke: var(--color-button-bg);
+      }
+    }
+  }
+  .group-hover\:stroke-link {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        stroke: var(--color-link);
+      }
+    }
+  }
   .peer-checked\:border-chip-primary-border {
     &:is(:where(.peer):checked ~ *) {
       border-color: var(--color-chip-primary-border);
@@ -1562,6 +1666,20 @@
       @media (hover: hover) {
         --tw-font-weight: var(--font-weight-bold);
         font-weight: var(--font-weight-bold);
+      }
+    }
+  }
+  .hover\:text-\[\#7644c3\] {
+    &:hover {
+      @media (hover: hover) {
+        color: #7644c3;
+      }
+    }
+  }
+  .hover\:text-button-bg {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-button-bg);
       }
     }
   }
@@ -1784,11 +1902,6 @@
       margin-bottom: calc(var(--spacing) * 10);
     }
   }
-  .md\:mb-15 {
-    @media (width >= 48rem) {
-      margin-bottom: calc(var(--spacing) * 15);
-    }
-  }
   .md\:mb-\[22px\] {
     @media (width >= 48rem) {
       margin-bottom: 22px;
@@ -1857,11 +1970,6 @@
   .md\:ml-0 {
     @media (width >= 48rem) {
       margin-left: calc(var(--spacing) * 0);
-    }
-  }
-  .md\:ml-2 {
-    @media (width >= 48rem) {
-      margin-left: calc(var(--spacing) * 2);
     }
   }
   .md\:ml-4 {
@@ -2067,6 +2175,11 @@
   .md\:gap-6 {
     @media (width >= 48rem) {
       gap: calc(var(--spacing) * 6);
+    }
+  }
+  .md\:gap-16 {
+    @media (width >= 48rem) {
+      gap: calc(var(--spacing) * 16);
     }
   }
   .md\:space-y-5 {

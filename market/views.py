@@ -306,7 +306,7 @@ class ProfileView(DetailView):
     - Uses the custom User model as the underlying model.
     - Renders the 'market/profile.html' template.
     - Exposes the User instance in the template as 'profile_user'.
-    - Additionally provides the latest 4 PostItem objects authored by this user.
+    - Additionally provides user's posts, liked items, and commented items.
     """
 
     # The model that this detail view will retrieve a single instance of
@@ -323,11 +323,11 @@ class ProfileView(DetailView):
 
     def get_context_data(self, **kwargs):
         """
-        Extend the default context with the user's recent PostItem listings.
+        Extend the default context with the user's recent activity.
 
-        - Adds 'user_postitems' containing the 4 most recently created posts
-            authored by the profile user.
-        - Relies on PostItem's default ordering (newest first).
+        - 'user_postitems': Latest 4 items posted by the user (newest first).
+        - 'liked_postitems': Latest 4 items liked by the user (ordered by like time).
+        - 'commented_postitems': Latest 4 items the user commented on (deduplicated).
         """
         # Start with the default context provided by DetailView
         context = super().get_context_data(**kwargs)
@@ -335,8 +335,35 @@ class ProfileView(DetailView):
         # Current profile owner (User instance for this page)
         profile_user = self.object
 
-        # Latest 4 items posted by this user, ordered by creation date (newest first)
+        # 1. Latest 4 items posted by this user (using PostItem default ordering)
         context["user_postitems"] = profile_user.posts.all()[:4]
+
+        # 2. Latest 4 items liked by this user
+        # Uses GenericRelation reverse lookup, ordered by when the like was created
+        context["liked_postitems"] = PostItem.objects.filter(
+            likes__author=profile_user
+        ).order_by("-likes__dt_created")[:4]
+
+        # 3. Latest 4 items commented on by this user
+        # First, fetch items connected via comments
+        commented_posts = PostItem.objects.filter(
+            comments__author=profile_user
+        ).order_by("-comments__dt_created")
+
+        # Manual deduplication to show each post only once
+        # (Avoids DB-specific issues with distinct() + order_by())
+        seen = set()
+        unique_commented_posts = []
+        for post in commented_posts:
+            if post.id not in seen:
+                unique_commented_posts.append(post)
+                seen.add(post.id)
+
+            # Stop once we collected 4 unique items
+            if len(unique_commented_posts) >= 4:
+                break
+
+        context["commented_postitems"] = unique_commented_posts
 
         return context
 
