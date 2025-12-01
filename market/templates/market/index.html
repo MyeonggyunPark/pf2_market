@@ -59,12 +59,14 @@
       </h2>
 
       {% comment %} Link to the "create new post" page {% endcomment %}
-      <a href="{% url 'item-create' %}"
-        class="inline-flex items-center self-start md:self-auto text-[20px] font-medium text-text-main hover:text-link transition-colors">
-        <img class="size-[30px] md:size-[29px] mr-1.5"
-          src="{% static 'market/icons/ic-pen.svg' %}" alt="pen icon">
-        <span>Create</span>
-      </a>
+      {% if not search_keyword %}
+        <a href="{% url 'item-create' %}"
+          class="inline-flex items-center self-start md:self-auto text-[20px] font-medium text-text-main hover:text-link transition-colors">
+          <img class="size-[30px] md:size-[29px] mr-1.5"
+            src="{% static 'market/icons/ic-pen.svg' %}" alt="pen icon">
+          <span>Create</span>
+        </a>
+      {% endif %}
     </div>
 
     {% comment %} item cards {% endcomment %}
