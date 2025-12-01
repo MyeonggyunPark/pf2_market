@@ -11,12 +11,51 @@
   {% comment %} Responsive container for the item list with adaptive padding and vertical spacing {% endcomment %}
   <div class="w-full max-w-[1060px] mx-auto px-4 md:px-5 mt-10 md:mt-[90px] mb-16 md:mb-[260px]">
 
+    {% comment %} 
+      Search Bar Section
+
+      - Located at the top for easy access.
+      - Uses GET method to send the search query ('q') to the IndexView.
+      - Includes client-side validation (via JS) to handle empty inputs.
+    {% endcomment %}
+    <form id="search-form"  method="get" action="{% url 'home' %}" class="flex justify-center items-start mb-8 md:mb-12 gap-2">
+      
+      {% comment %} Input Wrapper: Group for focus styling and positioning {% endcomment %}
+      <div class="relative w-full max-w-[400px] group">
+
+        {% comment %} Search Icon {% endcomment %}
+        <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 transform -translate-y-1/2 text-input-placeholder text-lg group-focus-within:text-button-bg"></i>
+        
+        {% comment %} Search Input {% endcomment %}
+        <div class="w-full">
+          <input id="search-input" type="text" name="q" value="{{ search_keyword|default:'' }}" placeholder="Search items" 
+                class="podo-input w-full h-[50px] pl-[50px] pr-5" novalidate>
+
+          {% comment %} Error Message {% endcomment %}
+          <div id="search-error-msg" 
+              class="hidden absolute top-full left-0 w-full text-input-error-fg text-right text-[14px] leading-[1.7] mt-1 pr-4">
+            Please enter a search keyword.
+          </div>
+        </div>
+      </div>
+
+      {% comment %} Search Button {% endcomment %}
+      <button type="submit" class="podo-button medium primary h-[50px] px-6 shrink-0">
+        Search
+      </button>
+
+    </form>
+
     {% comment %} Header section: page title and "write post" button {% endcomment %}
     <div class="flex items-end justify-between mb-6 md:mb-10">
 
       {% comment %} Page title {% endcomment %}
       <h2 class="text-[20px] md:text-[24px] font-semibold">
-        All Sale Items
+        {% if search_keyword %}
+          Search Results for "<span class="text-button-bg">{{ search_keyword }}</span>"
+        {% else %}
+          All Sale Items
+        {% endif %}
       </h2>
 
       {% comment %} Link to the "create new post" page {% endcomment %}

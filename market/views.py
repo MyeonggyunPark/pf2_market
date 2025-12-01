@@ -9,6 +9,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from braces.views import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic.edit import FormMixin
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 
 from market.models import PostItem, User, Comment, Like
 from market.forms import PostItemCreateForm, PostItemUpdateForm , ProfileForm, CommentForm
@@ -43,6 +44,10 @@ class IndexView(ListView):
     - Paginates the list, showing 8 items per page.
     - Shows only items that are not marked as sold (is_sold=False).
     - Ordering is handled implicitly by PostItem.Meta (newest first).
+
+    Search Functionality:
+    - Filters items based on the 'q' GET parameter.
+    - Searches within 'item_title' and 'item_detail' using OR logic.
     """
 
     # The model providing the queryset for this list view
@@ -62,10 +67,32 @@ class IndexView(ListView):
         Return the queryset for the index page.
 
         - Filters out items that are already sold (is_sold=True).
+        - [Updated] Applies search filter if 'q' parameter exists in URL.
+        - Search Scope: Matches keyword in 'item_title' OR 'item_detail'.
         - Default ordering (-dt_created) is applied by the model.
         """
+        queryset = PostItem.objects.filter(is_sold=False)
 
-        return PostItem.objects.filter(is_sold=False)
+        search_keyword = self.request.GET.get("q", "")
+
+        if search_keyword:
+            queryset = queryset.filter(
+                Q(item_title__icontains=search_keyword) | 
+                Q(item_detail__icontains=search_keyword) 
+            )
+        
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        """
+        Extend context to include the current search keyword.
+        
+        - Adds 'search_keyword' to context so the input field can retain the value
+            after the page reloads.
+        """
+        context = super().get_context_data(**kwargs)
+        context["search_keyword"] = self.request.GET.get("q", "")
+        return context
 
 
 class ItemDetailView(LoginRequiredMixin, FormMixin, DetailView):

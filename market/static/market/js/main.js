@@ -15,6 +15,9 @@
 
     // Initialize AJAX behavior for like buttons
     initLikeButtons();
+
+    // Initialize search form validation
+    initSearchValidation();
   });
 
   // Set up logic for displaying selected file names next to file inputs
@@ -220,6 +223,36 @@
     });
   }
 
+  // [NEW] Search form validation
+  // Prevents submission if the search input is empty and shows an error message.
+  function initSearchValidation() {
+    const searchForm = document.getElementById("search-form");
+    const searchInput = document.getElementById("search-input");
+    const errorMsg = document.getElementById("search-error-msg");
+
+    // Only run if the search form exists on the page
+    if (searchForm && searchInput) {
+      searchForm.addEventListener("submit", (e) => {
+        // Check if input is empty or just whitespace
+        if (!searchInput.value.trim()) {
+          e.preventDefault(); // Stop form submission
+
+          // Add error styles (defined in input.css as .podo-input.error)
+          searchInput.classList.add("error");
+
+          // Show the hidden error message
+          if (errorMsg) errorMsg.classList.remove("hidden");
+        }
+      });
+
+      // Remove error styles immediately when user starts typing
+      searchInput.addEventListener("input", () => {
+        searchInput.classList.remove("error");
+        if (errorMsg) errorMsg.classList.add("hidden");
+      });
+    }
+  }
+
   // Tab switching logic for Profile page
   // - Toggles visibility of content sections (Listings/Likes/Comments)
   // - Updates tab button styles (border, text color, icon color)
@@ -234,6 +267,7 @@
     if (targetContent) targetContent.classList.remove("hidden");
 
     // 3. Reset all tab buttons to inactive style
+    // Inactive: Enable hover effects
     document.querySelectorAll(".tab-btn").forEach((btn) => {
       // Remove active classes
       btn.classList.remove("border-button-bg", "text-text-main");
@@ -279,6 +313,7 @@
       const activePaths = activeBtn.querySelectorAll(".js-icon-fill");
       const activeStrokes = activeBtn.querySelectorAll(".js-icon-stroke");
 
+      // Removing group-hover classes disables the hover effect on active tab icon
       activePaths.forEach((p) => {
         p.classList.remove(
           "fill-site-footer-text",
